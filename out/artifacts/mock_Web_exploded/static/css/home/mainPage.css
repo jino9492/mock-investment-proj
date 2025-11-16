@@ -1,0 +1,547 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #ffffff;
+  color: #111;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+
+
+/* 전체 레이아웃 */
+.main__page-wrap {
+  padding-bottom: 40px;
+}
+
+.main__inner {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+}
+
+/* 오른쪽 사이드바 */
+.main__right-rail {
+  position: fixed;
+  right: 0;
+  width: 75px;
+  height: 1080px;
+  text-align: center;
+  font-size: 14px;
+  top: 0;
+
+}
+
+.main__rail-item {
+
+  margin-top: 38px;
+}
+
+.main__right-rail-toggle{
+  margin-top: 28px;
+  margin-bottom: 50px;
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+}
+.main__rail-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 4px;
+  background: #D9D9D9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* 메인 콘텐츠 영역 */
+.main__content {
+  width: 65vw;
+  margin: 0 auto;
+  padding-top: 24px;
+}
+
+.main__sub-title {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.main__dot-green {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2cc452;
+}
+
+.main__page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.main__top-section {
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr;
+  gap: 32px;
+  margin: 72px 0;
+}
+
+.main__news_card {
+  padding: 20px 24px;
+}
+
+.main__news_card-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* 블러 처리 */
+body.logged-out .main__card-account {
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+body.logged-out .login__modal {
+  opacity: 1;
+  visibility: visible;
+}
+
+body.logged-in .main__card-account {
+  filter: none;
+  pointer-events: auto;
+}
+
+body.logged-in .login__modal {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
+.main__card-login-wrap {
+  user-select: none;
+  position: relative;
+}
+
+/* 로그인  영역 */
+.login__modal {
+  position: absolute;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /*그라데이션 색 수정 필요*/
+   background: radial-gradient(
+    ellipse at center,
+    rgba(140, 180, 255, 0.40) 0%,
+    rgba(180, 205, 255, 0.30) 35%,
+    rgba(255, 255, 255, 0.0) 70%
+  );
+  padding: 24px 28px;
+
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  opacity: 0;
+}
+
+.login__modal-content-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+}
+
+.login__modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-top: 20px;
+}
+
+
+.login__modal-login {
+  display: block;
+  width: 160px;
+  margin: 0 auto;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 0;
+  background: #689DFF;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login__modal-signup {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  margin: 8px 0;
+  color: #666;
+  cursor: pointer;
+}
+
+
+/* 계좌 영역 */
+.main__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.main__summary-box {
+  background: #F5F5F5;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.main__summary-label {
+  color: #17171B;
+  margin-bottom: 4px;
+}
+
+.main__summary-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.main__summary-value span {
+  font-size: 14px;
+  color: #a65af7;
+}
+
+.main__divider {
+  border-top: 1px solid #ececec;
+  margin: 10px 0 12px;
+}
+
+.main__table-simple {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.main__table-simple th,
+.main__table-simple td {
+  padding: 4px 0;
+  vertical-align: middle;
+}
+
+.main__table-simple td:nth-child(1) {
+  width: 24px;
+}
+
+.main__table-simple td:nth-child(3),
+.main__table-simple td:nth-child(4) {
+  text-align: center;
+}
+.main__table-simple td:nth-child(2),
+.main__table-simple th:nth-child(2) {
+  text-align: center;
+}
+
+.main__text-purple {
+  color: #a65af7;
+}
+
+/* 인덱스 카드 */
+.main__index-section {
+  margin-bottom: 24px;
+}
+
+.main__index-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.main__index-thumb {
+  width: 120px;
+  height: 50px;
+  background: #D9D9D9;
+  flex-shrink: 0;
+}
+
+.main__index-card {
+  flex: 1;
+  max-width: 120px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.main__index-name {
+  text-align: start;
+  margin-bottom: 6px;
+}
+
+.main__index-value {
+  text-align: start;
+  font-size: 14px;
+  color: #555;
+}
+
+.main__index-arrow {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: 0;
+  cursor: pointer;
+  background: #e8e8ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* 뉴스 */
+
+.main__news-columns {
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+
+.main__news-block {
+  overflow: hidden;
+  font-size: 11px;
+  padding: 0 8px;
+  margin-top: 10px
+}
+
+
+.main__news-block-header {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.main__news-block-title {
+  font-size: 16px;
+}
+
+.main__news-plus {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+
+.main__news-main {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.main__news-thumb {
+  width: 100px;
+  height: 56px;
+  border-radius: 4px;
+  background: #D9D9D9;
+  flex-shrink: 0;
+}
+
+
+.main__news-main-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.main__news-headline {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  font-size: 14px;
+  line-height: 1.4;
+  max-height: 3.2em;
+  text-overflow: ellipsis;
+}
+
+.main__news-list {
+  list-style: none;
+  margin-top: 4px;
+}
+
+.main__news-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+section{
+  user-select: none;
+}
+
+/* 실시간 차트 */
+.main__section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #E8E8E8;
+  padding-bottom: 12px;
+}
+
+.main__bottom-section {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr; 
+  gap: 32px;
+}
+
+.main__table-header-row {
+  color: #797979;
+  padding: 10px 16px;
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: 30% 30% 20% 20%;
+  margin-bottom: 4px;
+}
+
+.main__table-header-row span:nth-child(3),
+.main__table-header-row span:nth-child(4),
+.main__list-row span:nth-child(3),
+.main__list-row span:nth-child(4) {
+  text-align: center;
+}
+
+.main__list-row {
+  height: 4em;
+  padding: 10px 16px;
+  font-size: 16px;
+  display: grid;
+  grid-template-columns: 5% 55% 20% 20%;
+  border-radius: 10px;
+}
+
+.main__company-profile{
+  display: inline-block;
+  border-radius: 100%;
+  width: 35px;
+  height: 35px;
+  background: #D9D9D9;
+  margin-right: 12px;
+}
+
+.main__list-row span {
+  display: flex;
+  align-items: center;
+}
+
+.main__list-row span:nth-child(3),
+.main__list-row span:nth-child(4){
+  justify-content: center;
+}
+
+.main__list-row:hover {
+  background-color: #F8F8F8;  
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+
+
+.main__chart-box {
+  height: 180px;
+  background: #D9D9D9;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+
+.main__chart-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+  font-size: 10px;
+  margin-bottom: 14px;
+  border: 1px solid #BABABA;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.main__chart-info div {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  width: 100%;
+}
+
+.main__chart-info-label {
+  color: #17171B;
+}
+
+
+.main__chart-info div span:last-child {
+  text-align: right;
+  flex-shrink: 0; 
+}
+
+
+.main__chart-header {
+  display: flex;
+  flex-direction: column;  
+  gap: 4px;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.main__chart-header strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+.main__chip-area {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.main__chip-title {
+  margin-bottom: 4px;
+}
+
+.main__chip-box {
+  background: #D9D9D9;
+  border: 1px solid #BABABA;
+  border-radius: 7px;
+  height: 48px;
+  width: 137px;
+}
