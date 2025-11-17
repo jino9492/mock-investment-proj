@@ -1,5 +1,7 @@
 /* 상단 네비게이션 */
 .header__top-bar {
+    position: sticky;
+    background: white;
     user-select: none;
     top: 0;
     left: 0;
@@ -12,7 +14,8 @@
 
 .header__top-inner {
     width: 100%;
-    padding: 0 24px;
+    padding-left: 24px;
+    padding-right: 75px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -64,7 +67,7 @@
     justify-content: flex-start;
     width: 170px;
     height: 34px;
-    margin-right: 33px;
+    margin-right: 10px;
     background-color: #F2F2F2;
     border-radius: 8px;
     
@@ -81,8 +84,8 @@
 .header__btn-login {
     width: 86px;
     height: 34px;
-    margin-right: 55px;
-    font-size: 18px;
+    margin-right: 32px;
+    font-size: 14px;
     border-radius: 8px;
     border: none;
     background: #689DFF;

@@ -14,7 +14,7 @@
 
     <div class="header__top-right">
       <button class="header__search-box">
-        <span class="header__search-placeholder"><img src="${pageContext.request.contextPath}/static/assets/searchIcon.png" alt="">여기를 눌러 검색</span>
+        <span class="header__search-placeholder"><img src="${pageContext.request.contextPath}/static/assets/search_icon.png" alt="">여기를 눌러 검색</span>
       </button>
       <button class="header__btn-login">로그인</button>
     </div>

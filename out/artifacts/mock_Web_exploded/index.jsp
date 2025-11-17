@@ -5,17 +5,17 @@
 <head>
   <base href="${pageContext.request.contextPath}">
   <meta charset="UTF-8" />
-  <title>가상 주식 계좌 사이트</title>
-  <link rel="stylesheet" href="static/css/home/mainPage.css"/>
-  <script src="static/js/home/mainPage.js"></script>
+  <title>MOCK</title>
+  <link rel="stylesheet" href="static/css/home/main_page.css"/>
+  <script src="static/js/home/main_page.js"></script>
 </head>
 <body>
 
-  <!-- 상단 네비게이션 -->
-  <%@ include file="WEB-INF/fragments/common/header.jsp" %>
 
   <div class="main__page-wrap">
     <div class="main__inner">
+      <!-- 상단 네비게이션 -->
+      <%@ include file="WEB-INF/fragments/common/header.jsp" %>
       <main class="main__content">
         <div class="main__sub-title">
           <span class="main__dot-green"></span>
@@ -287,25 +287,10 @@
 
       </main>
 
-            <!-- 오른쪽 사이드 -->
-            <aside class="main__right-rail">
-                
-                <button class="main__right-rail-toggle">
-                    <span class="main__arrow-icon"><img src="static/assets/toggle.png" alt=""></span>
-                </button>
-
-                <div class="main__rail-item">
-                    <div class="main__rail-icon">icon</div>
-                    <div>내 투자</div>
-                </div>
-
-                <div class="main__rail-item">
-                    <div class="main__rail-icon">icon</div>
-                    <div>관심</div>
-                </div>
-            </aside>
-            </div>
-        </div>
+    </div>
+    <!-- 오른쪽 사이드 -->
+    <%@ include file="WEB-INF/fragments/common/sidebar/sidebar.jsp" %>
+  </div>
 
 </body>
 </html>
