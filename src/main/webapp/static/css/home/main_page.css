@@ -19,20 +19,6 @@ ul {
 }
 
 
-/* 전체 레이아웃 */
-.main__page-wrap {
-  display: flex;
-  flex: 1;
-}
-
-.main__inner {
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-}
-
-
 
 /* 메인 콘텐츠 영역 */
 .main__content {
