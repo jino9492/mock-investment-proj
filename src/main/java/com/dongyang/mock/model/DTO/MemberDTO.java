@@ -3,7 +3,7 @@ package com.dongyang.mock.model.DTO;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-public class memberDTO {
+public class MemberDTO {
     private int memId; // NOT NULL
     private String memNickName; // NOT NULL
     private String memPassword; // NOT NULL
@@ -16,7 +16,7 @@ public class memberDTO {
     private String memLastLoginIP;
     private Date memLastLoginAt;
 
-    private char memOpen; // NOT NULL
+    private boolean memOpen; // NOT NULL
     private Date agreeTermsAt; // NOT NULL
     private Date agreePrivacyAt; // NOT NULL
     private Date agreeThirdAt;
@@ -103,11 +103,11 @@ public class memberDTO {
         this.memLastLoginAt = memLastLoginAt;
     }
 
-    public char getMemOpen() {
+    public boolean getMemOpen() {
         return memOpen;
     }
 
-    public void setMemOpen(char memOpen) {
+    public void setMemOpen(boolean memOpen) {
         this.memOpen = memOpen;
     }
 
