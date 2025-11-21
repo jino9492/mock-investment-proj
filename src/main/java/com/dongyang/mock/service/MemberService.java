@@ -12,7 +12,9 @@ public class MemberService {
     private MemberDAO memberDAO = new MemberDAO();
 
     public boolean join(MemberDTO member) throws SQLException {
-        Connection conn = DBManager.getConnection();
+        Connection conn = null;
+        conn = DBManager.getConnection();
+        System.out.println("asdf");
         boolean success = false;
 
         try {

@@ -1,6 +1,7 @@
 package com.dongyang.mock.model.DTO;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 
 public class MemberDTO {
@@ -14,12 +15,12 @@ public class MemberDTO {
 
     private Timestamp memJoinAt; // NOT NULL
     private String memLastLoginIP;
-    private Date memLastLoginAt;
+    private Timestamp memLastLoginAt;
 
     private boolean memOpen; // NOT NULL
-    private Date agreeTermsAt; // NOT NULL
-    private Date agreePrivacyAt; // NOT NULL
-    private Date agreeThirdAt;
+    private Timestamp agreeTermsAt; // NOT NULL
+    private Timestamp agreePrivacyAt; // NOT NULL
+    private Timestamp agreeThirdAt;
 
     private int virtualCash; // NOT NULL
 
@@ -95,11 +96,11 @@ public class MemberDTO {
         this.memLastLoginIP = memLastLoginIP;
     }
 
-    public Date getMemLastLoginAt() {
+    public Timestamp getMemLastLoginAt() {
         return memLastLoginAt;
     }
 
-    public void setMemLastLoginAt(Date memLastLoginAt) {
+    public void setMemLastLoginAt(Timestamp memLastLoginAt) {
         this.memLastLoginAt = memLastLoginAt;
     }
 
@@ -111,27 +112,27 @@ public class MemberDTO {
         this.memOpen = memOpen;
     }
 
-    public Date getAgreeTermsAt() {
+    public Timestamp getAgreeTermsAt() {
         return agreeTermsAt;
     }
 
-    public void setAgreeTermsAt(Date agreeTermsAt) {
+    public void setAgreeTermsAt(Timestamp agreeTermsAt) {
         this.agreeTermsAt = agreeTermsAt;
     }
 
-    public Date getAgreePrivacyAt() {
+    public Timestamp getAgreePrivacyAt() {
         return agreePrivacyAt;
     }
 
-    public void setAgreePrivacyAt(Date agreePrivacyAt) {
+    public void setAgreePrivacyAt(Timestamp agreePrivacyAt) {
         this.agreePrivacyAt = agreePrivacyAt;
     }
 
-    public Date getAgreeThirdAt() {
+    public Timestamp getAgreeThirdAt() {
         return agreeThirdAt;
     }
 
-    public void setAgreeThirdAt(Date agreeThirdAt) {
+    public void setAgreeThirdAt(Timestamp agreeThirdAt) {
         this.agreeThirdAt = agreeThirdAt;
     }
 

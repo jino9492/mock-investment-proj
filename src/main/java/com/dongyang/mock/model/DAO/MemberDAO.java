@@ -21,8 +21,21 @@ public class MemberDAO {
         PreparedStatement pstmt = null;
 
         try {
-            conn = getConnection();
             pstmt = conn.prepareStatement(sql);
+            System.out.println("--- 회원가입 필드 값 디버깅 시작 ---");
+            System.out.println("1. 닉네임: " + member.getMemNickName());
+            System.out.println("2. 비밀번호(해시 전): " + member.getMemPassword());
+            System.out.println("3. 이름: " + member.getMemName());
+            System.out.println("4. 생년월일: " + member.getMemBirth());
+            System.out.println("5. 전화번호: " + member.getMemPhone());
+            System.out.println("6. 이메일: " + member.getMemEmail());
+            System.out.println("7. 마지막 로그인 IP: " + member.getMemLastLoginIP());
+            System.out.println("8. 마지막 로그인 시각: " + member.getMemLastLoginAt());
+            System.out.println("9. 공개 여부: " + member.getMemOpen()); // DTO에서 isMemOpen()을 사용한다고 가정
+            System.out.println("10. 약관1 동의: " + member.getAgreeTermsAt());
+            System.out.println("11. 약관2 동의: " + member.getAgreePrivacyAt());
+            System.out.println("12. 약관3 동의: " + member.getAgreeThirdAt());
+            System.out.println("---------------------------------");
             pstmt.setString(1, member.getMemNickName());
             pstmt.setString(2, PasswordHasher.hashPassword(member.getMemPassword()));
             pstmt.setString(3, member.getMemName());
@@ -30,17 +43,18 @@ public class MemberDAO {
             pstmt.setString(5, member.getMemPhone());
             pstmt.setString(6, member.getMemEmail());
             pstmt.setString(7, member.getMemLastLoginIP());
-            pstmt.setDate(8, member.getMemLastLoginAt());
+            pstmt.setTimestamp(8, member.getMemLastLoginAt());
             pstmt.setBoolean(9, member.getMemOpen());
-            pstmt.setDate(10, member.getAgreeTermsAt());
-            pstmt.setDate(11, member.getAgreePrivacyAt());
-            pstmt.setDate(12, member.getAgreeThirdAt());
+            pstmt.setTimestamp(10, member.getAgreeTermsAt());
+            pstmt.setTimestamp(11, member.getAgreePrivacyAt());
+            pstmt.setTimestamp(12, member.getAgreeThirdAt());
 
             result = pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw e;
         } finally {
-            close(conn, pstmt);
+            close(null, pstmt);
         }
         return result;
     }
@@ -68,17 +82,17 @@ public class MemberDAO {
                 member.setMemEmail(rs.getString("mem_email"));
                 member.setMemJoinAt(rs.getTimestamp("mem_join_at"));
                 member.setMemLastLoginIP(rs.getString("mem_last_login_ip"));
-                member.setMemLastLoginAt(rs.getDate("mem_last_login_at"));
+                member.setMemLastLoginAt(rs.getTimestamp("mem_last_login_at"));
                 member.setMemOpen(rs.getBoolean("mem_open"));
-                member.setAgreeTermsAt(rs.getDate("agree_terms_at"));
-                member.setAgreePrivacyAt(rs.getDate("agree_privacy_at"));
-                member.setAgreeThirdAt(rs.getDate("agree_third_at"));
+                member.setAgreeTermsAt(rs.getTimestamp("agree_terms_at"));
+                member.setAgreePrivacyAt(rs.getTimestamp("agree_privacy_at"));
+                member.setAgreeThirdAt(rs.getTimestamp("agree_third_at"));
                 member.setVirtualCash(rs.getInt("virtual_cash"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            close(conn, pstmt, rs); // DBManager의 close 유틸리티 사용
+            close(null, pstmt, rs);
         }
         return member;
     }
@@ -98,10 +112,10 @@ public class MemberDAO {
         }
         catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(null, pstmt, rs);
         }
-        finally {
-            close(conn, pstmt, rs);
-        }
+
         return true;
     }
 }
