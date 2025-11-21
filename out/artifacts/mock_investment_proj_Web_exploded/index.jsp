@@ -6,8 +6,8 @@
   <base href="${pageContext.request.contextPath}">
   <meta charset="UTF-8" />
   <title>MOCK</title>
-  <link rel="stylesheet" href="static/css/home/mainPage.css"/>
-  <script src="static/js/home/mainPage.js"></script>
+  <link rel="stylesheet" href="static/css/home/main_page.css"/>
+  <script src="static/js/home/main_page.js"></script>
 </head>
 <body>
 
@@ -289,7 +289,7 @@
 
     </div>
     <!-- 오른쪽 사이드 -->
-    <%@ include file="WEB-INF/fragments/common/sidebar.jsp" %>
+    <%@ include file="WEB-INF/fragments/common/sidebar/sidebar.jsp" %>
   </div>
 
 </body>

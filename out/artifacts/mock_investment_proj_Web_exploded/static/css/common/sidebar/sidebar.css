@@ -1,3 +1,7 @@
+.sidebar__container {
+    z-index: 100;
+}
+
 /* 오른쪽 사이드바 */
 .sidebar__right-rail {
     position: fixed;
@@ -65,7 +69,7 @@
     transition: width .2s ease-in-out;
 }
 
-.sidebar__account-title {
+.sidebar__title {
     text-indent: 10px;
     margin-top: 1em;
     padding: 1em;
