@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class DateParser {
+    // 안전하게 Date로 변환
     public static Date getSqlDate(String dateStr) {
         if (dateStr != null && !dateStr.trim().isEmpty()) {
             try {

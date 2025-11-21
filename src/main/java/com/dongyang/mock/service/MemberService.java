@@ -14,9 +14,7 @@ public class MemberService {
     public boolean join(MemberDTO member) throws SQLException {
         Connection conn = null;
         conn = DBManager.getConnection();
-        System.out.println("asdf");
         boolean success = false;
-
         try {
             conn.setAutoCommit(false);
 
@@ -49,7 +47,9 @@ public class MemberService {
         if (member != null) {
             String hashedPassword = member.getMemPassword();
 
+            // 해싱된 비밀번호 비교
             if (PasswordHasher.checkPassword(plainPassword, hashedPassword)) {
+                memberDAO.renewLastLogin(nickname, member.getMemLastLoginIP(), conn);
                 member.setMemPassword(null); // 보안 이슈
                 return member;
             }

@@ -5,24 +5,24 @@ import java.sql.Time;
 import java.sql.Timestamp;
 
 public class MemberDTO {
-    private int memId; // NOT NULL
-    private String memNickName; // NOT NULL
-    private String memPassword; // NOT NULL
-    private String memName; // NOT NULL
-    private Date memBirth; // NOT NULL
-    private String memPhone; // NOT NULL
+    private int memId;
+    private String memNickName;
+    private String memPassword;
+    private String memName;
+    private Date memBirth;
+    private String memPhone;
     private String memEmail;
 
-    private Timestamp memJoinAt; // NOT NULL
+    private Timestamp memJoinAt;
     private String memLastLoginIP;
     private Timestamp memLastLoginAt;
 
-    private boolean memOpen; // NOT NULL
-    private Timestamp agreeTermsAt; // NOT NULL
-    private Timestamp agreePrivacyAt; // NOT NULL
+    private boolean memOpen;
+    private Timestamp agreeTermsAt;
+    private Timestamp agreePrivacyAt;
     private Timestamp agreeThirdAt;
 
-    private int virtualCash; // NOT NULL
+    private int virtualCash;
 
     public int getMemId() {
         return memId;

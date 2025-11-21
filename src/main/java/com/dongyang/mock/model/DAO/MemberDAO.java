@@ -10,7 +10,7 @@ import java.util.*;
 
 public class MemberDAO {
 
-    // 1. 회원 가입 (Insert)
+    // 멤버 추가
     public int insertMember(MemberDTO member, Connection conn) throws SQLException {
         String sql = "INSERT INTO member(mem_nickname, mem_password, mem_name," +
                 "mem_birth, mem_phone, mem_email, mem_last_login_ip," +
@@ -22,20 +22,7 @@ public class MemberDAO {
 
         try {
             pstmt = conn.prepareStatement(sql);
-            System.out.println("--- 회원가입 필드 값 디버깅 시작 ---");
-            System.out.println("1. 닉네임: " + member.getMemNickName());
-            System.out.println("2. 비밀번호(해시 전): " + member.getMemPassword());
-            System.out.println("3. 이름: " + member.getMemName());
-            System.out.println("4. 생년월일: " + member.getMemBirth());
-            System.out.println("5. 전화번호: " + member.getMemPhone());
-            System.out.println("6. 이메일: " + member.getMemEmail());
-            System.out.println("7. 마지막 로그인 IP: " + member.getMemLastLoginIP());
-            System.out.println("8. 마지막 로그인 시각: " + member.getMemLastLoginAt());
-            System.out.println("9. 공개 여부: " + member.getMemOpen()); // DTO에서 isMemOpen()을 사용한다고 가정
-            System.out.println("10. 약관1 동의: " + member.getAgreeTermsAt());
-            System.out.println("11. 약관2 동의: " + member.getAgreePrivacyAt());
-            System.out.println("12. 약관3 동의: " + member.getAgreeThirdAt());
-            System.out.println("---------------------------------");
+
             pstmt.setString(1, member.getMemNickName());
             pstmt.setString(2, PasswordHasher.hashPassword(member.getMemPassword()));
             pstmt.setString(3, member.getMemName());
@@ -59,6 +46,7 @@ public class MemberDAO {
         return result;
     }
 
+    // 닉네임으로 검색
     public MemberDTO selectMemberByNickname(String nickname, Connection conn) throws SQLException {
         String sql = "SELECT * FROM member WHERE mem_nickname=?";
         MemberDTO member = null;
@@ -97,6 +85,7 @@ public class MemberDAO {
         return member;
     }
 
+    // 닉네임 중복 체크
     public boolean isNicknameDuplicate(String nickname, Connection conn) throws SQLException {
         String sql = "SELECT * FROM member WHERE mem_nickname=?";
         PreparedStatement pstmt = null;
@@ -106,8 +95,9 @@ public class MemberDAO {
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, nickname);
             rs = pstmt.executeQuery();
+
             if (rs.next()) {
-                return false;
+                return true;
             }
         }
         catch (SQLException e) {
@@ -116,6 +106,29 @@ public class MemberDAO {
             close(null, pstmt, rs);
         }
 
-        return true;
+        return false;
+    }
+
+    // 최근 로그인 기록 갱신
+    public int renewLastLogin(String nickname, String loginIP, Connection conn) throws SQLException {
+        String sql = "UPDATE member SET mem_last_login_at = NOW(), mem_last_login_ip = ? WHERE mem_nickname = ?";
+        int result = 0;
+        PreparedStatement pstmt = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setString(1, loginIP);
+            pstmt.setString(2, nickname);
+
+            result = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            close(null, pstmt);
+        }
+        return result;
     }
 }

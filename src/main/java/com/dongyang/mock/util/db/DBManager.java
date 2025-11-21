@@ -9,8 +9,9 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBManager {
-    private static Properties props = new Properties();
+    private static final Properties props = new Properties();
 
+    // db 설정 파일 열기
     static {
         try (InputStream is = DBManager.class.getClassLoader().getResourceAsStream("db.properties")) {
             if (is == null) {
@@ -24,8 +25,8 @@ public class DBManager {
         }
     }
 
+    // 연결
     public static Connection getConnection() throws SQLException {
-            // 연결
         return DriverManager.getConnection(
                 props.getProperty("db.url"),
                 props.getProperty("db.user"),

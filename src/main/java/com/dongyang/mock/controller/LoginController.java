@@ -14,7 +14,8 @@ import java.sql.SQLException;
 
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
-    private MemberService memberService = new MemberService();
+    private final MemberService memberService = new MemberService();
+    String viewPage = "/WEB-INF/views/sign_form/login_form.jsp";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,17 +34,15 @@ public class LoginController extends HttpServlet {
         if (member != null) {
             HttpSession session = request.getSession();
             session.setAttribute("member", member);
-            response.sendRedirect(request.getContextPath());;
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
         } else {
             request.setAttribute("errorMsg", "로그인 정보가 일치하지 않습니다.");
-            response.sendRedirect(request.getContextPath() + "/login");
+            request.getRequestDispatcher(viewPage).forward(request, response);
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String viewPage = "/WEB-INF/views/sign_form/signup_form.jsp";
-
         req.getRequestDispatcher(viewPage).forward(req, resp);
     }
 }

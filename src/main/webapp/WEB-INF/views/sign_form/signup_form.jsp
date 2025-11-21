@@ -101,14 +101,15 @@
         <div class="radio-group">
             <%
                 String memOpen = request.getParameter("memOpen");
-                boolean isY = memOpen == null || "Y".equals(memOpen);
-                boolean isN = "N".equals(memOpen);
+
+                boolean isTrue = memOpen == null || "true".equalsIgnoreCase(memOpen);
+                boolean isFalse = "false".equalsIgnoreCase(memOpen);
             %>
             <label style="width: auto;">
-                <input type="radio" name="memOpen" value="Y" <%= isY ? "checked" : "" %>> 공개
+                <input type="radio" name="memOpen" value="true" <%= isTrue ? "checked" : "" %>> 공개
             </label>
             <label style="width: auto;">
-                <input type="radio" name="memOpen" value="N" <%= isN ? "checked" : "" %>> 비공개
+                <input type="radio" name="memOpen" value="false" <%= isFalse ? "checked" : "" %>> 비공개
             </label>
         </div>
 
@@ -134,9 +135,6 @@
 
         <input type="submit" value="가입하기">
     </form>
-
-    <% String err = (String) request.getAttribute("errorMsg"); %>
-    <p><%= err %></p>
 </div>
 </body>
 </html>

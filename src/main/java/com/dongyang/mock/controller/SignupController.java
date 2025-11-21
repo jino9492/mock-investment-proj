@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 @WebServlet("/signup")
 public class SignupController extends HttpServlet {
     private final MemberService memberService = new MemberService();
+    String viewPage = "/WEB-INF/views/sign_form/signup_form.jsp";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -62,14 +63,12 @@ public class SignupController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
         } else {
             request.setAttribute("errorMsg", "회원 가입 실패 또는 닉네임 중복.");
-            // response.sendRedirect(request.getContextPath() + "/signup");
-            return;
+            request.getRequestDispatcher(viewPage).forward(request, response);
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String viewPage = "/WEB-INF/views/sign_form/signup_form.jsp";
         req.getRequestDispatcher(viewPage).forward(req, resp);
     }
 }
