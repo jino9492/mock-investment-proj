@@ -10,7 +10,8 @@
     <title>LOGIN</title>
 </head>
 <body>
-
+<%--임시 헤더--%>
+<jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/header.jsp" />
 <main class="">
 
 </main>
@@ -26,12 +27,7 @@
 <%--    <button type="submit">로그인</button>--%>
 <%--</form>--%>
 
-<div class="sidebar">
-    <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar_button.jsp">
-        <jsp:param name="menuItems" value="로그인,대시보드,회원 관리,거래 관리" />
-        <jsp:param name="menuLinks" value="/admin,/admin/dashboard,/admin/users,/admin/trades" />
-    </jsp:include>
-</div>
+<jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/sidebar_left/sidebar.jsp" />
 
 <div class="main-content">
     <p>임시</p>
