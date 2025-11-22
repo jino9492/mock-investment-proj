@@ -45,4 +45,5 @@ wtpwebapps/
 Thumbs.db
 *.log
 
-/src/main/resources/db.properties
+src/main/resources/db.properties
+out/
