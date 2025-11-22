@@ -1,4 +1,4 @@
-package com.dongyang.mock.servlet;
+package com.dongyang.mock.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/admin")
-public class AdminServlet extends HttpServlet {
+public class AdminController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
