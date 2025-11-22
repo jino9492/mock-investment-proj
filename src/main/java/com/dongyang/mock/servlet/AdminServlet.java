@@ -24,6 +24,12 @@ public class AdminServlet extends HttpServlet {
             return;
         }
 
+        // 현재 경로를 JSP에 전달 -- 사이드바 버튼
+        String requestURI = req.getRequestURI();
+        String contextPath = req.getContextPath();
+        String currentPath = requestURI.replace(contextPath, "");
+        req.setAttribute("currentPath", currentPath);
+
         // 로그인 페이지 표시
         String viewPage = "/WEB-INF/views/admin/login.jsp";
         req.getRequestDispatcher(viewPage).forward(req, resp);
