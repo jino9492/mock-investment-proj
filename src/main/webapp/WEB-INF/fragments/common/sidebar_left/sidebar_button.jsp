@@ -41,20 +41,6 @@
   }
 %>
 
-<%--<!-- 디버깅 -->--%>
-<%--<div style="background: yellow; padding: 10px; margin-bottom: 20px;">--%>
-<%--  <strong>Debug Info:</strong><br>--%>
-<%--  currentPath attribute: [<%= request.getAttribute("currentPath") %>]<br>--%>
-<%--  forward URI: [<%= request.getAttribute("javax.servlet.forward.request_uri") %>]<br>--%>
-<%--  request URI: [<%= request.getRequestURI() %>]<br>--%>
-<%--  currentPage (최종): [<%= currentPage %>]<br>--%>
-<%--  <% if (menuLinks != null) {--%>
-<%--    for (int i = 0; i < menuLinks.length; i++) {--%>
-<%--      out.println("link[" + i + "]: [" + menuLinks[i].trim() + "]<br>");--%>
-<%--    }--%>
-<%--  } %>--%>
-<%--</div>--%>
-
 <c:if test="${not empty menuItems}">
   <c:forEach var="title" items="${menuItems}" varStatus="status">
     <%-- 메뉴 제목 설정 --%>
