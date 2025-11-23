@@ -25,11 +25,6 @@ public class AdminController extends HttpServlet {
         HttpSession session = req.getSession(false);
         String pathInfo = req.getPathInfo();
 
-        String requestURI = req.getRequestURI();
-        String contextPath = req.getContextPath();
-        String currentPath = requestURI.replace(contextPath, "");
-        req.setAttribute("currentPath", currentPath);
-
         if (pathInfo == null || pathInfo.equals("/")) {
             if (session != null && session.getAttribute("adminUser") != null) {
                 resp.sendRedirect(req.getContextPath() + "/admin/dashboard");

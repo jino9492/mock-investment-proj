@@ -9,24 +9,7 @@
   String menuItemsParam = request.getParameter("menuItems");
   String menuLinksParam = request.getParameter("menuLinks");
 
-  // 서블릿에서 설정한 현재 경로 가져오기
-  String currentPage = (String) request.getAttribute("currentPath");
-
-  // 없으면 다른 방법 시도
-  if (currentPage == null) {
-    currentPage = (String) request.getAttribute("javax.servlet.forward.request_uri");
-  }
-
-  if (currentPage == null) {
-    String currentURL = request.getRequestURI();
-    String contextPath = request.getContextPath();
-    currentPage = currentURL.replace(contextPath, "");
-  }
-
-  // 선행 슬래시 정규화
-  if (!currentPage.startsWith("/")) {
-    currentPage = "/" + currentPage;
-  }
+  String currentPage = (String) request.getAttribute("currentUrlPath");
   request.setAttribute("currentPage", currentPage);
 
   String[] menuItems = null;

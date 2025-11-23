@@ -2,7 +2,10 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/mypage/mypage.css"/>
 
 <div class="my-page">
-    <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp" />
+    <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
+        <jsp:param name="menuItems" value="내 정보,자산,주문내역,수익분석"/>
+        <jsp:param name="menuLinks" value="/mypage,/mypage/assets,/mypage/orders,/mypage/analysis"/>
+    </jsp:include>
 
 
     <!-- 메인 컨텐츠 -->
