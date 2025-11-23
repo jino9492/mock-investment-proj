@@ -1,11 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <%
   String textParam = request.getParameter("text");
   String linkParam = request.getParameter("link");
   String isActiveParam = request.getParameter("isActive");
-
-  System.out.println(isActiveParam);
 
   request.setAttribute("text", textParam);
   request.setAttribute("link", linkParam);

@@ -47,5 +47,5 @@ Thumbs.db
 
 src/main/resources/db.properties
 out/
-classes/
 build/
+classes/

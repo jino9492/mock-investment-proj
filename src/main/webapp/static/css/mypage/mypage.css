@@ -1,0 +1,211 @@
+/* 공통 */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #F6F7F9;
+
+}
+
+
+
+/* 전체 레이아웃 */
+.my-page {
+    display: flex;
+    min-height: 100vh;
+    padding-left: 250px;
+    width: 100%;
+}
+
+
+/* 메인 영역 */
+.my-page__content {
+    flex: 1;
+    max-width: calc(100% - 75px);
+    padding: 5%;
+}
+
+.my-page__section {
+    margin-bottom: 32px;
+}
+
+.my-page__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.my-page__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+
+}
+
+.my-page__title-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+}
+
+.my-page__subtitle {
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 20px;
+}
+
+.my-page__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+
+.my-page__edit-button {
+    border-radius: 16px;
+    border: none;
+    font-size: 14px;
+    color: #ABABAB;
+    cursor: pointer;
+    background-color: #F6F7F9;
+    margin-left: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+
+}
+
+
+
+.my-page__section-title {
+    margin: 0 0 12px;
+    font-size: 18px;
+}
+
+/* 프로필 카드 */
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #BABABA;
+    padding: 16px 24px;
+    margin-bottom: 16px;
+}
+
+.profile-card__body {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.profile-card__avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #D9D9D9;
+}
+
+.profile-card__nickname {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* 기본 정보 카드 */
+.info-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 0.5px solid #BABABA;
+    padding: 20px 20px;
+    margin-bottom: 110px;
+}
+
+.info-card__list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-card__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.info-card__label {
+    font-size: 16px;
+    color: #111827;
+}
+
+.info-card__value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #111827;
+    margin-left: auto;
+}
+
+
+/* 약관 카드 */
+.agreement-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #BABABA;
+    padding: 20px 30px;
+
+}
+
+.agreement-card__title {
+    margin-top: 15px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    position: relative;
+    padding-bottom: 14px;
+}
+
+.agreement-card__title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 900px;
+    height: 1px;
+    background-color: #e5e7eb;
+
+}
+
+
+.agreement-card__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.agreement-card__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 550px 12px 0;
+}
+
+
+.agreement-card__item:first-child {
+    border-top: none;
+}
+
+.agreement-card__item-text {
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.agreement-card__item-icon {
+    font-size: 16px;
+    color: #9ca3af;
+}
