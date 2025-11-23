@@ -51,6 +51,7 @@ body {
 .my-page__title-wrap {
     display: flex;
     flex-direction: column;
+    flex: 1;
 
 }
 
@@ -76,7 +77,9 @@ body {
     color: #ABABAB;
     cursor: pointer;
     background-color: #F6F7F9;
-    margin-left: 1350px;
+    margin-left: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
 
 }
 
