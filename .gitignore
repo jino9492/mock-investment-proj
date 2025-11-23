@@ -44,3 +44,6 @@ wtpwebapps/
 .DS_Store
 Thumbs.db
 *.log
+
+src/main/resources/db.properties
+out/
