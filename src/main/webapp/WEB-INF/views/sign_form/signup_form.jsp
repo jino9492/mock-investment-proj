@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/sign_form/signup_form.css"/>
+<script src="${pageContext.request.contextPath}/static/js/sign_form/signup.js"></script>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -57,19 +59,19 @@
 
                 <div class="signup__agreement-list">
                     <label class="signup__agreement-item">
-                        <input type="checkbox" class="signup__agreement-checkbox" />
+                        <input type="checkbox" class="signup__agreement-checkbox" name="agreePrivacy"/>
                         <span class="signup__agreement-label">
                 개인정보 수집 · 이용 동의
               </span>
                     </label>
                     <label class="signup__agreement-item">
-                        <input type="checkbox" class="signup__agreement-checkbox" />
+                        <input type="checkbox" class="signup__agreement-checkbox" name="agreeThird"/>
                         <span class="signup__agreement-label">
                 개인정보 제 3자 제공 동의
               </span>
                     </label>
                     <label class="signup__agreement-item">
-                        <input type="checkbox" class="signup__agreement-checkbox" />
+                        <input type="checkbox" class="signup__agreement-checkbox" name="agreeNotification" />
                         <span class="signup__agreement-label">
                 알림 수신 동의 (선택)
               </span>
