@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/sign_form/login_form.css"/>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
     <title>MOCK 로그인</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/sign_form/login_form.css"/>
 </head>
 <body class="login__page-wrap">
 <header class="login__header">

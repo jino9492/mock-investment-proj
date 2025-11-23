@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/sign_form/login_form.css"/>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
     <title>MOCK 로그인</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/sign_form/login_form.css"/>
 </head>
 <body class="login__page-wrap">
 <header class="login__header">
@@ -42,7 +43,7 @@
         <span class="login__card-footer-text">
           아직 MOCK의 회원이 아닌가요?
         </span>
-            <a href="signup_page.html" class="login__card-footer-link">가입하기</a>
+            <a href="signup_form.jsp" class="login__card-footer-link">가입하기</a>
         </p>
     </section>
 </main>
