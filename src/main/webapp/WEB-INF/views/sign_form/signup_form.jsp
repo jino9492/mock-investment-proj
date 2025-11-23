@@ -78,49 +78,18 @@
         <input type="hidden" name="cmd" value="join">
 
         <!-- 필수 입력 항목 -->
-        <label for="nickname" class="required">닉네임</label>
-        <input type="text" id="nickname" name="nickname" required value="<%= request.getParameter("nickname") != null ? request.getParameter("nickname") : "" %>"><br>
+        <label for="email" class="required">이메일</label>
+        <input type="email" id="email" name="email" required value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>"><br>
 
         <label for="password" class="required">비밀번호</label>
         <input type="password" id="password" name="password" required><br>
 
-        <label for="name" class="required">이름</label>
-        <input type="text" id="name" name="name" required value="<%= request.getParameter("name") != null ? request.getParameter("name") : "" %>"><br>
-
-        <label for="email" class="required">이메일</label>
-        <input type="email" id="email" name="email" required value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>"><br>
-
-        <!-- 선택/선언적 입력 항목 -->
-        <label for="phone">연락처</label>
-        <input type="text" id="phone" name="phone" value="<%= request.getParameter("phone") != null ? request.getParameter("phone") : "" %>"><br>
-
-        <label for="birth">생년월일 (YYYY-MM-DD)</label>
-        <input type="date" id="birth" name="birth" value="<%= request.getParameter("birth") != null ? request.getParameter("birth") : "" %>"><br>
-
-        <label>프로필 공개 여부</label>
-        <div class="radio-group">
-            <%
-                String memOpen = request.getParameter("memOpen");
-
-                boolean isTrue = memOpen == null || "true".equalsIgnoreCase(memOpen);
-                boolean isFalse = "false".equalsIgnoreCase(memOpen);
-            %>
-            <label style="width: auto;">
-                <input type="radio" name="memOpen" value="true" <%= isTrue ? "checked" : "" %>> 공개
-            </label>
-            <label style="width: auto;">
-                <input type="radio" name="memOpen" value="false" <%= isFalse ? "checked" : "" %>> 비공개
-            </label>
-        </div>
+        <label for="nickname" class="required">닉네임</label>
+        <input type="text" id="nickname" name="nickname" required value="<%= request.getParameter("nickname") != null ? request.getParameter("nickname") : "" %>"><br>
 
         <hr>
         <div class="agreement">
             <h3>약관 동의</h3>
-            <p>
-                <label style="width: auto;">
-                    <input type="checkbox" name="agreeTerms" required <%= request.getParameter("agreeTerms") != null ? "checked" : "" %>> 필수 약관 동의
-                </label>
-            </p>
             <p>
                 <label style="width: auto;">
                     <input type="checkbox" name="agreePrivacy" required <%= request.getParameter("agreePrivacy") != null ? "checked" : "" %>> 개인정보 수집/이용 동의
@@ -128,7 +97,12 @@
             </p>
             <p>
                 <label style="width: auto;">
-                    <input type="checkbox" name="agreeThird" <%= request.getParameter("agreeThird") != null ? "checked" : "" %>> 제3자 정보 제공 동의 (선택)
+                    <input type="checkbox" name="agreeThird" required <%= request.getParameter("agreeThird") != null ? "checked" : "" %>> 제3자 정보 제공 동의
+                </label>
+            </p>
+            <p>
+                <label style="width: auto;">
+                    <input type="checkbox" name="agreeNotification" <%= request.getParameter("agreeNotification") != null ? "checked" : "" %>> 알림 수신 동의 (선택)
                 </label>
             </p>
         </div>

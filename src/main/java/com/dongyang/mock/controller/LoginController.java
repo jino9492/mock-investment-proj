@@ -21,12 +21,12 @@ public class LoginController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
 
-        String nickname = request.getParameter("nickname");
+        String email = request.getParameter("email");
         String password = request.getParameter("password");
 
         MemberDTO member = null;
         try {
-            member = memberService.login(nickname, password);
+            member = memberService.login(email, password);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

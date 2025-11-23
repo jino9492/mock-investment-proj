@@ -2,6 +2,7 @@ package com.dongyang.mock.service;
 
 import com.dongyang.mock.model.DAO.MemberDAO;
 import com.dongyang.mock.model.DTO.MemberDTO;
+import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.util.*;
 import com.dongyang.mock.util.db.DBManager;
 
@@ -9,23 +10,25 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class MemberService {
-    private MemberDAO memberDAO = new MemberDAO();
+    private final MemberDAO memberDAO = new MemberDAO();
 
-    public boolean join(MemberDTO member) throws SQLException {
+    public MemberStatus.JoinResult join(MemberDTO member) throws SQLException {
         Connection conn = null;
         conn = DBManager.getConnection();
-        boolean success = false;
+        MemberStatus.JoinResult status = MemberStatus.JoinResult.FAIL_INSERT;
         try {
             conn.setAutoCommit(false);
 
+            // 이메일 중복 체크
+            if (memberDAO.isEmailDuplicate(member.getMemEmail(), conn)) { return MemberStatus.JoinResult.DUPLICATE_EMAIL; }
             // 닉네임 중복 체크
-            if (memberDAO.isNicknameDuplicate(member.getMemNickName(), conn)) return false;
+            if (memberDAO.isNicknameDuplicate(member.getMemNickname(), conn)) { return MemberStatus.JoinResult.DUPLICATE_NICKNAME; }
 
             int result = memberDAO.insertMember(member, conn);
 
             if (result > 0) {
                 conn.commit();
-                success = true;
+                status = MemberStatus.JoinResult.SUCCESS;
             } else {
                 conn.rollback();
             }
@@ -37,19 +40,19 @@ public class MemberService {
             DBManager.close(conn, null);
         }
 
-        return success;
+        return status;
     }
 
-    public MemberDTO login(String nickname, String plainPassword) throws SQLException {
+    public MemberDTO login(String email, String plainPassword) throws SQLException {
         Connection conn = DBManager.getConnection();
-        MemberDTO member = memberDAO.selectMemberByNickname(nickname, conn);
+        MemberDTO member = memberDAO.selectMemberByEmail(email, conn);
 
         if (member != null) {
             String hashedPassword = member.getMemPassword();
 
             // 해싱된 비밀번호 비교
             if (PasswordHasher.checkPassword(plainPassword, hashedPassword)) {
-                memberDAO.renewLastLogin(nickname, member.getMemLastLoginIP(), conn);
+                memberDAO.renewLastLogin(email, member.getMemLastLoginIP(), conn);
                 member.setMemPassword(null); // 보안 이슈
                 return member;
             }

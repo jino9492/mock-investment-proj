@@ -34,8 +34,8 @@
     <form action="<%= request.getContextPath() %>/login" method="post">
         <input type="hidden" name="cmd" value="login">
 
-        <label for="nickname">닉네임</label>
-        <input type="text" id="nickname" name="nickname" required><br>
+        <label for="email">이메일</label>
+        <input type="text" id="email" name="email" required><br>
 
         <label for="password">비밀번호</label>
         <input type="password" id="password" name="password" required><br>

@@ -1,6 +1,7 @@
 package com.dongyang.mock.controller;
 
 import com.dongyang.mock.model.DTO.MemberDTO;
+import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.service.MemberService;
 import com.dongyang.mock.util.*;
 import jakarta.servlet.ServletException;
@@ -25,44 +26,42 @@ public class SignupController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
+        String email = request.getParameter("email");
         String nickname = request.getParameter("nickname");
         String password = request.getParameter("password");
-        String name = request.getParameter("name");
-        Date birth = DateParser.getSqlDate(request.getParameter("birth"));
-        String phone = request.getParameter("phone");
-        String email = request.getParameter("email");
-        String open = request.getParameter("memOpen");
         String lastLoginIP = request.getRemoteAddr();
-        Timestamp agreeTerms = DateParser.getCheckTime(request.getParameter("agreeTerms"), now);
         Timestamp agreePrivacy = DateParser.getCheckTime(request.getParameter("agreePrivacy"), now);
         Timestamp agreeThird = DateParser.getCheckTime(request.getParameter("agreeThird"), now);
+        Timestamp agreeNotification = DateParser.getCheckTime(request.getParameter("agreeNotification"), now);
 
         MemberDTO newMember = new MemberDTO();
-        newMember.setMemNickName(nickname);
-        newMember.setMemPassword(password);
-        newMember.setMemName(name);
-        newMember.setMemBirth(birth);
-        newMember.setMemPhone(phone);
         newMember.setMemEmail(email);
+        newMember.setMemPassword(password);
+        newMember.setMemNickname(nickname);
         newMember.setMemLastLoginIP(lastLoginIP);
         newMember.setMemLastLoginAt(null);
-        newMember.setMemOpen(Boolean.parseBoolean(open));
-        newMember.setAgreeTermsAt(agreeTerms);
         newMember.setAgreePrivacyAt(agreePrivacy);
         newMember.setAgreeThirdAt(agreeThird);
+        newMember.setAgreeNotificationAt(agreeNotification);
 
-        boolean success = false;
+        MemberStatus.JoinResult status = MemberStatus.JoinResult.FAIL_INSERT;
         try {
-            success = memberService.join(newMember);
+            status = memberService.join(newMember);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        if (success) {
+        if (status == MemberStatus.JoinResult.SUCCESS) {
             request.setAttribute("msg", "회원 가입 성공!");
             response.sendRedirect(request.getContextPath() + "/login");
+        } else if (status == MemberStatus.JoinResult.DUPLICATE_EMAIL) {
+            request.setAttribute("errorMsg", "이메일 중복");
+            request.getRequestDispatcher(viewPage).forward(request, response);
+        } else if (status == MemberStatus.JoinResult.DUPLICATE_NICKNAME) {
+            request.setAttribute("errorMsg", "닉네임 중복");
+            request.getRequestDispatcher(viewPage).forward(request, response);
         } else {
-            request.setAttribute("errorMsg", "회원 가입 실패 또는 닉네임 중복.");
+            request.setAttribute("errorMsg", "회원가입 실패");
             request.getRequestDispatcher(viewPage).forward(request, response);
         }
     }

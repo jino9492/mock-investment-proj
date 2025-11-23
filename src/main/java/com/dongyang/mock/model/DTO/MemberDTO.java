@@ -6,21 +6,17 @@ import java.sql.Timestamp;
 
 public class MemberDTO {
     private int memId;
-    private String memNickName;
-    private String memPassword;
-    private String memName;
-    private Date memBirth;
-    private String memPhone;
     private String memEmail;
+    private String memPassword;
+    private String memNickname;
 
     private Timestamp memJoinAt;
     private String memLastLoginIP;
     private Timestamp memLastLoginAt;
 
-    private boolean memOpen;
-    private Timestamp agreeTermsAt;
     private Timestamp agreePrivacyAt;
     private Timestamp agreeThirdAt;
+    private Timestamp agreeNotificationAt;
 
     private int virtualCash;
 
@@ -32,12 +28,12 @@ public class MemberDTO {
         this.memId = memId;
     }
 
-    public String getMemNickName() {
-        return memNickName;
+    public String getMemEmail() {
+        return memEmail;
     }
 
-    public void setMemNickName(String memNickName) {
-        this.memNickName = memNickName;
+    public void setMemEmail(String memEmail) {
+        this.memEmail = memEmail;
     }
 
     public String getMemPassword() {
@@ -48,36 +44,12 @@ public class MemberDTO {
         this.memPassword = memPassword;
     }
 
-    public String getMemName() {
-        return memName;
+    public String getMemNickname() {
+        return memNickname;
     }
 
-    public void setMemName(String memName) {
-        this.memName = memName;
-    }
-
-    public Date getMemBirth() {
-        return memBirth;
-    }
-
-    public void setMemBirth(Date memBirth) {
-        this.memBirth = memBirth;
-    }
-
-    public String getMemPhone() {
-        return memPhone;
-    }
-
-    public void setMemPhone(String memPhone) {
-        this.memPhone = memPhone;
-    }
-
-    public String getMemEmail() {
-        return memEmail;
-    }
-
-    public void setMemEmail(String memEmail) {
-        this.memEmail = memEmail;
+    public void setMemNickname(String memNickname) {
+        this.memNickname = memNickname;
     }
 
     public Timestamp getMemJoinAt() {
@@ -104,22 +76,6 @@ public class MemberDTO {
         this.memLastLoginAt = memLastLoginAt;
     }
 
-    public boolean getMemOpen() {
-        return memOpen;
-    }
-
-    public void setMemOpen(boolean memOpen) {
-        this.memOpen = memOpen;
-    }
-
-    public Timestamp getAgreeTermsAt() {
-        return agreeTermsAt;
-    }
-
-    public void setAgreeTermsAt(Timestamp agreeTermsAt) {
-        this.agreeTermsAt = agreeTermsAt;
-    }
-
     public Timestamp getAgreePrivacyAt() {
         return agreePrivacyAt;
     }
@@ -134,6 +90,14 @@ public class MemberDTO {
 
     public void setAgreeThirdAt(Timestamp agreeThirdAt) {
         this.agreeThirdAt = agreeThirdAt;
+    }
+
+    public Timestamp getAgreeNotificationAt() {
+        return agreeNotificationAt;
+    }
+
+    public void setAgreeNotificationAt(Timestamp agreeNotificationAt) {
+        this.agreeNotificationAt = agreeNotificationAt;
     }
 
     public int getVirtualCash() {
