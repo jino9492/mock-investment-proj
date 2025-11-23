@@ -110,7 +110,7 @@ public class MemberDAO {
 
     // 최근 로그인 기록 갱신
     public int renewLastLogin(String email, String loginIP, Connection conn) throws SQLException {
-        String sql = "UPDATE member SET mem_last_login_at = NOW(), mem_last_login_ip = ? WHERE mem_nickname = ?";
+        String sql = "UPDATE member SET mem_last_login_at = NOW(), mem_last_login_ip = ? WHERE mem_email = ?";
         int result = 0;
         PreparedStatement pstmt = null;
 
