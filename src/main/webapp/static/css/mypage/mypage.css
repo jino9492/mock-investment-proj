@@ -120,12 +120,29 @@ body {
 }
 
 .profile-card__avatar {
-    width: 50px;
+    display: flex;
+    align-self: center;
+    width: 50px;    
     height: 50px;
     border-radius: 50%;
     background-color: #D9D9D9;
 }
 
+.profile-card__item {
+    margin: 8px 0;
+}
+
+.profile-card__item label {
+    font-weight: bold;
+}
+
+.profile-card__item input {
+    width: 30%;
+    height: 3em;
+    border-radius: 8px;
+    border: 1px solid #BABABA;
+    padding: 8px;
+}
 
 .emphasize {
     font-size: 18px;

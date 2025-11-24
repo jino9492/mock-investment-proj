@@ -20,6 +20,9 @@ public class MypageController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
 
+        String modifyRequest = request.getParameter("modify");
+        request.setAttribute("modify", modifyRequest);
+
         request.getRequestDispatcher(VIEW_PAGE).forward(request, response);
     }
 
