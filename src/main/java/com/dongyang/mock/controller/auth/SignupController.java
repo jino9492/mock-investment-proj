@@ -1,4 +1,4 @@
-package com.dongyang.mock.controller;
+package com.dongyang.mock.controller.auth;
 
 import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.model.status.MemberStatus;
@@ -11,8 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 

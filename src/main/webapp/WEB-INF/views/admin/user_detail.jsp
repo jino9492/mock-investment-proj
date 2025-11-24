@@ -16,12 +16,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/admin/user_detail.css"/>
 </head>
 <body>
-<header id="user__header">
-    <jsp:include page="/WEB-INF/fragments/common/header_admin.jsp" />
-</header>
-<aside id="user__aside">
-    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/sidebar_left/sidebar.jsp" />
- </aside>
+<jsp:include page="/WEB-INF/fragments/common/header_admin.jsp" />
+<jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/sidebar_left/sidebar.jsp" />
 <main class="detail-page">
     <div class="detail-header-bar">
         <a class="detail-back" href="${pageContext.request.contextPath}/admin/users">← 회원 목록으로</a>
@@ -236,7 +232,7 @@
             </form>
             <button type="button" class="btn btn--danger" id="member-delete-trigger">회원 탈퇴 처리</button>
         </div>
-        <p class="notice__footnote">* 탈퇴 시 모든 거래 내역과 자산 정보가 삭제되며, 동일 이메일로 재가입 불가합니다.</p>
+        <p class="notice__footnote">* 탈퇴 시 모든 거래 내역과 자산 정보가 삭제됩니다.</p>
     </section>
 
     <div class="modal modal--detail" id="member-edit-modal" aria-hidden="true">

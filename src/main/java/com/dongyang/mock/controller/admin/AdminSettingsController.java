@@ -1,4 +1,4 @@
-package com.dongyang.mock.controller;
+package com.dongyang.mock.controller.admin;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
