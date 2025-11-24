@@ -21,7 +21,7 @@
 /* 선택된 페이지 - 파란색 */
 .sidebar-left__btn.active {
     background-color: #99BDFF;
-    color: #17171B;
+    color: white;
     font-weight: 500;
     border-color: #a8c7e8;
 }
