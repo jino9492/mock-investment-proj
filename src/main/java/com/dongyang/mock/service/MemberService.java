@@ -60,4 +60,41 @@ public class MemberService {
 
         return null;
     }
+
+    public int modifyMemberInfo(MemberDTO member) throws SQLException {
+        Connection conn = null;
+        int updatedCount = 0;
+
+        try {
+            conn = DBManager.getConnection();
+            conn.setAutoCommit(false);
+
+            String email = member.getMemEmail();
+
+            if (member.getMemNickname() != null && !member.getMemNickname().isEmpty()) {
+                updatedCount += memberDAO.updateNickname(email, member.getMemNickname(), conn);
+            }
+
+            if (member.getMemPassword() != null && !member.getMemPassword().isEmpty()) {
+                updatedCount += memberDAO.updatePassword(email, member.getMemPassword(), conn);
+            }
+
+            if (member.getAgreeNotificationAt() != null) {
+                updatedCount += memberDAO.updateNotificationAgreement(email, member.getAgreeNotificationAt(), conn);
+            } else {
+                updatedCount += memberDAO.updateNotificationAgreement(email, null, conn);
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            try { conn.rollback(); } catch (SQLException rollbackEx) { rollbackEx.printStackTrace(); }
+            e.printStackTrace();
+        } finally {
+            try { conn.setAutoCommit(true); } catch (SQLException e) { e.printStackTrace(); }
+            DBManager.close(conn, null);
+        }
+
+        return updatedCount;
+    }
 }

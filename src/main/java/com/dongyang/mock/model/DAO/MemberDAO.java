@@ -39,6 +39,51 @@ public class MemberDAO {
         return result;
     }
 
+    public int updateNickname(String email, String nickname, Connection conn) throws SQLException {
+        String sql = "UPDATE member SET mem_nickname = ? WHERE mem_email = ?";
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, nickname);
+            pstmt.setString(2, email);
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(null, pstmt);
+        }
+    }
+
+    public int updatePassword(String email, String rawPassword, Connection conn) throws SQLException {
+        String sql = "UPDATE member SET mem_password = ? WHERE mem_email = ?";
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, PasswordHasher.hashPassword(rawPassword));
+            pstmt.setString(2, email);
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(null, pstmt);
+        }
+    }
+
+    public int updateNotificationAgreement(String email, Timestamp agreementTime, Connection conn) throws SQLException {
+        String sql = "UPDATE member SET agree_notification_at = ? WHERE mem_email = ?";
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setTimestamp(1, agreementTime);
+            pstmt.setString(2, email);
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(null, pstmt);
+        }
+    }
+
     // 닉네임으로 검색
     public MemberDTO selectMemberByEmail(String email, Connection conn) throws SQLException {
         String sql = "SELECT * FROM member WHERE mem_email=?";

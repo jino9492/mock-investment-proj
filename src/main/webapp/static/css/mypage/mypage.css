@@ -209,7 +209,7 @@ body {
 
 .profile-card__submit {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
 }
 
 .profile-card__item {
@@ -245,5 +245,9 @@ body {
 }
 
 .my-page__member-cancel button {
+    color: red;
+}
+
+.error-msg {
     color: red;
 }

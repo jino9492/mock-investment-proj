@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     const textInputs = document.querySelectorAll(
-        '.profile-card__item input[type="text"], input[type="password"], input[type="checkbox"]'
+        '.profile-card__item input[type="text"], input[type="password"]'
     );
+
+    const checkInput = document.querySelector('.toggle__checkbox');
+    console.log(checkInput)
 
     textInputs.forEach((e) => {
         e.addEventListener('input', updateSubmitButton);
@@ -13,10 +16,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }, true);
     });
 
+    if (checkInput) {
+        checkInput.addEventListener('change', updateSubmitButton);
+    }
+
     function updateSubmitButton() {
         const submitButton = document.querySelector('.profile-card__submit input[type="submit"]');
 
-        if (checkInputs(textInputs)) {
+        const allInputs = Array.from(textInputs);
+        if (checkInput) {
+            allInputs.push(checkInput);
+        }
+
+        if (checkInputs(allInputs)) {
             submitButton.classList.add('active');
             submitButton.disabled = false;
         } else {
@@ -28,13 +40,18 @@ document.addEventListener("DOMContentLoaded", function () {
     updateSubmitButton();
 });
 
-function checkInputs(textInputs) {
-    return Array.from(textInputs).some((e) => {
+function checkInputs(allInputs) {
+    return Array.from(allInputs).find((e) => {
+
         if (e.type === 'text' || e.type === 'password') {
             return e.value.trim().length > 0;
         }
+
         else if (e.type === 'checkbox') {
-            return e.checked;
+
+            // ⭐ 이 부분이 요청하신 '기본 상태의 반대' 로직입니다. ⭐
+            const isDefaultChecked = e.defaultChecked;
+            return e.checked !== isDefaultChecked;
         }
         return false;
     });

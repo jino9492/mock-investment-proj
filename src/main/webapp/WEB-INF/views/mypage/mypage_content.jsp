@@ -32,8 +32,8 @@
                 <div class="profile-card__body">
                     <div class="profile-card__avatar"></div>
                     <div class="profile-card__item-wrapper">
-                        <div class="profile-card__item emphasize">닉네임</div>
-                        <div class="profile-card__item">example@gmail.com</div>
+                        <div class="profile-card__item emphasize">${member.getMemNickname()}</div>
+                        <div class="profile-card__item">${member.getMemEmail()}</div>
                     </div>
                 </div>
             </div>
@@ -43,14 +43,14 @@
                 <span class="my-page__subtitle">자산</span>
                 <div class="profile-card">
                     <div class="profile-card__body">
-                        <div class="profile-card__item">1,000,000원</div>
+                        <div class="profile-card__item">${member.getVirtualCash()}원</div>
                     </div>
                 </div>
 
                 <span class="my-page__subtitle--small">11월 수익</span>
                 <div class="profile-card">
                     <div class="profile-card__body">
-                        <div class="profile-card__item">100,000원</div>
+                        <div class="profile-card__item">?원</div>
                     </div>
                 </div>
 
@@ -58,11 +58,11 @@
                     <div class="profile-card__body flex-column">
                         <div class="profile-card__item-wrapper">
                             <div class="profile-card__item">주문 가능 금액</div>
-                            <div class="profile-card__item">100,000원</div>
+                            <div class="profile-card__item">?원</div>
                         </div>
                         <div class="profile-card__item-wrapper">
-                            <div class="profile-card__item">주문 가능 금액</div>
-                            <div class="profile-card__item">100,000원</div>
+                            <div class="profile-card__item">투자 중인 금액</div>
+                            <div class="profile-card__item">?원</div>
                         </div>
                     </div>
                 </div>
@@ -106,24 +106,26 @@
                         <div class="profile-card__body flex-column">
                             <div class="profile-card__item-wrapper">
                                 <div class="profile-card__item"><label for="new-name">새 닉네임</label></div>
-                                <div class="profile-card__item"><input type="text" id="new-name"/></div>
+                                <div class="profile-card__item"><input type="text" name="nickname" id="new-name"/></div>
                             </div>
                             <div class="profile-card__item-wrapper">
                                 <div class="profile-card__item"><label for="new-password">새 비밀번호</label></div>
-                                <div class="profile-card__item"><input type="password" id="new-password"/></div>
+                                <div class="profile-card__item"><input type="password" name="password" id="new-password"/></div>
                             </div>
                             <div class="profile-card__item-wrapper">
                                 <div class="profile-card__item"><label for="new-password-check">새 비밀번호 확인</label></div>
-                                <div class="profile-card__item"><input type="password" id="new-password-check"/></div>
+                                <div class="profile-card__item"><input type="password" name="passwordCheck" id="new-password-check"/></div>
                             </div>
                             <div class="profile-card__item-wrapper">
                                 <div class="profile-card__item"><label for="notification-toggle">알림 설정</label></div>
                                 <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/toggle.jsp">
-                                    <jsp:param name="isActive" value="false"/>
+                                    <jsp:param name="isActive" value="${member.getAgreeNotificationAt() != null}"/>
                                     <jsp:param name="id" value="notification-toggle" />
+                                    <jsp:param name="name" value="agreeNotification" />
                                 </jsp:include>
                             </div>
                             <div class="profile-card__submit">
+                                <div class="error-msg">${errorMsg}</div>
                                 <input type="submit" value="제출">
                             </div>
                         </div>
