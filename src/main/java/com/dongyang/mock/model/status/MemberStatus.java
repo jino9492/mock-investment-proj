@@ -9,4 +9,11 @@ public final class MemberStatus {
         DUPLICATE_NICKNAME,
         FAIL_INSERT // DB 삽입 실패
     }
+
+    public enum UpdateResult {
+        SUCCESS,
+        DUPLICATE_EMAIL,
+        DUPLICATE_NICKNAME,
+        FAIL
+    }
 }

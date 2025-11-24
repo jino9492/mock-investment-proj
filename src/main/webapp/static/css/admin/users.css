@@ -21,7 +21,7 @@ body {
     /* sidebar.css에서 관리 */
 }
 
-#users-content {
+.users-page {
     margin-left: 250px;  /* 사이드바 너비 */
     padding: 30px;
     min-height: calc(100vh - 70px);
@@ -42,6 +42,26 @@ body {
 .page-header__date {
     font-size: 14px;
     color: #666;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.alert--success {
+    background: #E6F4EA;
+    color: #1E7B34;
+    border: 1px solid #B7DFBF;
+}
+
+.alert--error {
+    background: #FEECEC;
+    color: #C0392B;
+    border: 1px solid #F5B7B1;
 }
 
 /* ==================== 통계 그리드 ==================== */
@@ -219,6 +239,24 @@ body {
     background: #e8e8e8;
 }
 
+.data-table__detail-link {
+    display: inline-flex;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #C5D1F2;
+    color: #2F54EB;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.data-table__detail-link:hover {
+    background: #2F54EB;
+    color: #fff;
+    border-color: #2F54EB;
+}
+
 /* ==================== 테이블 래퍼 (흰색 박스) ==================== */
 .table-wrapper {
     background: white;
@@ -297,4 +335,295 @@ body {
 
 .pagination__btn--active:hover {
     background: #F6F7F9;
+}
+
+/* ==================== 모달 ==================== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 1500;
+}
+
+.modal.is-open {
+    display: flex;
+}
+
+.modal__overlay {
+    position: absolute;
+    inset: 0;
+}
+
+.modal__dialog {
+    position: relative;
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+.modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modal__close-btn {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field--inline {
+    border: 1px solid #E2E2E2;
+    border-radius: 10px;
+    padding: 12px 16px;
+    gap: 10px;
+}
+
+.form-field__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-field__required {
+    color: #C0392B;
+    margin-left: 4px;
+}
+
+.form-field__input {
+    border: 1px solid #BABABA;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.form-field__input:focus {
+    outline: none;
+    border-color: #689DFF;
+}
+
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #555;
+}
+
+.modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.modal__btn {
+    border-radius: 8px;
+    border: none;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal__btn--ghost {
+    background: #ECECEC;
+    color: #333;
+}
+
+.modal__btn--primary {
+    background: #689DFF;
+    color: #fff;
+}
+
+/* ==================== 상세 모달 ==================== */
+.modal--detail .modal__dialog {
+    max-width: 920px;
+    padding: 24px 28px 32px;
+}
+
+.member-detail__body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.member-detail__section {
+    border: 1px solid #E6E8F0;
+    border-radius: 14px;
+    padding: 18px 20px;
+    background: #FBFCFF;
+}
+
+.member-detail__section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 16px;
+}
+
+.member-detail__grid {
+    display: grid;
+    gap: 16px;
+}
+
+.member-detail__grid--basic {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.member-detail__item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.member-detail__label {
+    font-size: 12px;
+    color: #7A7F8C;
+}
+
+.member-detail__value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1C1E23;
+}
+
+.member-detail__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 999px;
+    background: #EFF8F1;
+    color: #1D6F42;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.member-detail__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.member-detail__card {
+    border-radius: 12px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #E6E8F0;
+    min-height: 96px;
+}
+
+.member-detail__card-label {
+    font-size: 13px;
+    color: #8C90A2;
+    margin-bottom: 8px;
+}
+
+.member-detail__card-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #191B1F;
+}
+
+.member-detail__card-value--accent.is-up {
+    color: #1F8C53;
+}
+
+.member-detail__card-value--accent.is-down {
+    color: #C0392B;
+}
+
+.member-detail__table-wrapper {
+    border-radius: 10px;
+    border: 1px solid #E6E8F0;
+    overflow: hidden;
+    background: #fff;
+}
+
+.member-detail__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.member-detail__table th {
+    background: #F2F4F8;
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #697089;
+    font-weight: 600;
+}
+
+.member-detail__table td {
+    padding: 14px;
+    font-size: 13px;
+    color: #1F2230;
+    border-top: 1px solid #EEF0F4;
+}
+
+.member-detail__empty-cell {
+    text-align: center;
+    color: #9BA0B3;
+    font-size: 13px;
+    padding: 24px 10px;
+}
+
+.member-detail__gain {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-weight: 600;
+}
+
+.member-detail__gain.is-up {
+    color: #1F8C53;
+}
+
+.member-detail__gain.is-down {
+    color: #C0392B;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge--buy {
+    background: #E6F4EA;
+    color: #1F8C53;
+}
+
+.badge--sell {
+    background: #FBEAEA;
+    color: #C0392B;
 }
