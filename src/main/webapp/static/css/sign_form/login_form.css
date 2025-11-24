@@ -29,14 +29,15 @@ html {
   justify-content: space-between;
   height: 70px;
   padding-left: 25px;
-  border-bottom: 1px solid #BABABA;
   margin-bottom: 200px;
 }
 
 .login__brand {
-  font-size: 20px;
-  font-weight: 500;
- 
+  display: inline;
+  letter-spacing: -8px;
+  font-weight: 1000;
+  font-size: 32px;
+  color: white;
 }
 
 .login__close-button {
@@ -46,6 +47,8 @@ html {
   font-weight: 500;
   cursor: pointer;
   margin-right: 36px;
+  color: black;
+  text-decoration: none;
 }
 
 /* 메인 컨텐츠 정렬 */

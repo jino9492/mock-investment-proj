@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/sign_form/signup_form.css"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/sign_form/signup_form.css"/>
 <script src="${pageContext.request.contextPath}/static/js/sign_form/signup.js"></script>
 
 <!DOCTYPE html>
@@ -10,8 +10,8 @@
 </head>
 <body class="signup__page-wrap">
 <header class="signup__header">
-    <div class="signup__brand">로고</div>
-    <button class="signup__close-button" aria-label="닫기">✕</button>
+    <div class="signup__brand">MOCK</div>
+    <a class="signup__close-button" aria-label="닫기" href="/">✕</a>
 </header>
 
 <main class="signup__content">
@@ -88,7 +88,7 @@
         <span class="signup__card-footer-text">
           MOCK의 회원인가요?
         </span>
-            <a href="login_form.jsp" class="signup__card-footer-link">로그인</a>
+            <a href="/login" class="signup__card-footer-link">로그인</a>
         </p>
     </section>
 </main>

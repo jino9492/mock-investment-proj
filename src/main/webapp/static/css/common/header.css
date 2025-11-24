@@ -59,6 +59,10 @@
     font-weight: bold;
 }
 
+.header__top-menu li a {
+    color: black;
+}
+
 .header__search-box {
     cursor: pointer;
     display: flex;

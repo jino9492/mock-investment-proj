@@ -72,8 +72,8 @@
         <div class="login__modal-content-wrapper">
           <div class="login__modal-title">로그인하고 <span style="color: #5F9BEE">모의투자</span>를 시작하세요!</div>
 
-          <button class="login__modal-login" type="button">로그인</button>
-          <button class="login__modal-signup" type="button">회원가입</button>
+          <a class="login__modal-login" href="/login">로그인</a>
+          <a class="login__modal-signup" href="/signup">회원가입</a>
         </div>
       </div>
     </div>

@@ -8,16 +8,4 @@ document.addEventListener('DOMContentLoaded', function () {
  
     body.classList.add('logged-out');
 
-    headerLoginBtn?.addEventListener('click', function () {
-      body.classList.add('logged-out');
-    });
-
-    popupLoginBtn?.addEventListener('click', function () {
-      body.classList.remove('logged-out');
-      body.classList.add('logged-in');
-    });
-
-    popupCloseBtn?.addEventListener('click', function () {
-      body.classList.remove('logged-out');
-    });
 });

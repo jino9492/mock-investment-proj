@@ -5,12 +5,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>MOCK 로그인</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/sign_form/login_form.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/sign_form/login_form.css"/>
 </head>
 <body class="login__page-wrap">
 <header class="login__header">
-    <div class="login__brand">로고</div>
-    <button class="login__close-button" aria-label="닫기">✕</button>
+    <div class="login__brand">MOCK</div>
+    <a class="login__close-button" aria-label="닫기" href="/">✕</a>
 </header>
 
 <main class="login__content">
@@ -43,7 +43,7 @@
         <span class="login__card-footer-text">
           아직 MOCK의 회원이 아닌가요?
         </span>
-            <a href="signup_form.jsp" class="login__card-footer-link">가입하기</a>
+            <a href="/signup" class="login__card-footer-link">가입하기</a>
         </p>
     </section>
 </main>
