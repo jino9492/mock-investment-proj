@@ -20,6 +20,9 @@ public class MemberDTO {
 
     private int virtualCash;
 
+    private Double profitRate;
+    private String statusLabel;
+
     public int getMemId() {
         return memId;
     }
@@ -106,5 +109,21 @@ public class MemberDTO {
 
     public void setVirtualCash(int virtualCash) {
         this.virtualCash = virtualCash;
+    }
+
+    public Double getProfitRate() {
+        return profitRate;
+    }
+
+    public void setProfitRate(Double profitRate) {
+        this.profitRate = profitRate;
+    }
+
+    public String getStatusLabel() {
+        return statusLabel;
+    }
+
+    public void setStatusLabel(String statusLabel) {
+        this.statusLabel = statusLabel;
     }
 }
