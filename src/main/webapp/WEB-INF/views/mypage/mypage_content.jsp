@@ -17,41 +17,48 @@
                         <h1 class="my-page__title">내 정보</h1>
                         <button class="my-page__edit-button">정보 수정</button>
                     </div>
-                    <span class="my-page__subtitle">프로필</span>
                 </div>
 
             </div>
-
 
             <!-- 프로필 카드 -->
+            <span class="my-page__subtitle">프로필</span>
             <div class="profile-card">
-
                 <div class="profile-card__body">
                     <div class="profile-card__avatar"></div>
-                    <div class="profile-card__nickname">닉네임</div>
-                </div>
-            </div>
-
-            <!-- 기본 정보 카드 -->
-            <div class="info-card">
-                <div class="info-card__list">
-                    <div class="info-card__item">
-                        <span class="info-card__label">이름</span>
-                        <span class="info-card__value">홍길동</span>
-                    </div>
-
-                    <div class="info-card__item">
-                        <span class="info-card__label">생년월일</span>
-                        <span class="info-card__value">0000.00.00</span>
-                    </div>
-
-                    <div class="info-card__item">
-                        <span class="info-card__label">휴대폰 번호</span>
-                        <span class="info-card__value">010-0000-0000</span>
+                    <div class="profile-card__item-wrapper">
+                        <div class="profile-card__item emphasize">닉네임     <button>변경</button></div>
+                        <div class="profile-card__item">example@gmail.com</div>
                     </div>
                 </div>
             </div>
 
+            <span class="my-page__subtitle">자산</span>
+            <div class="profile-card">
+                <div class="profile-card__body">
+                    <div class="profile-card__item">1,000,000원</div>
+                </div>
+            </div>
+
+            <span class="my-page__subtitle--small">11월 수익</span>
+            <div class="profile-card">
+                <div class="profile-card__body">
+                    <div class="profile-card__item">100,000원</div>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <div class="profile-card__body flex-column">
+                    <div class="profile-card__item-wrapper">
+                        <div class="profile-card__item">주문 가능 금액</div>
+                        <div class="profile-card__item">100,000원</div>
+                    </div>
+                    <div class="profile-card__item-wrapper">
+                        <div class="profile-card__item">주문 가능 금액</div>
+                        <div class="profile-card__item">100,000원</div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- 약관 섹션 -->
