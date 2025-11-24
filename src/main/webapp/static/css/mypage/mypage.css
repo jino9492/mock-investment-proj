@@ -122,7 +122,7 @@ body {
 .profile-card__avatar {
     display: flex;
     align-self: center;
-    width: 50px;    
+    width: 50px;
     height: 50px;
     border-radius: 50%;
     background-color: #D9D9D9;
@@ -205,4 +205,45 @@ body {
 .agreement-card__item-icon {
     font-size: 16px;
     color: #9ca3af;
+}
+
+.profile-card__submit {
+    display: flex;
+    justify-content: end;
+}
+
+.profile-card__item {
+
+}
+
+.profile-card__submit input {
+    background: #999999;
+    color: #CCCCCC;
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 5.5em;
+    height: 2.5em;
+    border: 0;
+    pointer-events: none;
+    cursor: not-allowed;
+    transition: background .1s linear;
+}
+
+.profile-card__submit input.active {
+    background: #2cc452;
+    color: white;
+    cursor: pointer;
+    pointer-events: all;
+}
+
+.my-page__member-control-wrapper li button {
+    background: transparent;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.my-page__member-cancel button {
+    color: red;
 }

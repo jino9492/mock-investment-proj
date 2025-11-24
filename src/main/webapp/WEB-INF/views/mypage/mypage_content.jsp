@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/mypage/mypage.css"/>
+<script src="${pageContext.request.contextPath}/static/js/mypage/mypage.js"></script>
 
 <div class="my-page">
     <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
@@ -99,34 +100,40 @@
         </c:if>
         <c:if test="${modify == 1}">
             <section class="my-page__section my-page__section--modify">
-                <span class="my-page__subtitle">정보 수정</span>
-                <div class="profile-card">
-                    <div class="profile-card__body flex-column">
-                        <div class="profile-card__item-wrapper">
-                            <div class="profile-card__item"><label for="new-name">새 닉네임</label></div>
-                            <div class="profile-card__item"><input type="text" id="new-name"/></div>
-                        </div>
-                        <div class="profile-card__item-wrapper">
-                            <div class="profile-card__item"><label for="new-password">새 비밀번호</label></div>
-                            <div class="profile-card__item"><input type="text" id="new-password"/></div>
-                        </div>
-                        <div class="profile-card__item-wrapper">
-                            <div class="profile-card__item"><label for="new-password-check">새 비밀번호 확인</label></div>
-                            <div class="profile-card__item"><input type="text" id="new-password-check"/></div>
-                        </div>
-                        <div class="profile-card__item-wrapper">
-                            <div class="profile-card__item"><label for="notification-toggle">알림 설정</label></div>
-                            <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/toggle.jsp">
-                                <jsp:param name="isActive" value="false"/>
-                                <jsp:param name="id" value="notification-toggle" />
-                            </jsp:include>
-                        </div>
-                        <div class="profile-card__submit">
-                            <input type="submit" value="제출">
+                <form method="POST">
+                    <span class="my-page__subtitle">정보 수정</span>
+                    <div class="profile-card">
+                        <div class="profile-card__body flex-column">
+                            <div class="profile-card__item-wrapper">
+                                <div class="profile-card__item"><label for="new-name">새 닉네임</label></div>
+                                <div class="profile-card__item"><input type="text" id="new-name"/></div>
+                            </div>
+                            <div class="profile-card__item-wrapper">
+                                <div class="profile-card__item"><label for="new-password">새 비밀번호</label></div>
+                                <div class="profile-card__item"><input type="password" id="new-password"/></div>
+                            </div>
+                            <div class="profile-card__item-wrapper">
+                                <div class="profile-card__item"><label for="new-password-check">새 비밀번호 확인</label></div>
+                                <div class="profile-card__item"><input type="password" id="new-password-check"/></div>
+                            </div>
+                            <div class="profile-card__item-wrapper">
+                                <div class="profile-card__item"><label for="notification-toggle">알림 설정</label></div>
+                                <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/toggle.jsp">
+                                    <jsp:param name="isActive" value="false"/>
+                                    <jsp:param name="id" value="notification-toggle" />
+                                </jsp:include>
+                            </div>
+                            <div class="profile-card__submit">
+                                <input type="submit" value="제출">
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </section>
         </c:if>
+        <ul class="my-page__member-control-wrapper">
+            <li class="my-page__bankruptcy">모의 투자를 재시작 할 수 있습니다 <button>파산 신청</button></li>
+            <li class="my-page__member-cancel">회원탈퇴 후 동일 아이디로 재가입이 불가합니다 <button>회원 탈퇴</button></li>
+        </ul>
     </main>
 </div>
