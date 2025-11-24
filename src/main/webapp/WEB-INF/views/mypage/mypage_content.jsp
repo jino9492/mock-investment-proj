@@ -121,6 +121,9 @@
                                 <jsp:param name="id" value="notification-toggle" />
                             </jsp:include>
                         </div>
+                        <div class="profile-card__submit">
+                            <input type="submit" value="제출">
+                        </div>
                     </div>
                 </div>
             </section>
