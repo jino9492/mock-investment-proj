@@ -62,6 +62,9 @@ public class AdminController extends HttpServlet {
             case "/settings":
                 req.getRequestDispatcher("/WEB-INF/views/admin/settings.jsp").forward(req, resp);
                 return;
+            case "/trades":
+                req.getRequestDispatcher("/WEB-INF/views/admin/settings.jsp").forward(req, resp);
+                return;
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
