@@ -7,6 +7,7 @@ public final class MemberStatus {
         SUCCESS,
         DUPLICATE_EMAIL,
         DUPLICATE_NICKNAME,
+        REQUIRED_AGREEMENT_MISSING,
         FAIL_INSERT // DB 삽입 실패
     }
 

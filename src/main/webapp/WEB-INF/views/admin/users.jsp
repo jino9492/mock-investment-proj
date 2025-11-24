@@ -16,7 +16,10 @@
 </head>
 <body>
 <jsp:include page="/WEB-INF/fragments/common/header_admin.jsp" />
-<jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/sidebar_left/sidebar.jsp" />
+<jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
+    <jsp:param name="menuItems" value="대시보드,회원 관리,거래 관리" />
+    <jsp:param name="menuLinks" value="/admin/dashboard,/admin/users,/admin/trades" />
+</jsp:include>
 <main class="users-page">
     <!-- 페이지 헤더 -->
     <div class="page-header">

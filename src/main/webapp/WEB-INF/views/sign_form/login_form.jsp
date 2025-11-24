@@ -35,7 +35,7 @@
                         name="password"
                 />
             </div>
-
+            <div class="error-msg">${errorMsg}</div>
             <button type="submit" class="login__card-button">로그인</button>
         </form>
 

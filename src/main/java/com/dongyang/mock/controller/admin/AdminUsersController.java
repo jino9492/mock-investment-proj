@@ -290,7 +290,7 @@ public class AdminUsersController extends HttpServlet {
             MemberDTO dto = new MemberDTO();
             dto.setMemId(memberId);
             dto.setMemEmail(existingMember.getMemEmail());
-            dto.setMemNickname(existingMember.getMemNickname());
+            dto.setMemNickname(nickname);
             dto.setVirtualCash(virtualCash);
             
             // 닉네임과 보유자금 수정 (이메일은 기존 값 유지, 비밀번호는 null로 전달하여 변경하지 않음)

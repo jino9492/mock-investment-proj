@@ -46,6 +46,18 @@ public class MypageController extends HttpServlet {
             return;
         }
 
+        if(request.getParameter("action")!=null && request.getParameter("action").equals("withdrawal")){
+            try {
+                memberService.deleteMember(sessionMember.getMemId());
+                session.removeAttribute("member");
+                session.invalidate();
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         request.setCharacterEncoding("UTF-8");
 
         String password = request.getParameter("password");
@@ -76,8 +88,8 @@ public class MypageController extends HttpServlet {
         MemberDTO update = new MemberDTO();
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
+        update.setMemId(sessionMember.getMemId());
         update.setMemEmail(sessionMember.getMemEmail());
-
         update.setMemPassword(password.isEmpty() ? null : password);
         update.setMemNickname(nickname.isEmpty() ? null : nickname);
 
@@ -88,7 +100,7 @@ public class MypageController extends HttpServlet {
         }
 
         try {
-            memberService.modifyMemberInfo(update);
+            memberService.updateMemberAccount(update);
 
             if (update.getMemNickname() != null) {
                 sessionMember.setMemNickname(update.getMemNickname());

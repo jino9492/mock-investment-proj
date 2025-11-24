@@ -8,8 +8,6 @@ import com.dongyang.mock.util.*;
 import com.dongyang.mock.util.db.DBManager;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -30,19 +28,26 @@ public class MemberService {
      * @return 가입 결과 (SUCCESS, DUPLICATE_EMAIL, DUPLICATE_NICKNAME, FAIL_INSERT)
      */
     public MemberStatus.JoinResult join(MemberDTO member) throws SQLException {
-        return executeInTransaction(conn -> {
+        return DBManager.executeInTransaction(conn -> {
             if (memberDAO.isEmailDuplicate(member.getMemEmail(), conn)) {
-                return TransactionResult.rollback(MemberStatus.JoinResult.DUPLICATE_EMAIL);
+                return DBManager.TransactionResult.rollback(MemberStatus.JoinResult.DUPLICATE_EMAIL);
             }
+
             if (memberDAO.isNicknameDuplicate(member.getMemNickname(), conn)) {
-                return TransactionResult.rollback(MemberStatus.JoinResult.DUPLICATE_NICKNAME);
+                return DBManager.TransactionResult.rollback(MemberStatus.JoinResult.DUPLICATE_NICKNAME);
+            }
+
+            if (member.getAgreeThirdAt() == null || member.getAgreePrivacyAt() == null) {
+                return DBManager.TransactionResult.rollback(MemberStatus.JoinResult.REQUIRED_AGREEMENT_MISSING);
             }
 
             int result = memberDAO.insertMember(member, conn);
+
             if (result > 0) {
-                return TransactionResult.commit(MemberStatus.JoinResult.SUCCESS);
+                return DBManager.TransactionResult.commit(MemberStatus.JoinResult.SUCCESS);
             }
-            return TransactionResult.rollback(MemberStatus.JoinResult.FAIL_INSERT);
+
+            return DBManager.TransactionResult.rollback(MemberStatus.JoinResult.FAIL_INSERT);
         });
     }
 
@@ -54,7 +59,7 @@ public class MemberService {
      * @return 로그인 성공 시 MemberDTO, 실패 시 null
      */
     public MemberDTO login(String email, String plainPassword) throws SQLException {
-        return withConnection(conn -> {
+        return DBManager.withConnection(conn -> {
             MemberDTO member = memberDAO.selectMemberByEmail(email, conn);
             if (member == null) {
                 return null;
@@ -74,7 +79,7 @@ public class MemberService {
      * @return 회원 정보, 없으면 null
      */
     public MemberDTO getMemberById(int memberId) throws SQLException {
-        return withConnection(conn -> memberDAO.selectMemberById(memberId, conn));
+        return DBManager.withConnection(conn -> memberDAO.selectMemberById(memberId, conn));
     }
 
     /**
@@ -86,30 +91,21 @@ public class MemberService {
      * @return 수정 결과 (SUCCESS, DUPLICATE_EMAIL, DUPLICATE_NICKNAME, FAIL)
      */
     public MemberStatus.UpdateResult updateMemberAccount(MemberDTO member) throws SQLException {
-        final int memberId = member.getMemId(); // 수정 대상 ID는 DTO에 있어야 함
-        final String email = member.getMemEmail();
+        final int memberId = member.getMemId();
         final String nickname = member.getMemNickname();
 
-        return executeInTransaction(conn -> {
-            if (email != null && memberDAO.isEmailDuplicate(email, conn)) {
-                MemberDTO existing = memberDAO.selectMemberByEmail(email, conn);
-                if (existing != null && existing.getMemId() != memberId) {
-                    return TransactionResult.rollback(MemberStatus.UpdateResult.DUPLICATE_EMAIL);
-                }
-            }
-
+        return DBManager.executeInTransaction(conn -> {
             if (nickname != null && !nickname.trim().isEmpty()) {
                 if (memberDAO.isNicknameDuplicateByOtherId(nickname, memberId, conn)) {
-                    return TransactionResult.rollback(MemberStatus.UpdateResult.DUPLICATE_NICKNAME);
+                    return DBManager.TransactionResult.rollback(MemberStatus.UpdateResult.DUPLICATE_NICKNAME);
                 }
             }
-
             int updated = memberDAO.updateMemberAccount(member, conn);
 
             if (updated > 0) {
-                return TransactionResult.commit(MemberStatus.UpdateResult.SUCCESS);
+                return DBManager.TransactionResult.commit(MemberStatus.UpdateResult.SUCCESS);
             }
-            return TransactionResult.rollback(MemberStatus.UpdateResult.FAIL);
+            return DBManager.TransactionResult.rollback(MemberStatus.UpdateResult.FAIL);
         });
     }
 
@@ -119,12 +115,12 @@ public class MemberService {
      * @return 삭제 성공 시 true, 실패 시 false
      */
     public boolean deleteMember(int memberId) throws SQLException {
-        return executeInTransaction(conn -> {
+        return DBManager.executeInTransaction(conn -> {
             int deleted = memberDAO.deleteMember(memberId, conn);
             if (deleted > 0) {
-                return TransactionResult.commit(Boolean.TRUE);
+                return DBManager.TransactionResult.commit(Boolean.TRUE);
             }
-            return TransactionResult.rollback(Boolean.FALSE);
+            return DBManager.TransactionResult.rollback(Boolean.FALSE);
         });
     }
 
@@ -137,7 +133,7 @@ public class MemberService {
      * @return 필터링된 회원 목록
      */
     public List<MemberDTO> getMembers(String keyword, String statusFilter, String profitFilter, String joinFilter) throws SQLException {
-        return withConnection(conn -> memberDAO.findMembers(keyword, statusFilter, profitFilter, joinFilter, conn));
+        return DBManager.withConnection(conn -> memberDAO.findMembers(keyword, statusFilter, profitFilter, joinFilter, conn));
     }
 
     /**
@@ -149,143 +145,6 @@ public class MemberService {
      * @return 회원 통계 정보
      */
     public MemberStatsDTO getMemberStats() throws SQLException {
-        return withConnection(memberDAO::fetchMemberStats);
-    }
-
-    /**
-     * 단순 DB 연결 헬퍼 메서드
-     * - 연결 획득 → 작업 수행 → 연결 해제
-     * - 트랜잭션 없이 단순 조회 작업에 사용
-     */
-    private <T> T withConnection(SqlFunction<T> function) throws SQLException {
-        Connection conn = null;
-        try {
-            conn = DBManager.getConnection();
-            return function.apply(conn);
-        } finally {
-            DBManager.close(conn, null);
-        }
-    }
-
-    /**
-     * 트랜잭션 관리 헬퍼 메서드
-     * - 자동 커밋 비활성화
-     * - 작업 수행 후 commit/rollback 결정
-     * - 예외 발생 시 자동 rollback
-     * - finally에서 자동 커밋 복구 및 연결 해제
-     */
-    private <T> T executeInTransaction(TransactionCallback<T> callback) throws SQLException {
-        Connection conn = null;
-        try {
-            conn = DBManager.getConnection();
-            conn.setAutoCommit(false);
-            TransactionResult<T> result = callback.doInTransaction(conn);
-            if (result.commit()) {
-                conn.commit();
-            } else {
-                conn.rollback();
-            }
-            return result.value();
-        } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException rollbackEx) {
-                    rollbackEx.printStackTrace();
-                }
-            }
-            throw e;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                } catch (SQLException ignored) {
-                }
-            }
-            DBManager.close(conn, null);
-        }
-    }
-
-    /**
-     * 단순 SQL 작업을 위한 함수형 인터페이스
-     */
-    @FunctionalInterface
-    private interface SqlFunction<T> {
-        T apply(Connection conn) throws SQLException;
-    }
-
-    /**
-     * 트랜잭션 내 작업을 위한 콜백 인터페이스
-     */
-    @FunctionalInterface
-    private interface TransactionCallback<T> {
-        TransactionResult<T> doInTransaction(Connection conn) throws SQLException;
-    }
-
-    /**
-     * 트랜잭션 결과를 담는 내부 클래스
-     * - commit 여부와 반환 값을 함께 관리
-     */
-    private static final class TransactionResult<T> {
-        private final T value;
-        private final boolean commit;
-
-        private TransactionResult(T value, boolean commit) {
-            this.value = value;
-            this.commit = commit;
-        }
-
-        static <T> TransactionResult<T> commit(T value) {
-            return new TransactionResult<>(value, true);
-        }
-
-        static <T> TransactionResult<T> rollback(T value) {
-            return new TransactionResult<>(value, false);
-        }
-
-        T value() {
-            return value;
-        }
-
-        boolean commit() {
-            return commit;
-        }
-    }
-
-    public int modifyMemberInfo(MemberDTO member) throws SQLException {
-        Connection conn = null;
-        int updatedCount = 0;
-
-        try {
-            conn = DBManager.getConnection();
-            conn.setAutoCommit(false);
-
-            String email = member.getMemEmail();
-
-            if (member.getMemNickname() != null && !member.getMemNickname().isEmpty()) {
-                updatedCount += memberDAO.updateNickname(email, member.getMemNickname(), conn);
-            }
-
-            if (member.getMemPassword() != null && !member.getMemPassword().isEmpty()) {
-                updatedCount += memberDAO.updatePassword(email, member.getMemPassword(), conn);
-            }
-
-            if (member.getAgreeNotificationAt() != null) {
-                updatedCount += memberDAO.updateNotificationAgreement(email, member.getAgreeNotificationAt(), conn);
-            } else {
-                updatedCount += memberDAO.updateNotificationAgreement(email, null, conn);
-            }
-
-            conn.commit();
-
-        } catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException rollbackEx) { rollbackEx.printStackTrace(); }
-            e.printStackTrace();
-        } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException e) { e.printStackTrace(); }
-            DBManager.close(conn, null);
-        }
-
-        return updatedCount;
+        return DBManager.withConnection(memberDAO::fetchMemberStats);
     }
 }

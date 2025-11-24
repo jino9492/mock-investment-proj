@@ -54,51 +54,6 @@ public class MemberDAO {
         return result;
     }
 
-    public int updateNickname(String email, String nickname, Connection conn) throws SQLException {
-        String sql = "UPDATE member SET mem_nickname = ? WHERE mem_email = ?";
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, nickname);
-            pstmt.setString(2, email);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            close(null, pstmt);
-        }
-    }
-
-    public int updatePassword(String email, String rawPassword, Connection conn) throws SQLException {
-        String sql = "UPDATE member SET mem_password = ? WHERE mem_email = ?";
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, PasswordHasher.hashPassword(rawPassword));
-            pstmt.setString(2, email);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            close(null, pstmt);
-        }
-    }
-
-    public int updateNotificationAgreement(String email, Timestamp agreementTime, Connection conn) throws SQLException {
-        String sql = "UPDATE member SET agree_notification_at = ? WHERE mem_email = ?";
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setTimestamp(1, agreementTime);
-            pstmt.setString(2, email);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            close(null, pstmt);
-        }
-    }
-
 
     /**
      * 회원 ID로 회원 정보 조회
@@ -169,23 +124,15 @@ public class MemberDAO {
         }
 
         final Integer memberId = member.getMemId();
-        final String email = member.getMemEmail();
         final String nickname = member.getMemNickname();
-        final String rawPassword = member.getMemPassword(); // rawPassword를 DTO에 담아 보냈다고 가정
+        final String rawPassword = member.getMemPassword();
         final Integer virtualCash = member.getVirtualCash();
+        final Timestamp agreeNotificationAt = member.getAgreeNotificationAt();
 
         StringBuilder sql = new StringBuilder("UPDATE member SET ");
         List<Object> parameters = new ArrayList<>();
 
         boolean needsComma = false;
-
-        // Email (null/empty 체크)
-        if (email != null && !email.trim().isEmpty()) {
-            if (needsComma) sql.append(", ");
-            sql.append("mem_email = ?");
-            parameters.add(email);
-            needsComma = true;
-        }
 
         // Nickname (null/empty 체크)
         if (nickname != null && !nickname.trim().isEmpty()) {
@@ -199,6 +146,7 @@ public class MemberDAO {
         if (rawPassword != null && !rawPassword.trim().isEmpty()) {
             if (needsComma) sql.append(", ");
             sql.append("mem_password = ?");
+            parameters.add(PasswordHasher.hashPassword(rawPassword));
             needsComma = true;
         }
 
@@ -214,9 +162,10 @@ public class MemberDAO {
             return 0;
         }
 
+        sql.append(", agree_notification_at = ?");
+        parameters.add(agreeNotificationAt);
         sql.append(" WHERE mem_id = ?");
         parameters.add(memberId);
-
         PreparedStatement pstmt = null;
         try {
             pstmt = conn.prepareStatement(sql.toString());

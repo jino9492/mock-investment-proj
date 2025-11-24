@@ -151,3 +151,6 @@ html {
   text-decoration: underline;
 }
 
+.error-msg {
+  color: red;
+}

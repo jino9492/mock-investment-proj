@@ -58,7 +58,10 @@ public class SignupController extends HttpServlet {
         } else if (status == MemberStatus.JoinResult.DUPLICATE_NICKNAME) {
             request.setAttribute("errorMsg", "닉네임 중복");
             request.getRequestDispatcher(viewPage).forward(request, response);
-        } else {
+        } else if (status == MemberStatus.JoinResult.REQUIRED_AGREEMENT_MISSING){
+            request.setAttribute("errorMsg", "필수 약관 동의 필요");
+            request.getRequestDispatcher(viewPage).forward(request, response);
+        } else{
             request.setAttribute("errorMsg", "회원가입 실패");
             request.getRequestDispatcher(viewPage).forward(request, response);
         }

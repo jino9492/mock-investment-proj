@@ -135,7 +135,10 @@
         </c:if>
         <ul class="my-page__member-control-wrapper">
             <li class="my-page__bankruptcy">모의 투자를 재시작 할 수 있습니다 <button>파산 신청</button></li>
-            <li class="my-page__member-cancel">회원탈퇴 후 일주일 이내로 동일 아이디 재가입이 불가합니다 <button>회원 탈퇴</button></li>
+            <li class="my-page__member-cancel">회원탈퇴 후 일주일 이내로 동일 아이디 재가입이 불가합니다 <button class="member-delete-trigger" name="withdrawal">회원 탈퇴</button></li>
+            <form method="POST" class="member-delete-form">
+                <input type="hidden" name="action" value="withdrawal"/>
+            </form>
         </ul>
     </main>
 </div>

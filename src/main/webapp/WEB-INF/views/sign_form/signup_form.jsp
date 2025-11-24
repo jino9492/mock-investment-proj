@@ -18,7 +18,7 @@
     <section class="signup__card">
         <h1 class="signup__card-title">회원가입</h1>
 
-        <form class="signup__card-form">
+        <form class="signup__card-form" method="POST">
             <div class="signup__card-field">
                 <input
                         type="text"
@@ -45,10 +45,6 @@
                         name="nickname"
                 />
             </div>
-
-
-
-
             <div class="signup__agreements">
                 <label class="signup__agreement-all">
                     <input type="checkbox" class="signup__agreement-checkbox" />
@@ -78,7 +74,7 @@
                     </label>
                 </div>
             </div>
-
+            <div class="error-msg">${errorMsg}</div>
             <button type="submit" class="signup__card-button">
                 회원가입
             </button>

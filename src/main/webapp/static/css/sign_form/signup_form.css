@@ -204,3 +204,7 @@ body {
 .signup__card-footer-link:hover {
   text-decoration: underline;
 }
+
+.error-msg {
+  color: red;
+}
