@@ -1,7 +1,9 @@
+<%@ page import="com.dongyang.mock.model.DTO.MemberDTO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/main_page.css"/>
 <script src="${pageContext.request.contextPath}/static/js/home/main_page.js"></script>
-
 <main class="main__content">
   <div class="main__sub-title">
     <span class="main__dot-green"></span>
@@ -12,7 +14,7 @@
 
     <!-- 계좌 카드 + 로그인 팝업 -->
     <div class="main__card-login-wrap">
-      <section class="main__card-account">
+      <section class="main__card-account ${isLoggedIn ? "logged-in" : ""}">
         <h1 class="main__page-title">○○○님의 가상 주식 계좌</h1>
         <div class="main__summary-grid">
           <div class="main__summary-box">
@@ -67,15 +69,17 @@
         </table>
       </section>
 
-      <!-- 로그인 팝업 -->
-      <div class="login__modal">
-        <div class="login__modal-content-wrapper">
-          <div class="login__modal-title">로그인하고 <span style="color: #5F9BEE">모의투자</span>를 시작하세요!</div>
+      <c:if test="${!isLoggedIn}">
+        <!-- 로그인 팝업 -->
+        <div class="login__modal">
+          <div class="login__modal-content-wrapper">
+            <div class="login__modal-title">로그인하고 <span style="color: #5F9BEE">모의투자</span>를 시작하세요!</div>
 
-          <a class="login__modal-login" href="/login">로그인</a>
-          <a class="login__modal-signup" href="/signup">회원가입</a>
+            <a class="login__modal-login" href="/login">로그인</a>
+            <a class="login__modal-signup" href="/signup">회원가입</a>
+          </div>
         </div>
-      </div>
+      </c:if>
     </div>
 
 

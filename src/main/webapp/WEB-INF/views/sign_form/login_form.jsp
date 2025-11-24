@@ -17,13 +17,13 @@
     <section class="login__card">
         <h1 class="login__card-title">로그인</h1>
 
-        <form class="login__card-form">
+        <form class="login__card-form" method="POST">
             <div class="login__card-field">
                 <input
-                        type="text"
+                        type="email"
                         class="login__card-input"
-                        placeholder="닉네임"
-                        name="nickname"
+                        placeholder="이메일"
+                        name="email"
                 />
             </div>
 

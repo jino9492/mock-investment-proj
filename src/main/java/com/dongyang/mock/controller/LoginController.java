@@ -34,7 +34,7 @@ public class LoginController extends HttpServlet {
         if (member != null) {
             HttpSession session = request.getSession();
             session.setAttribute("member", member);
-            response.sendRedirect(request.getContextPath() + "/index.jsp");
+            response.sendRedirect("/");
         } else {
             request.setAttribute("errorMsg", "로그인 정보가 일치하지 않습니다.");
             request.getRequestDispatcher(viewPage).forward(request, response);
