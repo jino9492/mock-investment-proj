@@ -2,14 +2,12 @@ body {
     background-color: #F6F7F9;
 }
 
-.detail-header-bar {
-    background: #fff;
-    border-bottom: 1px solid #E6E8F0;
-    padding: 10px 30px;
+.detail-header-bar a {
+    border-bottom: #1C1E23 1px solid;
 }
 
 .detail-back {
-    color: #2F54EB;
+    color: #1C1E23;
     text-decoration: none;
     font-weight: 600;
 }

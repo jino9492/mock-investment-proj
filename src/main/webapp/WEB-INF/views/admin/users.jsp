@@ -16,66 +16,6 @@
 <c:set var="statusFilter" value="${requestScope.statusFilter}" />
 <c:set var="profitFilter" value="${requestScope.profitFilter}" />
 <c:set var="joinFilter" value="${requestScope.joinFilter}" />
-<!-- 회원 목록 + 통계 조회 (필터 조건 반영) -->
-<sql:query var="memberResult" dataSource="${memberDS}">
-    SELECT mem_id,
-           mem_email,
-           mem_nickname,
-           mem_join_at,
-           DATE_FORMAT(mem_join_at, '%Y.%m.%d') AS mem_join_at_fmt,
-           mem_last_login_at,
-           DATE_FORMAT(mem_last_login_at, '%Y.%m.%d %H:%i') AS mem_last_login_at_fmt,
-           mem_last_login_ip,
-           virtual_cash,
-           ((virtual_cash - 10000000) / 10000000.0) * 100 AS profit_rate,
-           CASE
-               WHEN mem_last_login_at IS NOT NULL AND mem_last_login_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) THEN '활동'
-               ELSE '휴면'
-           END AS status_label
-    FROM member
-    WHERE 1 = 1
-    <c:if test="${not empty keyword}">
-        AND (
-            CAST(mem_id AS CHAR) LIKE ?
-            OR mem_email LIKE ?
-            OR mem_nickname LIKE ?
-        )
-    </c:if>
-    <c:if test="${statusFilter eq 'active'}">
-        AND mem_last_login_at IS NOT NULL
-        AND mem_last_login_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-    </c:if>
-    <c:if test="${statusFilter eq 'dormant'}">
-        AND (mem_last_login_at IS NULL OR mem_last_login_at < DATE_SUB(NOW(), INTERVAL 6 MONTH))
-    </c:if>
-    <c:if test="${profitFilter eq '10'}">
-        AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 10
-    </c:if>
-    <c:if test="${profitFilter eq '30'}">
-        AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 30
-    </c:if>
-    <c:if test="${profitFilter eq '50'}">
-        AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 50
-    </c:if>
-    <c:if test="${joinFilter eq '1m'}">
-        AND mem_join_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
-    </c:if>
-    <c:if test="${joinFilter eq '3m'}">
-        AND mem_join_at >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
-    </c:if>
-    <c:if test="${joinFilter eq '6m'}">
-        AND mem_join_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-    </c:if>
-    <c:if test="${joinFilter eq '1y'}">
-        AND mem_join_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
-    </c:if>
-    ORDER BY mem_id DESC
-    <c:if test="${not empty keyword}">
-        <sql:param value="${keywordPattern}" />
-        <sql:param value="${keywordPattern}" />
-        <sql:param value="${keywordPattern}" />
-    </c:if>
-</sql:query>
 <html>
 <head>
     <title>사용자 관리</title>
@@ -121,7 +61,7 @@
                 명
             </div>
             <div class="stat-card__change stat-card__change--down">
-                데이터 준비 중
+                전일 대비 변동 없음
             </div>
         </article>
 
@@ -132,7 +72,7 @@
                 명
             </div>
             <div class="stat-card__change stat-card__change--up">
-                데이터 준비 중
+                전일 대비 변동 없음
             </div>
         </article>
     </section>
@@ -146,7 +86,7 @@
                 명
             </div>
             <div class="stat-card__change stat-card__change--down">
-                데이터 준비 중
+                전일 대비 변동 없음
             </div>
         </article>
 
@@ -157,7 +97,7 @@
                 명
             </div>
             <div class="stat-card__change stat-card__change--up">
-                데이터 준비 중
+                전일 대비 변동 없음
             </div>
         </article>
 
@@ -165,7 +105,7 @@
             <div class="stat-card__label">탈퇴 사용자 수</div>
             <div class="stat-card__value">-</div>
             <div class="stat-card__change stat-card__change--down">
-                데이터 준비 중
+                전일 대비 변동 없음
             </div>
         </article>
     </section>
@@ -300,7 +240,7 @@
             <!-- 페이지네이션 -->
             <div class="pagination">
                 <button class="pagination__btn">이전</button>
-                <button class="pagination__btn pagination__btn--active">1</button>
+                <button class="pagination__btn">1</button>
                 <button class="pagination__btn">2</button>
                 <button class="pagination__btn">3</button>
                 <button class="pagination__btn">4</button>
@@ -319,13 +259,15 @@
                 <button type="button" class="modal__close-btn" data-modal-close>&times;</button>
             </div>
             <form id="member-create-form" class="modal-form" method="post" action="${pageContext.request.contextPath}/admin/users" accept-charset="UTF-8">
-                <div class="form-field">
-                    <label for="memberEmail" class="form-field__label">이메일<span class="form-field__required">*</span></label>
-                    <input type="email" id="memberEmail" name="memberEmail" class="form-field__input" required placeholder="user@example.com">
-                </div>
-                <div class="form-field">
-                    <label for="memberNickname" class="form-field__label">닉네임<span class="form-field__required">*</span></label>
-                    <input type="text" id="memberNickname" name="memberNickname" class="form-field__input" required placeholder="닉네임">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-field">
+                        <label for="memberEmail" class="form-field__label">이메일<span class="form-field__required">*</span></label>
+                        <input type="email" id="memberEmail" name="memberEmail" class="form-field__input" required placeholder="user@example.com">
+                    </div>
+                    <div class="form-field">
+                        <label for="memberNickname" class="form-field__label">닉네임<span class="form-field__required">*</span></label>
+                        <input type="text" id="memberNickname" name="memberNickname" class="form-field__input" required placeholder="닉네임">
+                    </div>
                 </div>
                 <div class="form-field">
                     <label for="memberPassword" class="form-field__label">임시 비밀번호<span class="form-field__required">*</span></label>
@@ -333,14 +275,6 @@
                 </div>
                 <fieldset class="form-field form-field--inline">
                     <legend class="form-field__label">약관 동의</legend>
-                    <label class="form-checkbox">
-                        <input type="checkbox" name="agreePrivacy" checked>
-                        <span>개인정보 수집 동의</span>
-                    </label>
-                    <label class="form-checkbox">
-                        <input type="checkbox" name="agreeThird">
-                        <span>제3자 정보 제공 동의</span>
-                    </label>
                     <label class="form-checkbox">
                         <input type="checkbox" name="agreeNotification">
                         <span>알림 수신 동의</span>

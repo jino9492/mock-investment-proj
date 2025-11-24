@@ -10,13 +10,25 @@ import static com.dongyang.mock.util.db.DBManager.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 회원 데이터 접근 객체 (DAO)
+ * - 회원 정보 CRUD 작업
+ * - 회원 검색 및 필터링
+ * - 회원 통계 조회
+ * - 중복 체크
+ */
 public class MemberDAO {
 
-    // 멤버 추가
+    /**
+     * 신규 회원 추가
+     * - 비밀번호는 해시화하여 저장
+     * - 기본 예치금 포함
+     * @return 영향받은 행 수 (1: 성공, 0: 실패)
+     */
     public int insertMember(MemberDTO member, Connection conn) throws SQLException {
         String sql = "INSERT INTO member(mem_email, mem_password, mem_nickname, mem_last_login_IP," +
-                "agree_privacy_at, agree_third_at, agree_notification_at)" +
-                "values (?, ?, ?, ?, ?, ?, ?)";
+                "agree_privacy_at, agree_third_at, agree_notification_at, virtual_cash)" +
+                "values (?, ?, ?, ?, ?, ?, ?, ?)";
         int result = 0;
         PreparedStatement pstmt = null;
 
@@ -30,6 +42,7 @@ public class MemberDAO {
             pstmt.setTimestamp(5, member.getAgreePrivacyAt());
             pstmt.setTimestamp(6, member.getAgreeThirdAt());
             pstmt.setTimestamp(7, member.getAgreeNotificationAt());
+            pstmt.setInt(8, member.getVirtualCash());
 
             result = pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -41,6 +54,10 @@ public class MemberDAO {
         return result;
     }
 
+    /**
+     * 회원 ID로 회원 정보 조회
+     * @return 회원 정보, 없으면 null
+     */
     public MemberDTO selectMemberById(int memberId, Connection conn) throws SQLException {
         String sql = "SELECT * FROM member WHERE mem_id=?";
         PreparedStatement pstmt = null;
@@ -58,11 +75,21 @@ public class MemberDAO {
         return null;
     }
 
-    public int updateMemberAccount(int memberId, String email, String nickname, String rawPassword, Connection conn) throws SQLException {
+    /**
+     * 회원 계정 정보 수정
+     * - 비밀번호는 null이 아니고 비어있지 않을 때만 업데이트
+     * - 보유자금은 null이 아닐 때만 업데이트
+     * - 비밀번호는 해시화하여 저장
+     * @return 영향받은 행 수
+     */
+    public int updateMemberAccount(int memberId, String email, String nickname, String rawPassword, Integer virtualCash, Connection conn) throws SQLException {
         StringBuilder sql = new StringBuilder("UPDATE member SET mem_email = ?, mem_nickname = ?");
         boolean hasPassword = rawPassword != null && !rawPassword.trim().isEmpty();
         if (hasPassword) {
             sql.append(", mem_password = ?");
+        }
+        if (virtualCash != null) {
+            sql.append(", virtual_cash = ?");
         }
         sql.append(" WHERE mem_id = ?");
 
@@ -75,6 +102,9 @@ public class MemberDAO {
             if (hasPassword) {
                 pstmt.setString(idx++, PasswordHasher.hashPassword(rawPassword));
             }
+            if (virtualCash != null) {
+                pstmt.setInt(idx++, virtualCash);
+            }
             pstmt.setInt(idx, memberId);
             return pstmt.executeUpdate();
         } finally {
@@ -82,6 +112,10 @@ public class MemberDAO {
         }
     }
 
+    /**
+     * 회원 삭제
+     * @return 영향받은 행 수 (1: 성공, 0: 실패)
+     */
     public int deleteMember(int memberId, Connection conn) throws SQLException {
         String sql = "DELETE FROM member WHERE mem_id = ?";
         PreparedStatement pstmt = null;
@@ -94,7 +128,10 @@ public class MemberDAO {
         }
     }
 
-    // 닉네임으로 검색
+    /**
+     * 이메일로 회원 정보 조회
+     * @return 회원 정보, 없으면 null
+     */
     public MemberDTO selectMemberByEmail(String email, Connection conn) throws SQLException {
         String sql = "SELECT * FROM member WHERE mem_email=?";
         PreparedStatement pstmt = null;
@@ -116,18 +153,30 @@ public class MemberDAO {
         return null;
     }
 
-    // 닉네임 중복 체크
+    /**
+     * 닉네임 중복 체크
+     * @return 중복이면 true, 없으면 false
+     */
     public boolean isNicknameDuplicate(String nickname, Connection conn) throws SQLException {
         String sql = "SELECT * FROM member WHERE mem_nickname=?";
         return isUnique(sql, nickname, conn);
     }
 
-    // 이메일 중복 체크
+    /**
+     * 이메일 중복 체크
+     * @return 중복이면 true, 없으면 false
+     */
     public boolean isEmailDuplicate(String email, Connection conn) throws SQLException {
         String sql = "SELECT * FROM member WHERE mem_email=?";
         return isUnique(sql, email, conn);
     }
 
+    /**
+     * 중복 체크 공통 메서드
+     * @param sql 실행할 SQL 쿼리
+     * @param col 검사할 값
+     * @return 중복이면 true, 없으면 false
+     */
     public boolean isUnique(String sql, String col, Connection conn){
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -150,7 +199,12 @@ public class MemberDAO {
         return false;
     }
 
-    // 최근 로그인 기록 갱신
+    /**
+     * 최근 로그인 정보 갱신
+     * - 로그인 시간을 현재 시간으로 업데이트
+     * - 로그인 IP 주소 업데이트
+     * @return 영향받은 행 수
+     */
     public int renewLastLogin(String email, String loginIP, Connection conn) throws SQLException {
         String sql = "UPDATE member SET mem_last_login_at = NOW(), mem_last_login_ip = ? WHERE mem_email = ?";
         int result = 0;
@@ -173,6 +227,10 @@ public class MemberDAO {
         return result;
     }
 
+    /**
+     * ResultSet을 MemberDTO로 변환
+     * - profit_rate와 status_label은 선택적 필드 (없을 수 있음)
+     */
     private MemberDTO mapToMember(ResultSet rs) throws SQLException {
         MemberDTO member = new MemberDTO();
         member.setMemId(rs.getInt("mem_id"));
@@ -199,6 +257,15 @@ public class MemberDAO {
         return member;
     }
 
+    /**
+     * 필터 조건에 맞는 회원 목록 조회
+     * - 키워드 검색: 회원 ID, 이메일, 닉네임
+     * - 상태 필터: 활동/휴면
+     * - 수익률 필터: 10%, 30%, 50% 이상
+     * - 가입일 필터: 1개월, 3개월, 6개월, 1년
+     * - 수익률과 상태 레이블을 계산하여 포함
+     * @return 필터링된 회원 목록
+     */
     public List<MemberDTO> findMembers(String keyword, String statusFilter, String profitFilter, String joinFilter, Connection conn) throws SQLException {
         StringBuilder sql = new StringBuilder(
                 "SELECT mem_id, mem_email, mem_nickname, mem_join_at, mem_last_login_at, mem_last_login_ip, mem_password, " +
@@ -265,6 +332,14 @@ public class MemberDAO {
         return members;
     }
 
+    /**
+     * 회원 통계 정보 조회
+     * - 전체 회원 수
+     * - 당일 접속자 수
+     * - 활동 사용자 수 (최근 6개월 내 로그인)
+     * - 휴면 사용자 수 (6개월 이상 미접속)
+     * @return 회원 통계 정보
+     */
     public MemberStatsDTO fetchMemberStats(Connection conn) throws SQLException {
         String sql = "SELECT COUNT(*) AS total_count, " +
                 "SUM(CASE WHEN DATE(mem_last_login_at) = CURDATE() THEN 1 ELSE 0 END) AS today_login_count, " +
@@ -277,17 +352,16 @@ public class MemberDAO {
         try {
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
+            MemberStatsDTO stats = new MemberStatsDTO();
             if (rs.next()) {
-                MemberStatsDTO stats = new MemberStatsDTO();
                 stats.setTotalCount(rs.getInt("total_count"));
                 stats.setTodayLoginCount(rs.getInt("today_login_count"));
                 stats.setActiveCount(rs.getInt("active_count"));
                 stats.setDormantCount(rs.getInt("dormant_count"));
-                return stats;
             }
+            return stats;
         } finally {
             close(null, pstmt, rs);
         }
-        return null;
     }
 }

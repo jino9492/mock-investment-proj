@@ -18,14 +18,14 @@
 <body>
 <header id="user__header">
     <jsp:include page="/WEB-INF/fragments/common/header_admin.jsp" />
-    <div class="detail-header-bar">
-        <a class="detail-back" href="${pageContext.request.contextPath}/admin/users">← 회원 목록으로</a>
-    </div>
 </header>
 <aside id="user__aside">
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/sidebar_left/sidebar.jsp" />
  </aside>
 <main class="detail-page">
+    <div class="detail-header-bar">
+        <a class="detail-back" href="${pageContext.request.contextPath}/admin/users">← 회원 목록으로</a>
+    </div>
     <!-- 알림 배너 -->
     <c:if test="${not empty param.status}">
         <div class="alert ${param.status eq 'update_success' ? 'alert--success' : 'alert--error'}">
@@ -53,7 +53,7 @@
             </div>
             <div>
                 <p class="member-card__label">총 거래 건수</p>
-                <strong>데이터 준비 중</strong>
+                <strong>0회</strong>
             </div>
         </div>
     </section>
@@ -97,7 +97,7 @@
             </div>
             <div class="detail-info">
                 <p class="detail-info__label">총 거래 건수</p>
-                <p class="detail-info__value">데이터 준비 중</p>
+                <p class="detail-info__value">0회</p>
             </div>
         </div>
     </section>
@@ -111,15 +111,15 @@
             </article>
             <article class="asset-card asset-card--purple">
                 <p class="asset-card__label">총 자산</p>
-                <p class="asset-card__value">데이터 준비 중</p>
+                <p class="asset-card__value">${virtualCashFormatted}원</p>
             </article>
             <article class="asset-card asset-card--green">
                 <p class="asset-card__label">수익률</p>
-                <p class="asset-card__value">데이터 준비 중</p>
+                <p class="asset-card__value">0.0%</p>
             </article>
             <article class="asset-card asset-card--green">
                 <p class="asset-card__label">평가 손익</p>
-                <p class="asset-card__value">데이터 준비 중</p>
+                <p class="asset-card__value">0원</p>
             </article>
         </div>
     </section>
@@ -249,17 +249,19 @@
             <form method="post" action="${pageContext.request.contextPath}/admin/users/detail" class="modal-form">
                 <input type="hidden" name="action" value="update"/>
                 <input type="hidden" name="memberId" value="${member.memId}"/>
-                <div class="form-field">
-                    <label class="form-field__label" for="editEmail">이메일</label>
-                    <input type="email" id="editEmail" name="memberEmail" class="form-field__input" required value="${member.memEmail}">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-field">
+                        <label class="form-field__label" for="editEmail">이메일</label>
+                        <input type="email" id="editEmail" name="memberEmail" class="form-field__input" value="${member.memEmail}" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-field__label" for="editNickname">닉네임</label>
+                        <input type="text" id="editNickname" name="memberNickname" class="form-field__input" required value="${member.memNickname}">
+                    </div>
                 </div>
                 <div class="form-field">
-                    <label class="form-field__label" for="editNickname">닉네임</label>
-                    <input type="text" id="editNickname" name="memberNickname" class="form-field__input" required value="${member.memNickname}">
-                </div>
-                <div class="form-field">
-                    <label class="form-field__label" for="editPassword">비밀번호 재설정 <span class="form-field__hint">(선택)</span></label>
-                    <input type="password" id="editPassword" name="memberPassword" class="form-field__input" minlength="6" placeholder="변경 시에만 입력">
+                    <label class="form-field__label" for="editVirtualCash">보유자금</label>
+                    <input type="number" id="editVirtualCash" name="virtualCash" class="form-field__input" required min="0" value="${member.virtualCash}" placeholder="보유자금을 입력하세요">
                 </div>
                 <div class="modal__actions">
                     <button type="button" class="modal__btn modal__btn--ghost" data-modal-close>취소</button>

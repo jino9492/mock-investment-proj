@@ -65,7 +65,7 @@
     </c:choose>
 
     <%-- 활성화(Active) 상태 확인 --%>
-    <c:set var="isActive" value="${currentPage eq link}" />
+    <c:set var="isActive" value="${fn:contains(currentPage, link) and link != '#'}" />
 
     <a href="${link}" class="sidebar-left__btn ${isActive ? 'active' : ''}">
       <span class="sidebar-left__btn-text">${titleText}</span>
