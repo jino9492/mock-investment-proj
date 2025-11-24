@@ -10,7 +10,6 @@
 
 .stock-box__container {
     display: flex;
-    margin-left: 15px;
     padding-right: 10px;
     width: calc(100% - 75px - 30px);
     border-radius: 10px;

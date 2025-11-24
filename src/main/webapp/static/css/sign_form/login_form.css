@@ -1,0 +1,153 @@
+:root {
+  background: linear-gradient(
+    to top,
+    #ffffff 0%,
+    #e5eeff 50%,
+    #99bdff 100%
+  );
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+
+.login__page-wrap {
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 헤더 */
+
+.login__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  padding-left: 25px;
+  margin-bottom: 200px;
+}
+
+.login__brand {
+  display: inline;
+  letter-spacing: -8px;
+  font-weight: 1000;
+  font-size: 32px;
+  color: white;
+}
+
+.login__close-button {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 36px;
+  color: black;
+  text-decoration: none;
+}
+
+/* 메인 컨텐츠 정렬 */
+
+.login__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+/* 로그인 카드 */
+
+.login__card {
+  background-color: #FFFFFF;
+  width: 500px;
+  height: 500px;
+  margin-top: 0;
+  border-radius: 24px;
+  text-align: center;
+}
+
+.login__card-title {
+
+  margin-top: 40px;
+  margin-bottom: 30px;
+  font-size: 30px;
+  font-weight: 800;
+
+}
+
+/* 폼 */
+
+.login__card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login__card-field {
+  width: 100%;
+}
+
+.login__card-input {
+  width: 420px;
+  height: 65px;
+  border-radius: 10px;
+  border: 0.5px solid #ABABAB;
+  padding-left: 27px;
+  font-size: 20px;
+  outline: none;
+  box-sizing: border-box;
+  background-color: #F9F9F9;
+}
+
+.login__card-input::placeholder {
+  color: #ABABAB;
+}
+
+.login__card-input:focus {
+  border-color: #4B8AFF;
+  box-shadow: 0 0 0 1px #689DFF;
+}
+
+/* 로그인 버튼 */
+
+.login__card-button {
+  margin-top: 45px;
+  height: 65px;
+  width: 420px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: #689DFF;
+  margin-left: 40px;
+}
+
+/* 푸터 텍스트 */
+
+.login__card-footer {
+  margin-top: 35px;
+  font-size: 16px;
+  color: #17171B;
+}
+
+.login__card-footer-text {
+  margin-right: 4px;
+}
+
+.login__card-footer-link {
+  color: #4B8AFF;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.login__card-footer-link:hover {
+  text-decoration: underline;
+}
+

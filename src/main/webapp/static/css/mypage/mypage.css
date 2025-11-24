@@ -1,0 +1,253 @@
+/* 공통 */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #F6F7F9;
+
+}
+
+
+
+/* 전체 레이아웃 */
+.my-page {
+    display: flex;
+    min-height: 100vh;
+    padding-left: 250px;
+    width: 100%;
+}
+
+
+/* 메인 영역 */
+.my-page__content {
+    flex: 1;
+    max-width: calc(100% - 75px);
+    padding: 5%;
+}
+
+.my-page__section {
+    margin-bottom: 32px;
+}
+
+.my-page__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.my-page__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+
+}
+
+.my-page__title-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+}
+
+.my-page__subtitle {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.my-page__subtitle--small {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 15px;
+    margin-bottom: 12px;
+}
+
+.my-page__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+
+.my-page__edit-button {
+    border-radius: 16px;
+    border: none;
+    font-size: 14px;
+    color: #ABABAB;
+    cursor: pointer;
+    background-color: #F6F7F9;
+    margin-left: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+
+}
+
+
+
+.my-page__section-title {
+    margin: 0 0 12px;
+    font-size: 18px;
+}
+
+/* 프로필 카드 */
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #BABABA;
+    padding: 16px 24px;
+    margin-bottom: 16px;
+}
+
+.profile-card__body {
+    display: flex;
+    gap: 25px;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-card__avatar {
+    display: flex;
+    align-self: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #D9D9D9;
+}
+
+.profile-card__item {
+    margin: 8px 0;
+}
+
+.profile-card__item label {
+    font-weight: bold;
+}
+
+.profile-card__item input {
+    width: 30%;
+    height: 3em;
+    border-radius: 8px;
+    border: 1px solid #BABABA;
+    padding: 8px;
+}
+
+.emphasize {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* 약관 카드 */
+.agreement-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #BABABA;
+    padding: 20px 30px;
+
+}
+
+.agreement-card__title {
+    margin-top: 15px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    position: relative;
+    padding-bottom: 14px;
+}
+
+.agreement-card__title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #e5e7eb;
+
+}
+
+
+.agreement-card__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.agreement-card__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 550px 12px 0;
+}
+
+
+.agreement-card__item:first-child {
+    border-top: none;
+}
+
+.agreement-card__item-text {
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.agreement-card__item-icon {
+    font-size: 16px;
+    color: #9ca3af;
+}
+
+.profile-card__submit {
+    display: flex;
+    justify-content: space-between;
+}
+
+.profile-card__item {
+
+}
+
+.profile-card__submit input {
+    background: #999999;
+    color: #CCCCCC;
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 5.5em;
+    height: 2.5em;
+    border: 0;
+    pointer-events: none;
+    cursor: not-allowed;
+    transition: background .1s linear;
+}
+
+.profile-card__submit input.active {
+    background: #2cc452;
+    color: white;
+    cursor: pointer;
+    pointer-events: all;
+}
+
+.my-page__member-control-wrapper li button {
+    background: transparent;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.my-page__member-cancel button {
+    color: red;
+}
+
+.error-msg {
+    color: red;
+}
