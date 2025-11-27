@@ -1,4 +1,4 @@
-package com.dongyang.mock.controller.auth;
+package com.dongyang.mock.controller.member;
 
 import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.service.MemberService;
