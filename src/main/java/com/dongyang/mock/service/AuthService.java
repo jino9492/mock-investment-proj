@@ -1,16 +1,15 @@
 package com.dongyang.mock.service;
 
 import com.dongyang.mock.util.api.TokenManager;
-import com.google.gson.Gson; // Gson 라이브러리 임포트
+import com.google.gson.Gson;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map; // Map 사용을 위해 임포트
+import java.util.Map;
 
 public class AuthService {
 
     private final TokenManager tokenManager;
-    // Gson 인스턴스 생성
     private final Gson gson = new Gson();
 
     public AuthService() {
@@ -34,7 +33,7 @@ public class AuthService {
             conn.setRequestProperty("Accept", "application/json");
             conn.setDoOutput(true);
 
-            // 요청 본문 생성 (TokenManager의 상수 사용)
+            // 요청 본문 생성
             String jsonInputString = String.format(
                     "{\"grant_type\":\"client_credentials\", \"appkey\":\"%s\", \"appsecret\":\"%s\"}",
                     TokenManager.APP_KEY,
@@ -46,7 +45,7 @@ public class AuthService {
                 os.write(jsonInputString.getBytes("utf-8"));
             }
 
-            // 3. 응답 처리
+            // 응답 처리
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 String responseJson = readResponse(conn.getInputStream());
                 System.out.println(responseJson);
