@@ -53,6 +53,6 @@ public class TokenManager {
         this.accessToken = token;
         // API가 알려준 만료 시간(초)에서 약 60초를 미리 빼서 갱신하도록 설정
         this.tokenExpiryTime = System.currentTimeMillis() + (expiresIn * 1000) - 60000;
-        System.out.println("Access Token이 성공적으로 저장되었습니다. 만료 시각: " + new java.util.Date(tokenExpiryTime));
+        System.out.println("Access Token is successfully saved. Expiry Time : " + new java.util.Date(tokenExpiryTime));
     }
 }

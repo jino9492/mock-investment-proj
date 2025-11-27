@@ -7,11 +7,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.dongyang.mock.model.DTO.AuthResponseDTO;
+import com.google.gson.Gson;
 
 @WebServlet("/auth/issue-token")
 public class AuthController extends HttpServlet {
-
     private AuthService authService;
+    private final Gson gson = new Gson(); // Gson 인스턴스 생성
 
     @Override
     public void init() throws ServletException {
@@ -19,19 +21,22 @@ public class AuthController extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         String token = authService.issueAccessToken();
+
+        AuthResponseDTO responseDTO;
+
         if (token != null) {
-            response.getWriter().write("{\"success\": true, \"accessToken\": \"" + token + "\"}");
+            responseDTO = new AuthResponseDTO(true, token, "Access Token Issued");
         } else {
-            // 토큰 발급 실패
+            responseDTO = new AuthResponseDTO(false, null, "Access Token Issuing Failed");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"success\": false, \"message\": \"Access Token 발급에 실패했습니다. 키 또는 네트워크를 확인하세요.\"}");
         }
+
+        String jsonResponse = gson.toJson(responseDTO);
+        response.getWriter().write(jsonResponse);
     }
 }

@@ -48,7 +48,6 @@ public class AuthService {
             // 응답 처리
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 String responseJson = readResponse(conn.getInputStream());
-                System.out.println(responseJson);
 
                 Map<String, Object> responseMap = gson.fromJson(responseJson, Map.class);
 
@@ -67,7 +66,7 @@ public class AuthService {
                     tokenManager.setToken(accessToken, expiresIn);
                     return accessToken;
                 } else {
-                    System.err.println("토큰 발급 응답에 필수 정보(access_token, expires_in)가 누락되었습니다.");
+                    System.err.println("Required information (access_token, expires_in) is missing in the token issuance response.");
                 }
             } else {
                 InputStream errorStream = conn.getErrorStream();
@@ -76,8 +75,8 @@ public class AuthService {
                 }
 
                 String errorResponse = readResponse(errorStream);
-                System.err.println("❌ 토큰 발급 실패 - 응답 코드: " + conn.getResponseCode());
-                System.err.println("📜 수신된 원본 데이터:\n" + errorResponse);
+                System.err.println("Token Issuing Failed - Response Code : " + conn.getResponseCode());
+                System.err.println("receipted origin data:\n" + errorResponse);
             }
 
         } catch (Exception e) {
