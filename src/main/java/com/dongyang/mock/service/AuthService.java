@@ -88,6 +88,22 @@ public class AuthService {
         return null;
     }
 
+    public String getValidAccessToken() {
+        TokenManager tokenManager = TokenManager.getInstance();
+
+        // 만료 여부 확인
+        if (tokenManager.getAccessToken() == null) {
+            String newToken = issueAccessToken();
+
+            if (newToken == null) {
+                throw new RuntimeException("Access Token refresh failed.");
+            }
+            return newToken;
+        }
+
+        return tokenManager.getAccessToken();
+    }
+
     private String readResponse(InputStream is) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf-8"))) {
             StringBuilder responseBody = new StringBuilder();
@@ -98,4 +114,5 @@ public class AuthService {
             return responseBody.toString();
         }
     }
+
 }
