@@ -4,7 +4,7 @@ import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.model.DTO.MemberStatsDTO;
 import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.service.MemberService;
-import com.dongyang.mock.util.DateParser;
+import com.dongyang.mock.util.DateUtility;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -147,9 +147,9 @@ public class AdminUsersController extends HttpServlet {
         newMember.setMemNickname(nickname);
         newMember.setMemLastLoginIP(req.getRemoteAddr());
         newMember.setMemLastLoginAt(null);
-        newMember.setAgreePrivacyAt(DateParser.getCheckTime(req.getParameter("agreePrivacy"), now));
-        newMember.setAgreeThirdAt(DateParser.getCheckTime(req.getParameter("agreeThird"), now));
-        newMember.setAgreeNotificationAt(DateParser.getCheckTime(req.getParameter("agreeNotification"), now));
+        newMember.setAgreePrivacyAt(DateUtility.getCheckTime(req.getParameter("agreePrivacy"), now));
+        newMember.setAgreeThirdAt(DateUtility.getCheckTime(req.getParameter("agreeThird"), now));
+        newMember.setAgreeNotificationAt(DateUtility.getCheckTime(req.getParameter("agreeNotification"), now));
         newMember.setVirtualCash(1000000); // 기본 예치금 1,000,000원
 
         MemberStatus.JoinResult status = MemberStatus.JoinResult.FAIL_INSERT;

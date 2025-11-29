@@ -1,4 +1,4 @@
-package com.dongyang.mock.service;
+package com.dongyang.mock.service.auth;
 
 import com.dongyang.mock.util.api.TokenManager;
 import com.google.gson.Gson;
@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.Map;
 
 public class AuthService {
-
     private final TokenManager tokenManager;
     private final Gson gson = new Gson();
 
@@ -18,15 +17,15 @@ public class AuthService {
 
     public String issueAccessToken() {
 
-        String cachedToken = tokenManager.getAccessToken();
+        String cachedToken = tokenManager.getAccessToken(TokenManager.TOKEN_KIS);
         if (cachedToken != null) {
-            System.out.println("캐시된 토큰 재사용: " + cachedToken);
+            System.out.println("KIS 캐시된 토큰 재사용: " + cachedToken);
             return cachedToken;
         }
 
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(TokenManager.API_TOKEN_URL + "/oauth2/tokenP");
+            URL url = new URL(TokenManager.KIS_API_TOKEN_URL + "/oauth2/tokenP");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -36,8 +35,8 @@ public class AuthService {
             // 요청 본문 생성
             String jsonInputString = String.format(
                     "{\"grant_type\":\"client_credentials\", \"appkey\":\"%s\", \"appsecret\":\"%s\"}",
-                    TokenManager.APP_KEY,
-                    TokenManager.APP_SECRET
+                    TokenManager.KIS_APP_KEY,
+                    TokenManager.KIS_APP_SECRET
             );
 
             // 본문 전송
@@ -63,7 +62,7 @@ public class AuthService {
 
                 // TokenManager에 저장
                 if (accessToken != null && expiresIn > 0) {
-                    tokenManager.setToken(accessToken, expiresIn);
+                    tokenManager.setToken(TokenManager.TOKEN_KIS, accessToken, expiresIn);
                     return accessToken;
                 } else {
                     System.err.println("Required information (access_token, expires_in) is missing in the token issuance response.");
@@ -88,7 +87,7 @@ public class AuthService {
         return null;
     }
 
-    private String readResponse(InputStream is) throws IOException {
+    protected String readResponse(InputStream is) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf-8"))) {
             StringBuilder responseBody = new StringBuilder();
             String responseLine;
