@@ -26,7 +26,7 @@ public class AuthService {
 
         HttpURLConnection conn = null;
         try {
-            String endpoint = "/auth/token";
+            String endpoint = "/oauth2/token";
             URL url = new URL(TokenManager.API_DOMAIN + endpoint);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
