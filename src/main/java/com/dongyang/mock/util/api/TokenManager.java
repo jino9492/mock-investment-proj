@@ -2,8 +2,6 @@ package com.dongyang.mock.util.api;
 
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
 
 public class TokenManager {
     private static final Properties props = new Properties();
@@ -21,14 +19,13 @@ public class TokenManager {
         }
     }
 
-    public static final String KIS_APP_KEY = props.getProperty("koreainvest.app.key");
-    public static final String KIS_APP_SECRET = props.getProperty("koreainvest.app.secret");
-    public static final String KIS_API_TOKEN_URL = props.getProperty("koreainvest.api.token.url");
+    public static final String APP_KEY = props.getProperty("kw.app.key");
+    public static final String APP_SECRET = props.getProperty("kw.app.secret");
+    public static final String API_DOMAIN = props.getProperty("kw.api.domain");
 
-    // 토큰 종류를 키(String)로, ApiToken 객체를 값으로 저장
-    private final Map<String, ApiToken> tokenStore = new ConcurrentHashMap<>();
-
-    public static final String TOKEN_KIS = "KIS";
+    public static String tokenType;
+    private String accessToken; // 발급받은 토큰 정보
+    private long tokenExpiryTime; // 토큰 만료 시간 (밀리초)
 
     private TokenManager() { }
 
@@ -37,18 +34,27 @@ public class TokenManager {
         return instance;
     }
 
-    public String getAccessToken(String tokenKey) {
-        ApiToken token = tokenStore.get(tokenKey);
-        if (token != null && !token.isExpired()) {
-            return token.token;
+    /**
+     * 현재 유효한 Access Token을 반환합니다. 만료되었으면 null을 반환합니다.
+     */
+    public String getAccessToken() {
+        if (accessToken != null && System.currentTimeMillis() < tokenExpiryTime) {
+            return accessToken;
         }
         // 토큰이 만료되었거나 없음
         return null;
     }
 
-    public void setToken(String tokenKey, String token, long expiresIn) {
-        ApiToken apiToken = new ApiToken(token, expiresIn);
-        tokenStore.put(tokenKey, apiToken);
-        System.out.println(tokenKey + " Access Token is successfully saved.");
+    /**
+     * 새로운 Access Token과 만료 시간을 설정합니다.
+     * @param token 새로 발급받은 Access Token
+     * @param expiresIn API가 알려준 유효 기간 (초 단위)
+     */
+    public void setToken(String token, String type, long expiresIn) {
+        tokenType = type;
+        this.accessToken = token;
+        // API가 알려준 만료 시간(초)에서 약 60초를 미리 빼서 갱신하도록 설정
+        this.tokenExpiryTime = System.currentTimeMillis() + (expiresIn * 1000) - 60000;
+        System.out.println("Access Token is successfully saved. Expiry Time : " + new java.util.Date(tokenExpiryTime));
     }
 }

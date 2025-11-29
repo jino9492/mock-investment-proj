@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 public class AuthService {
+
     private final TokenManager tokenManager;
     private final Gson gson = new Gson();
 
@@ -17,15 +18,16 @@ public class AuthService {
 
     public String issueAccessToken() {
 
-        String cachedToken = tokenManager.getAccessToken(TokenManager.TOKEN_KIS);
+        String cachedToken = tokenManager.getAccessToken();
         if (cachedToken != null) {
-            System.out.println("KIS 캐시된 토큰 재사용: " + cachedToken);
+            System.out.println("캐시된 토큰 재사용: " + cachedToken);
             return cachedToken;
         }
 
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(TokenManager.KIS_API_TOKEN_URL + "/oauth2/tokenP");
+            String endpoint = "/auth/token";
+            URL url = new URL(TokenManager.API_DOMAIN + endpoint);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -35,8 +37,8 @@ public class AuthService {
             // 요청 본문 생성
             String jsonInputString = String.format(
                     "{\"grant_type\":\"client_credentials\", \"appkey\":\"%s\", \"appsecret\":\"%s\"}",
-                    TokenManager.KIS_APP_KEY,
-                    TokenManager.KIS_APP_SECRET
+                    TokenManager.APP_KEY,
+                    TokenManager.APP_SECRET
             );
 
             // 본문 전송
@@ -50,8 +52,9 @@ public class AuthService {
 
                 Map<String, Object> responseMap = gson.fromJson(responseJson, Map.class);
 
-                String accessToken = (String) responseMap.get("access_token");
-                Object expiresInObj = responseMap.get("expires_in");
+                String tokenType = (String) responseMap.get("token_type");
+                String accessToken = (String) responseMap.get("token");
+                Object expiresInObj = responseMap.get("expires_dt");
 
                 long expiresIn = 0;
                 if (expiresInObj instanceof Number) {
@@ -62,7 +65,7 @@ public class AuthService {
 
                 // TokenManager에 저장
                 if (accessToken != null && expiresIn > 0) {
-                    tokenManager.setToken(TokenManager.TOKEN_KIS, accessToken, expiresIn);
+                    tokenManager.setToken(accessToken, tokenType, expiresIn);
                     return accessToken;
                 } else {
                     System.err.println("Required information (access_token, expires_in) is missing in the token issuance response.");
@@ -87,7 +90,23 @@ public class AuthService {
         return null;
     }
 
-    protected String readResponse(InputStream is) throws IOException {
+    public String getValidAccessToken() {
+        TokenManager tokenManager = TokenManager.getInstance();
+
+        // 만료 여부 확인
+        if (tokenManager.getAccessToken() == null) {
+            String newToken = issueAccessToken();
+
+            if (newToken == null) {
+                throw new RuntimeException("Access Token refresh failed.");
+            }
+            return newToken;
+        }
+
+        return tokenManager.getAccessToken();
+    }
+
+    private String readResponse(InputStream is) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf-8"))) {
             StringBuilder responseBody = new StringBuilder();
             String responseLine;

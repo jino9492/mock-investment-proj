@@ -88,7 +88,7 @@ public class IndexBatchService {
 
     // --- buildDomesticUrl 메서드: 기간 파라미터 적용 ---
     private String buildDomesticUrl(String indexCode, String startDate, String endDate) {
-        return TokenManager.KIS_API_TOKEN_URL + ApiConstants.PATH_DOMESTIC_INDEX_DAILY +
+        return TokenManager.API_DOMAIN + ApiConstants.PATH_DOMESTIC_INDEX_DAILY +
                 "?fid_cond_mrkt_div_code=J" +
                 "&fid_input_iscd=" + indexCode +
                 "&fid_period_div_code=D" +
@@ -99,7 +99,7 @@ public class IndexBatchService {
 
     // --- buildOverseasUrl 메서드: 기간 파라미터 적용 ---
     private String buildOverseasUrl(String symbol, String startDate, String endDate, String marketCode) {
-        return TokenManager.KIS_API_TOKEN_URL + ApiConstants.PATH_OVERSEAS_INDEX_DAILY +
+        return TokenManager.API_DOMAIN + ApiConstants.PATH_OVERSEAS_INDEX_DAILY +
                 "?AUTH=dummy&EXCD=" + marketCode +
                 "&SYMB=" + symbol +
                 "&GUBN=D" +
@@ -119,8 +119,8 @@ public class IndexBatchService {
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
         conn.setRequestProperty("authorization", "Bearer " + token);
-        conn.setRequestProperty("appkey", TokenManager.KIS_APP_KEY);
-        conn.setRequestProperty("appsecret", TokenManager.KIS_APP_SECRET);
+        conn.setRequestProperty("appkey", TokenManager.APP_KEY);
+        conn.setRequestProperty("appsecret", TokenManager.APP_SECRET);
         conn.setRequestProperty("custtype", "P");
         conn.setRequestProperty("tr_id", trId); // Transaction ID 설정
 
