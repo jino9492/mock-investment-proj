@@ -26,7 +26,8 @@ public class AuthService {
 
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(TokenManager.API_TOKEN_URL + "/oauth2/tokenP");
+            String endpoint = "/auth/token";
+            URL url = new URL(TokenManager.API_DOMAIN + endpoint);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -35,7 +36,7 @@ public class AuthService {
 
             // 요청 본문 생성
             String jsonInputString = String.format(
-                    "{\"grant_type\":\"client_credentials\", \"appkey\":\"%s\", \"appsecret\":\"%s\"}",
+                    "{\"grant_type\":\"client_credentials\", \"appkey\":\"%s\", \"secretkey\":\"%s\"}",
                     TokenManager.APP_KEY,
                     TokenManager.APP_SECRET
             );
@@ -51,8 +52,9 @@ public class AuthService {
 
                 Map<String, Object> responseMap = gson.fromJson(responseJson, Map.class);
 
-                String accessToken = (String) responseMap.get("access_token");
-                Object expiresInObj = responseMap.get("expires_in");
+                String tokenType = (String) responseMap.get("token_type");
+                String accessToken = (String) responseMap.get("token");
+                Object expiresInObj = responseMap.get("expires_dt");
 
                 long expiresIn = 0;
                 if (expiresInObj instanceof Number) {
@@ -63,7 +65,7 @@ public class AuthService {
 
                 // TokenManager에 저장
                 if (accessToken != null && expiresIn > 0) {
-                    tokenManager.setToken(accessToken, expiresIn);
+                    tokenManager.setToken(accessToken, tokenType, expiresIn);
                     return accessToken;
                 } else {
                     System.err.println("Required information (access_token, expires_in) is missing in the token issuance response.");
