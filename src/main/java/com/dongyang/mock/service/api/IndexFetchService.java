@@ -1,7 +1,8 @@
-package com.dongyang.mock.service.auth;
+package com.dongyang.mock.service.api;
 
 import com.dongyang.mock.model.DAO.IndexHistoryDAO;
 import com.dongyang.mock.model.DTO.IndexDTO;
+import com.dongyang.mock.service.auth.AuthService;
 import com.dongyang.mock.util.api.ApiConstants;
 import com.dongyang.mock.util.db.DBManager;
 import com.google.gson.Gson;
@@ -103,7 +104,7 @@ public class IndexFetchService {
         br.close();
 
         String jsonResponse = response.toString();
-        System.out.println("API 응답 (" + tr + "): " + jsonResponse);
+        System.out.println("API 응답 (" + tr + "): " + jsonResponse.substring(0, Math.min(jsonResponse.length(), 200)) + "...");
 
         return gson.fromJson(jsonResponse, Map.class);
     }

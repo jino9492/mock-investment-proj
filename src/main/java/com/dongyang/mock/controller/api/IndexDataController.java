@@ -1,6 +1,6 @@
-package com.dongyang.mock.controller.auth;
+package com.dongyang.mock.controller.api;
 
-import com.dongyang.mock.service.auth.IndexDataService;
+import com.dongyang.mock.service.api.IndexDataService;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

@@ -3,4 +3,4 @@ kw.app.secret=your_secretkey
 kw.api.domain=https://mockapi.kiwoom.com
 
 kw.index.tr=ka20005
-kw.index.endpoint=api/dostk/chart
+kw.index.endpoint=/api/dostk/chart

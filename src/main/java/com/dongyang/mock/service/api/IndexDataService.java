@@ -1,4 +1,4 @@
-package com.dongyang.mock.service.auth;
+package com.dongyang.mock.service.api;
 
 import com.dongyang.mock.model.DAO.IndexHistoryDAO;
 import com.dongyang.mock.util.db.DBManager;
