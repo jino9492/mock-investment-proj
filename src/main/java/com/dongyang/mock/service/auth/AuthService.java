@@ -36,7 +36,7 @@ public class AuthService {
 
             // 요청 본문 생성
             String jsonInputString = String.format(
-                    "{\"grant_type\":\"client_credentials\", \"appkey\":\"%s\", \"appsecret\":\"%s\"}",
+                    "{\"grant_type\":\"client_credentials\", \"appkey\":\"%s\", \"secretkey\":\"%s\"}",
                     TokenManager.APP_KEY,
                     TokenManager.APP_SECRET
             );
@@ -66,7 +66,7 @@ public class AuthService {
                 // TokenManager에 저장
                 if (accessToken != null && expiresIn > 0) {
                     tokenManager.setToken(accessToken, tokenType, expiresIn);
-                    return accessToken;
+                    return tokenManager.getAccessToken();
                 } else {
                     System.err.println("Required information (access_token, expires_in) is missing in the token issuance response.");
                 }

@@ -1,14 +1,26 @@
 package com.dongyang.mock.util.api;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 public final class ApiConstants {
+    private static final Properties props = new Properties();
+
+    static {
+        try (InputStream is = TokenManager.class.getClassLoader().getResourceAsStream("api.properties")) {
+            if (is == null) {
+                throw new RuntimeException("api.properties 파일을 찾을 수 없습니다.");
+            }
+            props.load(is);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private ApiConstants() { }
 
-    // 국내 지수 (KOSPI/KOSDAQ) 기간별 시세
-    public static final String TR_DOMESTIC_INDEX_DAILY = "FHKST03010100";
-    public static final String PATH_DOMESTIC_INDEX_DAILY = "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice";
-
-    // 해외 지수 (NASDAQ/S&P) 기간별 시세
-    public static final String TR_OVERSEAS_INDEX_DAILY = "HHDFS76240000";
-    public static final String PATH_OVERSEAS_INDEX_DAILY = "/uapi/overseas-price/v1/quotations/inquire-daily-index-chartprice";
+    // 국내 지수 (KOSPI/KOSDAQ ...) 분봉 시세
+    public static final String TR_DOMESTIC_INDEX = props.getProperty("kw.index.tr");
+    public static final String PATH_DOMESTIC_INDEX = props.getProperty("kw.api.domain") + props.getProperty("kw.index.endpoint");
 }

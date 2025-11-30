@@ -23,7 +23,7 @@ public class TokenManager {
     public static final String APP_SECRET = props.getProperty("kw.app.secret");
     public static final String API_DOMAIN = props.getProperty("kw.api.domain");
 
-    public static String tokenType;
+    private String tokenType;
     private String accessToken; // 발급받은 토큰 정보
     private long tokenExpiryTime; // 토큰 만료 시간 (밀리초)
 
@@ -39,7 +39,7 @@ public class TokenManager {
      */
     public String getAccessToken() {
         if (accessToken != null && System.currentTimeMillis() < tokenExpiryTime) {
-            return accessToken;
+            return tokenType + " " + accessToken;
         }
         // 토큰이 만료되었거나 없음
         return null;
@@ -51,7 +51,7 @@ public class TokenManager {
      * @param expiresIn API가 알려준 유효 기간 (초 단위)
      */
     public void setToken(String token, String type, long expiresIn) {
-        tokenType = type;
+        this.tokenType = type;
         this.accessToken = token;
         // API가 알려준 만료 시간(초)에서 약 60초를 미리 빼서 갱신하도록 설정
         this.tokenExpiryTime = System.currentTimeMillis() + (expiresIn * 1000) - 60000;
