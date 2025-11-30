@@ -7,7 +7,7 @@
     <c:set var="D3_LIBRARY_LOADED" value="true" scope="request" />
 </c:if>
 <c:if test="${empty requestScope.SPARKLINE_JS_LOADED}">
-    <script src="${pageContext.request.contextPath}/static/js/common/chart/sparkline.js"></script>
+    <script type="module" src="${pageContext.request.contextPath}/static/js/common/chart/sparkline.js"></script>
     <c:set var="SPARKLINE_JS_LOADED" value="true" scope="request" />
 </c:if>
 

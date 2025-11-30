@@ -1,8 +1,42 @@
-document.addEventListener('DOMContentLoaded', ()=>{
+import { loadIndexSparklineData } from '../api/fetch_utils.js';
+
+document.addEventListener('DOMContentLoaded', () => {
     const sparklines = document.querySelectorAll('.sparkline-container');
+    const loadPromises = [];
+    const indexNamesMap = new Map();
+
     sparklines.forEach((e, i) => {
-        loadSparkline(e.id);
+        const indexName = e.id;
+
+        if (indexName) {
+            loadPromises.push(loadIndexSparklineData(indexName));
+            indexNamesMap.set(i, indexName);
+        }
     });
+
+    Promise.all(loadPromises)
+        .then(results => {
+            console.log("모든 스파크라인 데이터 로드 완료 :", results);
+
+            results.forEach((dataObject, i) => {
+                const indexName = indexNamesMap.get(i);
+
+                const prices = dataObject.prices || [];
+                const overnights = dataObject.overnights || [];
+
+                const selector = '#' + indexName;
+
+                drawSparkline(selector, prices, overnights);
+            });
+        })
+        .catch(error => {
+            const failedIndex = error.indexName || "알 수 없는 지수";
+            console.error(`데이터 로드 실패 (${failedIndex}):`, error.message);
+
+            if (failedIndex !== "알 수 없는 지수") {
+                d3.select('#' + failedIndex).html("데이터 로드 실패");
+            }
+        });
 });
 
 function drawSparkline(selector, prices, overnights) {
@@ -89,37 +123,4 @@ function drawSparkline(selector, prices, overnights) {
         .attr("stroke", isUp ? "#FF5252" : "#42A5F5")
         .attr("stroke-width", 1.5)
         .attr("d", line);
-}
-
-function loadSparkline(indexName) {
-    const url = `/api/index/sparkline?code=${encodeURIComponent(indexName)}`;
-
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP Error! Status: ${response.status} - Could not load ${indexName}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(`순수 JS로 로드된 ${indexName} 데이터:`, data);
-
-            const prices = data.prices || [];
-            const overnights = data.overnights || [];
-
-            var selector = '#' + indexName;
-
-            drawSparkline(selector, prices, overnights);
-
-        })
-        .catch(error => {
-            console.error(`데이터 로드 중 오류 발생 (${indexName}):`, error.message);
-            const selector = '#' + indexName;
-            d3.select(selector).html("데이터 로드 실패");
-        });
 }
