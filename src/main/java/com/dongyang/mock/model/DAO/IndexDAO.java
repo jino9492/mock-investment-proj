@@ -1,6 +1,6 @@
 package com.dongyang.mock.model.DAO;
 import com.dongyang.mock.model.DTO.IndexDTO;
-import com.dongyang.mock.util.db.DBManager; // DBManager 사용 가정
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IndexHistoryDAO {
+public class IndexDAO {
     public Map<String, List<Double>> findRecentIndexData(String indexCode, int limit, Connection conn) {
         Map<String, List<Double>> result = new HashMap<>();
         List<Double> prices = new ArrayList<>();
@@ -72,7 +72,7 @@ public class IndexHistoryDAO {
         return null;
     }
 
-    public int[] saveOrUpdateIndexBatch(List<IndexDTO> dataList, Connection conn) throws SQLException {
+    public int[] insertIndexBatch(List<IndexDTO> dataList, Connection conn) throws SQLException {
         if (dataList == null || dataList.isEmpty()) {
             return new int[0];
         }

@@ -23,4 +23,7 @@ public final class ApiConstants {
     // 국내 지수 (KOSPI/KOSDAQ ...) 분봉 시세
     public static final String TR_DOMESTIC_INDEX = props.getProperty("kw.index.tr");
     public static final String PATH_DOMESTIC_INDEX = props.getProperty("kw.api.domain") + props.getProperty("kw.index.endpoint");
+
+    public static final String TR_STOCK_CODE = props.getProperty("kw.stockcode.tr");
+    public static final String PATH_STOCK_CODE = props.getProperty("kw.api.domain") + props.getProperty("kw.stockcode.endpoint");
 }

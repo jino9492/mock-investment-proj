@@ -1,6 +1,6 @@
 package com.dongyang.mock.controller.api;
 
-import com.dongyang.mock.service.api.IndexDataService;
+import com.dongyang.mock.service.api.IndexService;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 @WebServlet("/api/index/sparkline")
-public class IndexDataController extends HttpServlet {
+public class IndexController extends HttpServlet {
 
-    private final IndexDataService indexService = new IndexDataService();
+    private final IndexService indexService = new IndexService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
