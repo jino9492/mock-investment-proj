@@ -354,7 +354,7 @@ public class MemberDAO {
 
         List<Object> params = new ArrayList<>();
 
-        if (keyword != null && !keyword.isBlank()) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
             String pattern = "%" + keyword + "%";
             sql.append(" AND (CAST(mem_id AS CHAR) LIKE ? OR mem_email LIKE ? OR mem_nickname LIKE ?)");
             params.add(pattern);

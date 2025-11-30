@@ -25,6 +25,5 @@
     <!-- 오른쪽 사이드 -->
     <jsp:include page="WEB-INF/fragments/common/sidebar/sidebar.jsp" />
   </div>
-
 </body>
 </html>
