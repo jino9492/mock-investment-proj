@@ -44,6 +44,11 @@ public class StockCodeFetchService extends  FetchService implements ServletConte
             Thread.sleep(DELAY_TIME);
             runFetch(token, "1");
             Thread.sleep(DELAY_TIME);
+            runFetch(token, "2");
+            Thread.sleep(DELAY_TIME);
+            runFetch(token, "4");
+            Thread.sleep(DELAY_TIME);
+            runFetch(token, "7");
         } catch(Exception e){
             System.err.println("배치 업데이트 중 오류 발생: " + e.getMessage());
         }

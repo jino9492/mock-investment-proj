@@ -26,4 +26,7 @@ public final class ApiConstants {
 
     public static final String TR_STOCK_CODE = props.getProperty("kw.stockcode.tr");
     public static final String PATH_STOCK_CODE = props.getProperty("kw.api.domain") + props.getProperty("kw.stockcode.endpoint");
+
+    public static final String TR_STOCK = props.getProperty("kw.stock.tr");
+    public static final String PATH_STOCK = props.getProperty("kw.api.domain") + props.getProperty("kw.stock.endpoint");
 }
