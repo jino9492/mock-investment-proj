@@ -1,5 +1,7 @@
 package com.dongyang.mock.controller.stock;
 
+import com.dongyang.mock.model.DTO.*;
+import com.dongyang.mock.service.api.StockDetailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +19,32 @@ public class StockInfoController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        Long stkId = Long.parseLong(req.getParameter("stockID"));
+
+        StockDetailService stockDetailService = new StockDetailService();
+
+        StockDTO stockDTO;
+        StockDetailDTO stockDetailDTO;
+        StockFinancialIndicatorDTO stockFinancialIndicatorDTO;
+        StockFinancialSummaryDTO stockFinancialSummaryDTO;
+        StockPriceDailyDTO stockPriceDailyDTO;
+
+        try{
+            stockDTO = stockDetailService.getStockById(stkId);
+            stockDetailDTO = stockDetailService.getStockDetailById(stkId);
+            stockFinancialIndicatorDTO = stockDetailService.getFinancialIndicatorById(stkId);
+            stockFinancialSummaryDTO = stockDetailService.getFinancialSummaryById(stkId);
+            stockPriceDailyDTO = stockDetailService.getStockPriceDailyById(stkId);
+
+            req.setAttribute("stock", stockDTO);
+            req.setAttribute("detail", stockDetailDTO);
+            req.setAttribute("indicator", stockFinancialIndicatorDTO);
+            req.setAttribute("summary", stockFinancialSummaryDTO);
+            req.setAttribute("daily", stockPriceDailyDTO);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
         req.getRequestDispatcher(viewPage).forward(req, resp);
     }

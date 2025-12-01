@@ -2,6 +2,7 @@ package com.dongyang.mock.model.DAO;
 
 import com.dongyang.mock.model.DTO.StockDetailDTO;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.List;
 
@@ -65,15 +66,49 @@ public class StockDetailDAO {
         }
     }
 
-    public int getStockDetailCount(Connection conn) throws SQLException {
-        final String sql =  "SELECT COUNT(*) FROM stock_detail";
-        ResultSet rs = null;
+    public StockDetailDTO selectStockDetailById(Long stockId, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, company_name, face_value, settlement_month, market_cap, " +
+                "listing_date, description, created_at, updated_at " +
+                "FROM stock_detail WHERE stock_id = ?";
+
+        StockDetailDTO detail = null;
+
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            rs = pstmt.executeQuery();
-            return rs.next() ? rs.getInt(1) : 0;
+
+            pstmt.setLong(1, stockId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    detail = mapResultSetToStockDetailDTO(rs);
+                }
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.err.println("Stock Detail ID " + stockId + " 조회 실패: " + e.getMessage());
+            throw e;
         }
+
+        return detail;
+    }
+
+    private StockDetailDTO mapResultSetToStockDetailDTO(ResultSet rs) throws SQLException {
+        StockDetailDTO dto = new StockDetailDTO();
+        dto.setStockId(rs.getLong("stock_id"));
+        dto.setCompanyName(rs.getString("company_name"));
+
+        // NULL 가능성이 있는 DECIMAL 필드 처리
+        BigDecimal faceValue = rs.getBigDecimal("face_value");
+        if (!rs.wasNull()) {
+            dto.setFaceValue(faceValue);
+        }
+
+        dto.setSettlementMonth(rs.getString("settlement_month"));
+        dto.setMarketCap(rs.getString("market_cap"));
+        dto.setListingDate(rs.getDate("listing_date"));
+        dto.setDescription(rs.getString("description"));
+        dto.setCreatedAt(rs.getTimestamp("created_at"));
+        dto.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+        return dto;
     }
 
     public Boolean existsByStockCode(Long stkId, Connection conn) throws SQLException {

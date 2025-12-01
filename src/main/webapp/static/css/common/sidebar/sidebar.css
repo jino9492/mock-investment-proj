@@ -61,6 +61,7 @@ ul {
 }
 
 .sidebar__work-area {
+    background: white;
     position: sticky;
     top: 0;
     height: 100vh;

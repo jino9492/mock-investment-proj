@@ -13,10 +13,10 @@ body.stock-info-page {
 
 
 .stock-info__container {
-    margin-left: 40px;
-    margin-top: 10px;
-    padding: 0 40px;
-    margin-right: 60px;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: 24px auto;
 }
 
 
@@ -28,10 +28,11 @@ body.stock-info-page {
 }
 
 .stock-info__main {
-    max-width: 1340px;
     background-color: #FFFFFF;
+    min-height: 100%;
     width: 100%;
     padding: 40px;
+    border-radius: 18px;
 }
 
 .stock-info__sidebar {
@@ -168,7 +169,7 @@ body.stock-info-page {
     align-items: center;
     white-space: nowrap;
     padding-bottom: 15px;
-    border-bottom: 1px solid #d8d8d8;
+    border-bottom: 1px solid #e8e8e8;
 }
 
 
@@ -231,7 +232,7 @@ body.stock-info-page {
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid #d8d8d8;
+    border-bottom: 1px solid #e8e8e8;
 }
 
 .stock-info__metrics-row--last {
@@ -254,7 +255,7 @@ body.stock-info-page {
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid #d8d8d8;
+    border-bottom: 1px solid #e8e8e8;
 }
 
 .stock-info__finance-row--last {

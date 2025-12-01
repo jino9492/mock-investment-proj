@@ -2,10 +2,8 @@ package com.dongyang.mock.model.DAO;
 
 import com.dongyang.mock.model.DTO.StockFinancialIndicatorDTO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.List;
 
 public class StockFinancialIndicatorDAO {
@@ -80,5 +78,56 @@ public class StockFinancialIndicatorDAO {
             System.err.println("재무 지표 배치 저장/갱신 실패: " + e.getMessage());
             throw e;
         }
+    }
+
+    public StockFinancialIndicatorDTO selectIndicatorByIdAndDate(Long stockId, Date indicatorDate, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, indicator_date, per, pbr, roe, eps, bps, created_at, updated_at " +
+                "FROM stock_financial_indicator WHERE stock_id = ? AND indicator_date = ?";
+
+        StockFinancialIndicatorDTO indicator = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, stockId);
+            pstmt.setDate(2, indicatorDate);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    indicator = mapResultSetToDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("재무 지표 조회 실패 (Stock ID: " + stockId + ", Date: " + indicatorDate + "): " + e.getMessage());
+            throw e;
+        }
+
+        return indicator;
+    }
+
+    private StockFinancialIndicatorDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
+        StockFinancialIndicatorDTO dto = new StockFinancialIndicatorDTO();
+        dto.setStockId(rs.getLong("stock_id"));
+        dto.setIndicatorDate(rs.getDate("indicator_date"));
+
+        // NULL 가능성이 있는 DECIMAL 필드 처리
+        BigDecimal per = rs.getBigDecimal("per");
+        if (!rs.wasNull()) dto.setPer(per);
+
+        BigDecimal pbr = rs.getBigDecimal("pbr");
+        if (!rs.wasNull()) dto.setPbr(pbr);
+
+        BigDecimal roe = rs.getBigDecimal("roe");
+        if (!rs.wasNull()) dto.setRoe(roe);
+
+        BigDecimal eps = rs.getBigDecimal("eps");
+        if (!rs.wasNull()) dto.setEps(eps);
+
+        BigDecimal bps = rs.getBigDecimal("bps");
+        if (!rs.wasNull()) dto.setBps(bps);
+
+        dto.setCreatedAt(rs.getTimestamp("created_at"));
+        dto.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+        return dto;
     }
 }

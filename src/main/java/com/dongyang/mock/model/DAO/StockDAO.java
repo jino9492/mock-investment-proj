@@ -53,7 +53,7 @@ public class StockDAO {
         }
     }
 
-    public Map<Long, String> getAllStockSymbolMap(Connection conn) throws SQLException {
+    public Map<Long, String> selectAllStockSymbolMap(Connection conn) throws SQLException {
         final String sql = "SELECT stock_id, stock_symbol FROM stock";
         Map<Long, String> symbolMap = new HashMap<>();
 
@@ -68,7 +68,7 @@ public class StockDAO {
         return symbolMap;
     }
 
-    public Date getListingDateById(Long id, Connection conn) throws SQLException {
+    public Date selectListingDateById(Long id, Connection conn) throws SQLException {
         final String sql = "SELECT listing_date FROM stock WHERE stock_id = ?";
         ResultSet rs = null;
 
@@ -85,14 +85,50 @@ public class StockDAO {
         return null;
     }
 
-    public int getStockCount(Connection conn) throws SQLException {
-        final String sql =  "SELECT COUNT(*) FROM stock";
-        ResultSet rs = null;
+    public StockDTO selectStockById(Long stockId, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, stock_symbol, stock_name, market_type, stock_code_id, " +
+                "listing_date, status, created_at, updated_at " +
+                "FROM stock WHERE stock_id = ?";
+
+        StockDTO stock = null;
+
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            rs = pstmt.executeQuery();
-            return rs.next() ? rs.getInt(1) : 0;
+
+            pstmt.setLong(1, stockId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    stock = mapResultSetToStockDTO(rs);
+                }
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.err.println("Stock ID " + stockId + " 조회 실패: " + e.getMessage());
+            throw e;
         }
+
+        return stock;
+    }
+
+    private StockDTO mapResultSetToStockDTO(ResultSet rs) throws SQLException {
+        StockDTO dto = new StockDTO();
+        dto.setStockId(rs.getLong("stock_id"));
+        dto.setStockSymbol(rs.getString("stock_symbol"));
+        dto.setStockName(rs.getString("stock_name"));
+        dto.setMarketType(rs.getString("market_type"));
+
+        // stock_code_id (BIGINT NULL) 처리
+        Long stockCodeId = rs.getLong("stock_code_id");
+        if (rs.wasNull()) {
+            dto.setStockCodeId(null);
+        } else {
+            dto.setStockCodeId(stockCodeId);
+        }
+
+        dto.setListingDate(rs.getDate("listing_date"));
+        dto.setStatus(rs.getString("status"));
+        dto.setCreatedAt(rs.getTimestamp("created_at"));
+        dto.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+        return dto;
     }
 }

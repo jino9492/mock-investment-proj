@@ -111,4 +111,58 @@ public class StockPriceDailyDAO {
         // 데이터가 없으면 (최초 수집 시) null 또는 0을 반환합니다.
         return null;
     }
+
+    public StockPriceDailyDTO selectPriceDailyByIdAndDate(Long stockId, Date priceDate, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, price_date, open_price, high_price, low_price, close_price, volume, amount, " +
+                "prev_close, change_price, change_rate, created_at " +
+                "FROM stock_price_daily WHERE stock_id = ? AND price_date = ?";
+
+        StockPriceDailyDTO priceDaily = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, stockId);
+            pstmt.setDate(2, priceDate);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    priceDaily = mapResultSetToDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("일별 주가 조회 실패 (Stock ID: " + stockId + ", Date: " + priceDate + "): " + e.getMessage());
+            throw e;
+        }
+
+        return priceDaily;
+    }
+
+    private StockPriceDailyDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
+        StockPriceDailyDTO dto = new StockPriceDailyDTO();
+        dto.setStockId(rs.getLong("stock_id"));
+        dto.setPriceDate(rs.getDate("price_date"));
+
+        // NOT NULL 필드
+        dto.setOpenPrice(rs.getBigDecimal("open_price"));
+        dto.setHighPrice(rs.getBigDecimal("high_price"));
+        dto.setLowPrice(rs.getBigDecimal("low_price"));
+        dto.setClosePrice(rs.getBigDecimal("close_price"));
+        dto.setVolume(rs.getLong("volume"));
+
+        // NULL 가능성이 있는 필드 처리
+        Long amount = rs.getLong("amount");
+        if (!rs.wasNull()) dto.setAmount(amount);
+
+        BigDecimal prevClose = rs.getBigDecimal("prev_close");
+        if (!rs.wasNull()) dto.setPrevClose(prevClose);
+
+        BigDecimal changePrice = rs.getBigDecimal("change_price");
+        if (!rs.wasNull()) dto.setChangePrice(changePrice);
+
+        BigDecimal changeRate = rs.getBigDecimal("change_rate");
+        if (!rs.wasNull()) dto.setChangeRate(changeRate);
+
+        dto.setCreatedAt(rs.getTimestamp("created_at"));
+
+        return dto;
+    }
 }

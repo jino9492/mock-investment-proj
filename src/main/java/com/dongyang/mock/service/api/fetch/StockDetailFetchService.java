@@ -17,7 +17,6 @@ import java.math.RoundingMode;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class StockDetailFetchService extends FetchService implements ServletCont
             System.out.println("====================== Stock Detail 로드 중 ======================");
             Thread initThread = new Thread(() -> {
                 try {
-                    stockMap = DBManager.withConnection(conn->stockDAO.getAllStockSymbolMap(conn));
+                    stockMap = DBManager.withConnection(conn->stockDAO.selectAllStockSymbolMap(conn));
                     runUpdate();
                     System.out.println("Stock Detail 데이터가 서버 메모리에 로드되었습니다. (비동기 완료)");
                 } catch (Exception e) {
@@ -81,7 +80,7 @@ public class StockDetailFetchService extends FetchService implements ServletCont
                     counter++;
                     Thread.sleep(DELAY_TIME);
                 } else {
-                     System.out.println(stkCd + " 종목은 이미 존재합니다. 건너갑니다.");
+                     // System.out.println(stkCd + " 종목은 이미 존재합니다. 건너갑니다.");
                 }
 
                 if (counter >= CHUNK_SIZE) {
@@ -132,7 +131,7 @@ public class StockDetailFetchService extends FetchService implements ServletCont
             BigDecimal fav = getBigDecimalValue(response, "fav");
             String settlementMonth = getStringValue(response, "setl_mm");
             String marketCap = getStringValue(response, "mac");
-            Date listingDate = DBManager.withConnection(conn -> stockDAO.getListingDateById(stockId, conn));
+            Date listingDate = DBManager.withConnection(conn -> stockDAO.selectListingDateById(stockId, conn));
             String description = "";
 
             resultDetail.add(new StockDetailDTO(stockId, name, fav, settlementMonth, marketCap, listingDate, description));
