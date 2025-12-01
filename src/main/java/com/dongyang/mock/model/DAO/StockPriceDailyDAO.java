@@ -2,10 +2,8 @@ package com.dongyang.mock.model.DAO;
 
 import com.dongyang.mock.model.DTO.StockPriceDailyDTO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.List;
 
 public class StockPriceDailyDAO {
@@ -95,5 +93,22 @@ public class StockPriceDailyDAO {
             System.err.println("일별 주가 데이터 배치 저장/갱신 실패: " + e.getMessage());
             throw e;
         }
+    }
+
+    public BigDecimal getPreviousClosePrice(Long stockId, Connection conn) throws SQLException {
+        String sql = "SELECT close_price FROM stock_price_daily " +
+                "WHERE stock_id = ? ORDER BY price_date DESC LIMIT 1";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, stockId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // close_price는 DECIMAL(18, 2)이므로 BigDecimal로 읽습니다.
+                    return rs.getBigDecimal("close_price");
+                }
+            }
+        }
+        // 데이터가 없으면 (최초 수집 시) null 또는 0을 반환합니다.
+        return null;
     }
 }

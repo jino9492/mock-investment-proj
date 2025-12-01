@@ -2,11 +2,10 @@ package com.dongyang.mock.model.DAO;
 
 import com.dongyang.mock.model.DTO.StockDTO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StockDAO {
     public int[] insertStockBatch(List<StockDTO> dataList, Connection conn) throws SQLException {
@@ -51,6 +50,49 @@ public class StockDAO {
         } catch (SQLException e) {
             System.err.println("주식 데이터 배치 저장/갱신 실패: " + e.getMessage());
             throw e;
+        }
+    }
+
+    public Map<Long, String> getAllStockSymbolMap(Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, stock_symbol FROM stock";
+        Map<Long, String> symbolMap = new HashMap<>();
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                // key: stock_id, value: stock_symbol
+                symbolMap.put(rs.getLong("stock_id"), rs.getString("stock_symbol"));
+            }
+        }
+        return symbolMap;
+    }
+
+    public Date getListingDateById(Long id, Connection conn) throws SQLException {
+        final String sql = "SELECT listing_date FROM stock WHERE stock_id = ?";
+        ResultSet rs = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setLong(1, id);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new Date(rs.getTimestamp("listing_date").getTime());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public int getStockCount(Connection conn) throws SQLException {
+        final String sql =  "SELECT COUNT(*) FROM stock";
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

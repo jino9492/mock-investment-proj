@@ -17,11 +17,9 @@ public class StockDetailDTO {
     private Timestamp createdAt;      // DATETIME NOT NULL
     private Timestamp updatedAt;      // DATETIME NOT NULL
 
-    // 1. 기본 생성자
     public StockDetailDTO() {
     }
 
-    // 2. 주요 필드를 포함하는 생성자 (선택 사항)
     public StockDetailDTO(Long stockId, String companyName, BigDecimal faceValue, String settlementMonth,
                           String marketCap, Date listingDate, String description) {
         this.stockId = stockId;

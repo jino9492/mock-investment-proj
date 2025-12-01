@@ -27,11 +27,11 @@ public class StockFetchService extends  FetchService implements ServletContextLi
 
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            System.out.println("====================== StockCode 로드 중 ======================");
+            System.out.println("====================== Stock 로드 중 ======================");
             stockCodeMap = DBManager.withConnection(stockCodeDAO::getAllStockCodeIdMap);
             runUpdate();
             System.out.println("Stock 데이터가 서버 메모리에 로드되었습니다.");
-            System.out.println("====================== StockCode 로드 종료 ======================");
+            System.out.println("====================== Stock 로드 종료 ======================");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

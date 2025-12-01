@@ -24,6 +24,7 @@ public class ApiFetchScheduler implements ServletContextListener {
                 5, // 반복 주기 (5)
                 TimeUnit.MINUTES // 시간 단위 (분)
         );
+
         System.out.println("Scheduler started. Running MyTask every 5 minutes.");
     }
 

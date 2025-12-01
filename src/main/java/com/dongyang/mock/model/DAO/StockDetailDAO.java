@@ -2,10 +2,7 @@ package com.dongyang.mock.model.DAO;
 
 import com.dongyang.mock.model.DTO.StockDetailDTO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.List;
 
 public class StockDetailDAO {
@@ -66,5 +63,30 @@ public class StockDetailDAO {
             System.err.println("종목 상세 데이터 배치 저장/갱신 실패: " + e.getMessage());
             throw e;
         }
+    }
+
+    public int getStockDetailCount(Connection conn) throws SQLException {
+        final String sql =  "SELECT COUNT(*) FROM stock_detail";
+        ResultSet rs = null;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Boolean existsByStockCode(Long stkId, Connection conn) throws SQLException {
+        final String sql = "SELECT COUNT(*) FROM stock_detail WHERE stock_id = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, stkId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -10,3 +10,6 @@ kw.stockcode.endpoint=/api/dostk/stkinfo
 
 kw.stock.tr=ka10099
 kw.stock.endpoint=/api/dostk/stkinfo
+
+kw.stockdetail.tr=ka10001
+kw.stockdetail.endpoint=/api/dostk/stkinfo
