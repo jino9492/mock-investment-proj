@@ -302,6 +302,11 @@ body.stock-page {
     font-size: 17px;
 }
 
+.order-card__input--readonly {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
 .input-wrapper {
     position: relative;
     flex: 1;

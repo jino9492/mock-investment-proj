@@ -3,6 +3,7 @@
 <%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/info.css"/>
+<script src="${pageContext.request.contextPath}/static/js/stock/info.js"></script>
 
 <body class="stock-info-page">
 <main class="stock-info__container">
@@ -180,72 +181,7 @@
 
         <!-- 오른쪽 주문 카드 사이드바 -->
         <aside class="stock-info__sidebar">
-            <section class="order-card">
-                <h2 class="order-card__title">주문하기</h2>
-
-                <!-- 구매 / 판매 / 대기 탭 -->
-                <div class="order-card__trade-type">
-                    <button class="order-card__trade-tab order-card__trade-tab--active">구매</button>
-                    <button class="order-card__trade-tab">판매</button>
-                    <button class="order-card__trade-tab">대기</button>
-                </div>
-
-                <!-- 주문유형 -->
-                <div class="order-card__row">
-                    <label class="order-card__label">주문유형</label>
-                    <div class="order-card__field">
-                        <select class="order-card__select_box">
-                            <option value="1" selected>일반주문</option>
-                            <option value="2">조건주문</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- 구매가격 -->
-                <div class="order-card__row">
-                    <label class="order-card__label">구매가격</label>
-                    <div class="order-card__field order-card__field--split">
-                        <button class="order-card__pill order-card__pill--active">지정가</button>
-                        <button class="order-card__pill">시장가</button>
-                    </div>
-                </div>
-
-                <!-- 가격 입력 -->
-                <div class="order-card__row">
-                    <label class="order-card__label">&nbsp;</label>
-                    <div class="order-card__field order-card__field--price">
-                        <div class="input-wrapper">
-                            <input type="text" class="order-card__input">
-                            <span class="unit-text">원</span>
-                        </div>
-                        <button class="order-card__step-btn">-/+</button>
-                    </div>
-                </div>
-
-                <!-- 수량 -->
-                <div class="order-card__row">
-                    <label class="order-card__label">수량</label>
-                    <div class="order-card__field order-card__field--qty">
-                        <input type="text" class="order-card__input" placeholder="최대 0주 가능" />
-                        <button class="order-card__step-btn">-/+</button>
-                    </div>
-                </div>
-
-                <hr class="order-card__divider" />
-
-                <!-- 금액 정보 -->
-                <div class="order-card__summary-row">
-                    <span class="order-card__summary-label">구매가능 금액</span>
-                    <span class="order-card__summary-value">00,000원</span>
-                </div>
-                <div class="order-card__summary-row">
-                    <span class="order-card__summary-label">총 주문 금액</span>
-                    <span class="order-card__summary-value">원</span>
-                </div>
-
-                <!-- 버튼 -->
-                <button class="order-card__submit-btn">구매하기</button>
-            </section>
+            <jsp:include page="/WEB-INF/fragments/stock/order_card.jsp" />
         </aside>
     </div>
 
