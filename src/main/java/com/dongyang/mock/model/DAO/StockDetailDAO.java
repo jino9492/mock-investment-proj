@@ -15,24 +15,23 @@ public class StockDetailDAO {
             return new int[0];
         }
 
+        // 컬럼 목록: stock_id, company_name, face_value, settlement_month, market_cap, listing_date, description
         final String sql = "INSERT INTO stock_detail (" +
                 "stock_id, company_name, face_value, settlement_month, market_cap, " +
-                "listing_date, founded_year, total_shares, shares_as_of, description) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "listing_date, description) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE" +
                 "    company_name = VALUES(company_name)," +
                 "    face_value = VALUES(face_value)," +
                 "    settlement_month = VALUES(settlement_month)," +
                 "    market_cap = VALUES(market_cap)," +
                 "    listing_date = VALUES(listing_date)," +
-                "    founded_year = VALUES(founded_year)," +
-                "    total_shares = VALUES(total_shares)," +
-                "    shares_as_of = VALUES(shares_as_of)," +
                 "    description = VALUES(description)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             for (StockDetailDTO data : dataList) {
+
                 // 1. stock_id (BIGINT NOT NULL / PK)
                 pstmt.setLong(1, data.getStockId());
 
@@ -55,21 +54,8 @@ public class StockDetailDAO {
                 // 6. listing_date (DATE NULL)
                 pstmt.setDate(6, data.getListingDate());
 
-                // 7. founded_year (VARCHAR NULL)
-                pstmt.setString(7, data.getFoundedYear());
-
-                // 8. total_shares (BIGINT NULL)
-                if (data.getTotalShares() != null) {
-                    pstmt.setLong(8, data.getTotalShares());
-                } else {
-                    pstmt.setNull(8, Types.BIGINT);
-                }
-
-                // 9. shares_as_of (DATE NULL)
-                pstmt.setDate(9, data.getSharesAsOf());
-
-                // 10. description (TEXT NULL)
-                pstmt.setString(10, data.getDescription());
+                // 7. description (TEXT NULL)
+                pstmt.setString(7, data.getDescription());
 
                 pstmt.addBatch();
             }

@@ -2,37 +2,34 @@ package com.dongyang.mock.model.DTO;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.math.BigDecimal; // DECIMAL(18,2) 처리를 위해 필요
+import java.math.BigDecimal;
 
 public class StockDetailDTO {
+
+    // 필드 (제공된 SQL 정의에 기반)
     private Long stockId;             // BIGINT NOT NULL (Primary Key & Foreign Key)
     private String companyName;       // VARCHAR(100) NOT NULL
     private BigDecimal faceValue;     // DECIMAL(18,2) NULL
     private String settlementMonth;   // VARCHAR(10) NULL
-    private String marketCap;         // VARCHAR(50) NULL (시가총액 문자 형태)
+    private String marketCap;         // VARCHAR(50) NULL
     private Date listingDate;         // DATE NULL
-    private String foundedYear;       // VARCHAR(20) NULL (텍스트)
-    private Long totalShares;         // BIGINT NULL
-    private Date sharesAsOf;          // DATE NULL (기준일)
-    private String description;       // TEXT NULL (TEXT는 String으로 처리)
-    private Timestamp createdAt;      // DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-    private Timestamp updatedAt;      // DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    private String description;       // TEXT NULL
+    private Timestamp createdAt;      // DATETIME NOT NULL
+    private Timestamp updatedAt;      // DATETIME NOT NULL
 
+    // 1. 기본 생성자
     public StockDetailDTO() {
     }
 
+    // 2. 주요 필드를 포함하는 생성자 (선택 사항)
     public StockDetailDTO(Long stockId, String companyName, BigDecimal faceValue, String settlementMonth,
-                          String marketCap, Date listingDate, String foundedYear, Long totalShares,
-                          Date sharesAsOf, String description) {
+                          String marketCap, Date listingDate, String description) {
         this.stockId = stockId;
         this.companyName = companyName;
         this.faceValue = faceValue;
         this.settlementMonth = settlementMonth;
         this.marketCap = marketCap;
         this.listingDate = listingDate;
-        this.foundedYear = foundedYear;
-        this.totalShares = totalShares;
-        this.sharesAsOf = sharesAsOf;
         this.description = description;
     }
 
@@ -90,33 +87,6 @@ public class StockDetailDTO {
 
     public void setListingDate(Date listingDate) {
         this.listingDate = listingDate;
-    }
-
-    // founded_year (설립년도)
-    public String getFoundedYear() {
-        return foundedYear;
-    }
-
-    public void setFoundedYear(String foundedYear) {
-        this.foundedYear = foundedYear;
-    }
-
-    // total_shares (발행주식수)
-    public Long getTotalShares() {
-        return totalShares;
-    }
-
-    public void setTotalShares(Long totalShares) {
-        this.totalShares = totalShares;
-    }
-
-    // shares_as_of (기준일)
-    public Date getSharesAsOf() {
-        return sharesAsOf;
-    }
-
-    public void setSharesAsOf(Date sharesAsOf) {
-        this.sharesAsOf = sharesAsOf;
     }
 
     // description (주요 사업)
