@@ -53,7 +53,8 @@ ul {
   display: grid;
   grid-template-columns: 1.1fr 1.2fr;
   gap: 32px;
-  margin: 72px 0;
+  margin-top: 30px;
+  margin-bottom: 72px;
 }
 
 .main__news_card {

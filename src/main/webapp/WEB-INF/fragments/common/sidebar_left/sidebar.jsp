@@ -1,19 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/sidebar_left/sidebar.css">
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/sidebar_left/sidebar.css">
 
 <%
   String menuItemsParam = request.getParameter("menuItems");
   String menuLinksParam = request.getParameter("menuLinks");
+  String showSiteLinkParam = request.getParameter("showSiteLink");
 
-  String currentPage = (String) request.getAttribute("currentUrlPath");
-  request.setAttribute("currentPage", currentPage);
+  String currentPath = (String) request.getAttribute("currentPath");
+  request.setAttribute("currentPage", currentPath);
 
   String[] menuItems = null;
   String[] menuLinks = null;
+  boolean showSiteLink = "true".equals(showSiteLinkParam);
 
   if (menuItemsParam != null && !menuItemsParam.isEmpty()) {
     menuItems = menuItemsParam.split(",");
@@ -24,9 +25,17 @@
     menuLinks = menuLinksParam.split(",");
     request.setAttribute("menuLinks", menuLinks);
   }
+  
+  request.setAttribute("showSiteLink", showSiteLink);
 %>
 
 <aside class="sidebar-left__container">
+  <c:if test="${showSiteLink}">
+    <a href="${pageContext.request.contextPath}/" class="sidebar-left__site-link">
+      <span>사이트 바로가기</span>
+      <span class="sidebar-left__site-link-arrow">→</span>
+    </a>
+  </c:if>
   <c:if test="${not empty menuItems}">
     <c:forEach var="title" items="${menuItems}" varStatus="status">
       <%-- 메뉴 제목 설정 --%>

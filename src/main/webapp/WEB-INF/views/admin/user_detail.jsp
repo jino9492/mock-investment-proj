@@ -1,41 +1,21 @@
-<%--
-  User detail view (static prototype)
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="member" value="${requestScope.member}" />
 <fmt:formatDate value="${member.memJoinAt}" pattern="yyyy-MM-dd" var="joinDate" />
 <fmt:formatDate value="${member.memLastLoginAt}" pattern="yyyy-MM-dd HH:mm" var="lastLoginDate" />
 <fmt:formatNumber value="${member.virtualCash}" type="number" groupingUsed="true" var="virtualCashFormatted" />
 <c:set var="statusLabel" value="${empty member.memLastLoginAt ? '신규' : '활성'}" />
-<html>
-<head>
-    <title>회원 상세 정보</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/admin/users.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/admin/user_detail.css"/>
-</head>
-<body>
-<jsp:include page="/WEB-INF/fragments/common/header_admin.jsp" />
-<jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
-    <jsp:param name="menuItems" value="대시보드,회원 관리,거래 관리" />
-    <jsp:param name="menuLinks" value="/admin/dashboard,/admin/users,/admin/trades" />
-</jsp:include>
+<c:set var="pageTitle" value="회원 상세 정보" scope="request" />
+<c:set var="pageStyles" value="admin/users.css,admin/user_detail.css" scope="request" />
+<c:set var="pageScripts" value="admin/user_detail.js" scope="request" />
+<jsp:include page="/WEB-INF/fragments/admin/admin_layout_head.jsp" />
+<jsp:include page="/WEB-INF/fragments/admin/admin_layout_header.jsp" />
 <main class="detail-page">
     <div class="detail-header-bar">
         <a class="detail-back" href="${pageContext.request.contextPath}/admin/users">← 회원 목록으로</a>
     </div>
-    <!-- 알림 배너 -->
-    <c:if test="${not empty param.status}">
-        <div class="alert ${param.status eq 'update_success' ? 'alert--success' : 'alert--error'}">
-            <c:choose>
-                <c:when test="${param.status eq 'update_success'}">회원 정보가 업데이트되었습니다.</c:when>
-                <c:when test="${param.status eq 'update_duplicate_email'}">이미 사용 중인 이메일입니다.</c:when>
-                <c:when test="${param.status eq 'update_duplicate_nickname'}">이미 사용 중인 닉네임입니다.</c:when>
-                <c:otherwise>요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.</c:otherwise>
-            </c:choose>
-        </div>
-    </c:if>
+    <jsp:include page="/WEB-INF/fragments/admin/admin_status_alert.jsp" />
     <!-- 헤더 카드 -->
     <section class="member-card">
         <div class="member-card__header">
@@ -270,7 +250,5 @@
         </div>
     </div>
 </main>
-<script src="${pageContext.request.contextPath}/static/js/admin/user_detail.js"></script>
-</body>
-</html>
+<jsp:include page="/WEB-INF/fragments/admin/admin_layout_footer.jsp" />
 
