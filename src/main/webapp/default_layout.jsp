@@ -24,7 +24,11 @@
     </div>
     <!-- 오른쪽 사이드 -->
     <jsp:include page="WEB-INF/fragments/common/sidebar/sidebar.jsp" />
+<<<<<<< HEAD
 </div>
 
+=======
+  </div>
+>>>>>>> e0532982619086b54f2ada34eaadf52d6eea9f21
 </body>
 </html>

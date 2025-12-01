@@ -1,0 +1,350 @@
+/* ============================================
+ * 리그 페이지 스타일시트
+ * ============================================
+ * 
+ * BEM 네이밍 규칙:
+ * - Block: league
+ * - Element: league__element-name
+ * - Modifier: league__element-name--modifier
+ * 
+ * 레이아웃 구조:
+ * - 메인 콘텐츠: 65vw 고정 너비
+ * - 상단 섹션: Grid 2열 (1.1fr : 1.2fr)
+ * - 하단 섹션: 전체 너비
+ * ============================================ */
+
+/* ============================================
+ * 전역 리셋 스타일
+ * ============================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #ffffff;
+  color: #17171B;
+  font-size: 16px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* ============================================
+ * 메인 콘텐츠 영역
+ * ============================================
+ * - 홈 페이지와 동일한 크기 (65vw)
+ * - 중앙 정렬
+ * ============================================ */
+.league__content {
+  width: 65vw;
+  margin: 0 auto;
+}
+
+.league__page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* ============================================
+ * 상단 섹션
+ * ============================================
+ * - Grid 레이아웃: 2열 (1.1fr : 1.2fr)
+ * - 홈 페이지와 동일한 레이아웃 비율
+ * - 왼쪽: 계좌 카드, 오른쪽: 랭킹 카드
+ * ============================================ */
+.league__top-section {
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr;
+  gap: 32px;
+  margin-top: 72px;
+}
+
+/* ============================================
+ * 계좌 카드 영역
+ * ============================================
+ * - 홈 페이지와 동일한 스타일
+ * - 계좌 요약 정보 + 수익률 상위 종목 테이블 포함
+ * ============================================ */
+.league__card-account {
+  /* 홈 페이지와 동일 - 별도 스타일 없음 */
+}
+
+/* ============================================
+ * 계좌 요약 영역
+ * ============================================
+ * - Grid 2열: 계좌 총 금액, 상위 백분율
+ * - 투자중인 금액: 별도 박스
+ * ============================================ */
+.league__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.league__summary-box {
+  background: #F5F5F5;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.league__summary-label {
+  color: #17171B;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.league__summary-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #17171B;
+}
+
+.league__summary-value span {
+  font-size: 16px;
+  color: #a65af7;
+}
+
+.league__summary-value span.league__text-gray {
+  color: #666666;
+}
+
+.league__summary-value span.league__text-red {
+  color: #E74C3C;
+}
+
+.league__summary-value span.league__text-blue {
+  color: #4A90E2;
+}
+
+.league__divider {
+  border-top: 1px solid #ececec;
+  margin: 10px 0 12px;
+}
+
+/* ============================================
+ * 수익률 상위 종목 테이블
+ * ============================================
+ * - 홈 페이지와 동일한 스타일
+ * - 컬럼: 순위, 주식명, 현재가, 매수 평균가, 등락률
+ * - display: block으로 최소 높이 보장
+ * ============================================ */
+.league__table-simple {
+  width: 100%;
+  border-collapse: collapse;
+  min-height: 108px;
+  display: block;
+}
+
+.league__table-simple thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.league__table-simple tbody {
+  display: block;
+  min-height: 84px;
+}
+
+.league__table-simple tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.league__table-simple th {
+  font-size: 12px;
+  color: #17171B;
+  font-weight: 600;
+  padding: 4px 0;
+  vertical-align: middle;
+}
+
+.league__table-simple td {
+  font-size: 16px;
+  color: #17171B;
+  padding: 4px 0;
+  vertical-align: middle;
+}
+
+.league__table-simple td:first-child {
+  width: 24px;
+  font-size: 12px;
+  color: #17171B;
+}
+
+.league__table-simple td:nth-child(3),
+.league__table-simple td:nth-child(4),
+.league__table-simple td:nth-child(5) {
+  text-align: center;
+}
+
+.league__table-simple td:nth-child(2),
+.league__table-simple th:nth-child(2) {
+  text-align: left;
+}
+
+/* ============================================
+ * 텍스트 색상 유틸리티 클래스
+ * ============================================
+ * - purple: 보라색 (기본 강조)
+ * - gray: 회색 (보합/0%)
+ * - red: 빨간색 (상승/+)
+ * - blue: 파란색 (하락/-)
+ * ============================================ */
+.league__text-purple {
+  color: #a65af7;
+  font-size: 16px;
+}
+
+.league__text-gray {
+  color: #666666;
+  font-size: 16px;
+}
+
+.league__text-red {
+  color: #E74C3C;
+  font-size: 16px;
+}
+
+.league__text-blue {
+  color: #4A90E2;
+  font-size: 16px;
+}
+
+/* ============================================
+ * 랭킹 카드 영역
+ * ============================================
+ * - 현재 사용자 기준 주변 랭킹 표시
+ * - Flex 레이아웃: 순위, 닉네임, 수익률
+ * - active 클래스: 현재 사용자 하이라이트
+ * ============================================ */
+.league__rank-card {
+  padding: 20px 24px;
+}
+
+.league__rank-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.league__rank-list {
+  list-style: none;
+  padding: 0;
+}
+
+.league__rank-item {
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.league__rank-item.active {
+  background-color: #E3F2FD;
+  font-weight: 600;
+}
+
+.league__rank-number {
+  display: inline-block;
+  width: 60px;
+  text-align: right;
+  margin-right: 8px;
+  font-size: 12px;
+  color: #17171B;
+}
+
+.league__rank-name {
+  font-size: 16px;
+  color: #17171B;
+  flex: 1;
+}
+
+.league__rank-return {
+  font-size: 16px;
+  color: #17171B;
+}
+
+/* ============================================
+ * 하단 섹션: 전체 포트폴리오
+ * ============================================
+ * - 사용자가 보유한 모든 주식 목록
+ * - 테이블 형태로 표시
+ * ============================================ */
+.league__bottom-section {
+  margin-top: 10px;
+}
+
+.league__section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+}
+
+/* ============================================
+ * 포트폴리오 테이블
+ * ============================================
+ * - 테두리와 배경이 있는 스타일
+ * - Flex 레이아웃으로 컬럼 정렬
+ * - 호버 효과 적용
+ * ============================================ */
+.league__investment-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #BABABA;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.league__investment-table tr {
+  display: flex;
+  justify-content: space-between;
+}
+
+.league__investment-table th {
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: 600;
+  color: #17171B;
+  font-size: 12px;
+  flex: 1;
+}
+
+.league__investment-table th:first-child {
+  text-align: left;
+}
+
+.league__investment-table td {
+  padding: 12px 16px;
+  font-size: 16px;
+  color: #17171B;
+  text-align: center;
+  flex: 1;
+}
+
+.league__investment-table td:first-child {
+  text-align: left;
+}
+
+.league__investment-table tbody tr:hover {
+  background-color: #F9F9F9;
+}
+
+section {
+  user-select: none;
+}
