@@ -4,7 +4,10 @@ package com.dongyang.mock.model.DAO;
 import java.sql.*;
 import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.model.DTO.MemberStatsDTO;
+import com.dongyang.mock.model.DTO.MemberAssetDTO;
+import com.dongyang.mock.model.DTO.MemberHoldingDTO;
 import com.dongyang.mock.util.PasswordHasher;
+import java.math.BigDecimal;
 
 import static com.dongyang.mock.util.db.DBManager.*;
 import java.util.ArrayList;
@@ -450,5 +453,126 @@ public class MemberDAO {
         } finally {
             close(null, pstmt, rs);
         }
+    }
+
+    /**
+     * 회원 자산 정보 조회
+     * - 예치금
+     * - 보유주식 평가액
+     * - 총 자산
+     * - 수익률
+     * - 평가 손익
+     */
+    public MemberAssetDTO fetchMemberAsset(int memberId, Connection conn) throws SQLException {
+        // 보유주식 평가액 계산
+        String stockValueSql = "SELECT COALESCE(SUM(h.quantity * spd.close_price), 0) as stock_value " +
+                "FROM holding h " +
+                "INNER JOIN stock_price_daily spd ON h.stock_id = spd.stock_id " +
+                "AND spd.price_date = (SELECT MAX(price_date) FROM stock_price_daily WHERE stock_id = h.stock_id) " +
+                "WHERE h.mem_id = ? AND h.quantity > 0";
+
+        long stockValue = 0L;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            pstmt = conn.prepareStatement(stockValueSql);
+            pstmt.setInt(1, memberId);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                BigDecimal value = rs.getBigDecimal("stock_value");
+                stockValue = value != null ? value.longValue() : 0L;
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+
+        // 회원 정보 조회 (예치금, 초기 자본)
+        String memberSql = "SELECT virtual_cash, 10000000 as initial_capital FROM member WHERE mem_id = ?";
+        long virtualCash = 0L;
+        long initialCapital = 10000000L;
+        try {
+            pstmt = conn.prepareStatement(memberSql);
+            pstmt.setInt(1, memberId);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                virtualCash = rs.getLong("virtual_cash");
+                initialCapital = rs.getLong("initial_capital");
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+
+        // 총 자산 = 예치금 + 보유주식 평가액
+        long totalAsset = virtualCash + stockValue;
+        
+        // 평가 손익 = 총 자산 - 초기 자본
+        long profitLoss = totalAsset - initialCapital;
+        
+        // 수익률 = (평가 손익 / 초기 자본) * 100
+        double profitRate = initialCapital > 0 ? ((double) profitLoss / initialCapital) * 100.0 : 0.0;
+
+        MemberAssetDTO asset = new MemberAssetDTO();
+        asset.setVirtualCash(virtualCash);
+        asset.setStockValue(stockValue);
+        asset.setTotalAsset(totalAsset);
+        asset.setProfitLoss(profitLoss);
+        asset.setProfitRate(profitRate);
+        return asset;
+    }
+
+    /**
+     * 회원 보유 종목 목록 조회
+     */
+    public List<MemberHoldingDTO> fetchMemberHoldings(int memberId, Connection conn) throws SQLException {
+        String sql = "SELECT " +
+                "s.stock_name, " +
+                "h.quantity, " +
+                "h.avg_buy_price as average_price, " +
+                "spd.close_price as current_price, " +
+                "h.quantity * spd.close_price as evaluation_amount, " +
+                "(spd.close_price - h.avg_buy_price) * h.quantity as profit_loss, " +
+                "CASE " +
+                "  WHEN h.avg_buy_price > 0 " +
+                "  THEN ((spd.close_price - h.avg_buy_price) / h.avg_buy_price) * 100 " +
+                "  ELSE 0 " +
+                "END as profit_rate " +
+                "FROM holding h " +
+                "INNER JOIN stock s ON h.stock_id = s.stock_id " +
+                "INNER JOIN stock_price_daily spd ON h.stock_id = spd.stock_id " +
+                "AND spd.price_date = (SELECT MAX(price_date) FROM stock_price_daily WHERE stock_id = h.stock_id) " +
+                "WHERE h.mem_id = ? AND h.quantity > 0 " +
+                "ORDER BY s.stock_name";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<MemberHoldingDTO> holdings = new ArrayList<>();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memberId);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                MemberHoldingDTO holding = new MemberHoldingDTO();
+                holding.setStockName(rs.getString("stock_name"));
+                holding.setQuantity(rs.getInt("quantity"));
+                
+                BigDecimal avgPrice = rs.getBigDecimal("average_price");
+                holding.setAveragePrice(avgPrice != null ? avgPrice.intValue() : 0);
+                
+                BigDecimal currentPrice = rs.getBigDecimal("current_price");
+                holding.setCurrentPrice(currentPrice != null ? currentPrice.intValue() : 0);
+                
+                BigDecimal evalAmount = rs.getBigDecimal("evaluation_amount");
+                holding.setEvaluationAmount(evalAmount != null ? evalAmount.longValue() : 0L);
+                
+                BigDecimal profitLoss = rs.getBigDecimal("profit_loss");
+                holding.setProfitLoss(profitLoss != null ? profitLoss.longValue() : 0L);
+                
+                holding.setProfitRate(rs.getDouble("profit_rate"));
+                holdings.add(holding);
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        return holdings;
     }
 }

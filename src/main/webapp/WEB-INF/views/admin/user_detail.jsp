@@ -90,28 +90,29 @@
 
     <section class="stat-card" style="margin-bottom: 20px;">
         <h4 style="font-size: 18px; font-weight: 600; color: #17171B; margin-bottom: 16px;">자산 정보</h4>
+        <c:set var="asset" value="${requestScope.asset}" />
         <div class="asset-grid">
             <article class="asset-card asset-card--blue">
                 <p class="asset-card__label">예치금</p>
-                <p class="asset-card__value">${virtualCashFormatted}원</p>
+                <p class="asset-card__value"><fmt:formatNumber value="${not empty asset ? asset.virtualCash : 0}" pattern="#,###"/>원</p>
             </article>
             <article class="asset-card asset-card--purple">
                 <p class="asset-card__label">총 자산</p>
-                <p class="asset-card__value">${virtualCashFormatted}원</p>
+                <p class="asset-card__value"><fmt:formatNumber value="${not empty asset ? asset.totalAsset : 0}" pattern="#,###"/>원</p>
             </article>
             <article class="asset-card asset-card--green">
                 <p class="asset-card__label">수익률</p>
-                <p class="asset-card__value">0.0%</p>
+                <p class="asset-card__value"><fmt:formatNumber value="${not empty asset ? asset.profitRate : 0}" pattern="#,##0.0"/>%</p>
             </article>
             <article class="asset-card asset-card--green">
                 <p class="asset-card__label">평가 손익</p>
-                <p class="asset-card__value">0원</p>
+                <p class="asset-card__value"><fmt:formatNumber value="${not empty asset ? asset.profitLoss : 0}" pattern="#,###"/>원</p>
             </article>
         </div>
     </section>
-    <!-- 임의 데이터 지정 -->
     <section class="stat-card" style="margin-bottom: 20px;">
         <h4 style="font-size: 18px; font-weight: 600; color: #17171B; margin-bottom: 16px;">보유 종목</h4>
+        <c:set var="holdings" value="${requestScope.holdings}" />
         <div class="table-card">
             <table>
                 <thead>
@@ -125,45 +126,46 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>삼성전자</td>
-                    <td class="text-right">50주</td>
-                    <td class="text-right">68,000원</td>
-                    <td class="text-right">72,500원</td>
-                    <td class="text-right font-strong">3,625,000원</td>
-                    <td class="text-right">
-                        <div class="gain gain--up">
-                            <span>+6.62%</span>
-                            <small>+225,000원</small>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>SK하이닉스</td>
-                    <td class="text-right">30주</td>
-                    <td class="text-right">145,000원</td>
-                    <td class="text-right">158,000원</td>
-                    <td class="text-right font-strong">4,740,000원</td>
-                    <td class="text-right">
-                        <div class="gain gain--up">
-                            <span>+8.97%</span>
-                            <small>+390,000원</small>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>NAVER</td>
-                    <td class="text-right">20주</td>
-                    <td class="text-right">195,000원</td>
-                    <td class="text-right">203,000원</td>
-                    <td class="text-right font-strong">4,060,000원</td>
-                    <td class="text-right">
-                        <div class="gain gain--up">
-                            <span>+4.10%</span>
-                            <small>+160,000원</small>
-                        </div>
-                    </td>
-                </tr>
+                <c:choose>
+                    <c:when test="${not empty holdings}">
+                        <c:forEach items="${holdings}" var="holding">
+                            <tr>
+                                <td>${holding.stockName}</td>
+                                <td class="text-right"><fmt:formatNumber value="${holding.quantity}" pattern="#,###"/>주</td>
+                                <td class="text-right"><fmt:formatNumber value="${holding.averagePrice}" pattern="#,###"/>원</td>
+                                <td class="text-right"><fmt:formatNumber value="${holding.currentPrice}" pattern="#,###"/>원</td>
+                                <td class="text-right font-strong"><fmt:formatNumber value="${holding.evaluationAmount}" pattern="#,###"/>원</td>
+                                <td class="text-right">
+                                    <c:choose>
+                                        <c:when test="${holding.profitLoss > 0}">
+                                            <div class="gain gain--up">
+                                                <span>+<fmt:formatNumber value="${holding.profitRate}" pattern="#,##0.00"/>%</span>
+                                                <small>+<fmt:formatNumber value="${holding.profitLoss}" pattern="#,###"/>원</small>
+                                            </div>
+                                        </c:when>
+                                        <c:when test="${holding.profitLoss < 0}">
+                                            <div class="gain" style="color: #C0392B;">
+                                                <span><fmt:formatNumber value="${holding.profitRate}" pattern="#,##0.00"/>%</span>
+                                                <small><fmt:formatNumber value="${holding.profitLoss}" pattern="#,###"/>원</small>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="gain" style="color: #666;">
+                                                <span>0.00%</span>
+                                                <small>0원</small>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: #999;">보유 종목이 없습니다.</td>
+                        </tr>
+                    </c:otherwise>
+                </c:choose>
                 </tbody>
             </table>
         </div>
@@ -171,6 +173,7 @@
 
     <section class="stat-card" style="margin-bottom: 20px;">
         <h4 style="font-size: 18px; font-weight: 600; color: #17171B; margin-bottom: 16px;">최근 거래 내역</h4>
+        <c:set var="recentTrades" value="${requestScope.recentTrades}" />
         <div class="table-card">
             <table>
                 <thead>
@@ -184,30 +187,34 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>2025-11-19 14:25</td>
-                    <td><span class="badge badge--sell">매수</span></td>
-                    <td>삼성전자</td>
-                    <td class="text-right">10주</td>
-                    <td class="text-right">72,500원</td>
-                    <td class="text-right font-strong">725,000원</td>
-                </tr>
-                <tr>
-                    <td>2025-11-19 10:15</td>
-                    <td><span class="badge badge--buy">매도</span></td>
-                    <td>카카오</td>
-                    <td class="text-right">15주</td>
-                    <td class="text-right">54,200원</td>
-                    <td class="text-right font-strong">813,000원</td>
-                </tr>
-                <tr>
-                    <td>2025-11-18 15:30</td>
-                    <td><span class="badge badge--sell">매수</span></td>
-                    <td>SK하이닉스</td>
-                    <td class="text-right">5주</td>
-                    <td class="text-right">158,000원</td>
-                    <td class="text-right font-strong">790,000원</td>
-                </tr>
+                <c:choose>
+                    <c:when test="${not empty recentTrades}">
+                        <c:forEach items="${recentTrades}" var="trade">
+                            <tr>
+                                <td><fmt:formatDate value="${trade.tradeDate}" pattern="yyyy-MM-dd HH:mm"/></td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${trade.tradeType eq 'buy'}">
+                                            <span class="badge badge--buy">매수</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="badge badge--sell">매도</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>${trade.stockName}</td>
+                                <td class="text-right"><fmt:formatNumber value="${trade.quantity}" pattern="#,###"/>주</td>
+                                <td class="text-right"><fmt:formatNumber value="${trade.price}" pattern="#,###"/>원</td>
+                                <td class="text-right font-strong"><fmt:formatNumber value="${trade.totalAmount}" pattern="#,###"/>원</td>
+                            </tr>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: #999;">거래 내역이 없습니다.</td>
+                        </tr>
+                    </c:otherwise>
+                </c:choose>
                 </tbody>
             </table>
         </div>

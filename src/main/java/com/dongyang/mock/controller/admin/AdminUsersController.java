@@ -2,8 +2,12 @@ package com.dongyang.mock.controller.admin;
 
 import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.model.DTO.MemberStatsDTO;
+import com.dongyang.mock.model.DTO.MemberAssetDTO;
+import com.dongyang.mock.model.DTO.MemberHoldingDTO;
+import com.dongyang.mock.model.DTO.TradeDTO;
 import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.service.MemberService;
+import com.dongyang.mock.service.TradeService;
 import com.dongyang.mock.util.DateUtility;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,6 +31,7 @@ import java.util.List;
 public class AdminUsersController extends BaseAdminController {
 
     private final MemberService memberService = new MemberService();
+    private final TradeService tradeService = new TradeService();
 
     /**
      * GET 요청 처리
@@ -163,7 +168,19 @@ public class AdminUsersController extends BaseAdminController {
                 return;
             }
 
+            // 회원 자산 정보 조회
+            MemberAssetDTO asset = memberService.getMemberAsset(memberId);
+            
+            // 보유 종목 목록 조회
+            List<MemberHoldingDTO> holdings = memberService.getMemberHoldings(memberId);
+            
+            // 최근 거래 내역 조회 (최대 10건)
+            List<TradeDTO> recentTrades = tradeService.getMemberRecentTrades(memberId, 10);
+
             req.setAttribute("member", member);
+            req.setAttribute("asset", asset);
+            req.setAttribute("holdings", holdings);
+            req.setAttribute("recentTrades", recentTrades);
             req.getRequestDispatcher("/WEB-INF/views/admin/user_detail.jsp").forward(req, resp);
         } catch (SQLException e) {
             handleSQLException(e, "Failed to load member detail");

@@ -42,5 +42,15 @@ public class TradeService {
     public TradeStatsDTO getTradeStats() throws SQLException {
         return DBManager.withConnection(tradeDAO::fetchTradeStats);
     }
+
+    /**
+     * 특정 회원의 최근 거래 내역 조회
+     * @param memberId 회원 ID
+     * @param limit 조회할 최대 건수
+     * @return 최근 거래 내역 목록
+     */
+    public List<TradeDTO> getMemberRecentTrades(int memberId, int limit) throws SQLException {
+        return DBManager.withConnection(conn -> tradeDAO.findMemberRecentTrades(memberId, limit, conn));
+    }
 }
 

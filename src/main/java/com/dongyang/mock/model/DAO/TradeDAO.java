@@ -185,5 +185,44 @@ public class TradeDAO {
         trade.setTradeDate(rs.getTimestamp("trade_date"));
         return trade;
     }
+
+    /**
+     * 특정 회원의 최근 거래 내역 조회
+     * @param memberId 회원 ID
+     * @param limit 조회할 최대 건수
+     * @return 최근 거래 내역 목록
+     */
+    public List<TradeDTO> findMemberRecentTrades(int memberId, int limit, Connection conn) throws SQLException {
+        String sql = "SELECT t.trade_id, t.mem_id, m.mem_nickname, s.stock_name, " +
+                "CASE WHEN o.side = 'BUY' THEN 'buy' ELSE 'sell' END AS trade_type, " +
+                "t.trade_quantity AS quantity, " +
+                "t.trade_price AS price, " +
+                "t.trade_price * t.trade_quantity AS total_amount, " +
+                "CASE WHEN o.status = 'FILLED' THEN 'settled' WHEN o.status = 'CANCELLED' THEN 'cancelled' ELSE o.status END AS status, " +
+                "t.traded_at AS trade_date " +
+                "FROM trade t " +
+                "INNER JOIN trade_order o ON t.order_id = o.order_id " +
+                "INNER JOIN stock s ON t.stock_id = s.stock_id " +
+                "LEFT JOIN member m ON t.mem_id = m.mem_id " +
+                "WHERE t.mem_id = ? " +
+                "ORDER BY t.traded_at DESC, t.trade_id DESC " +
+                "LIMIT ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<TradeDTO> trades = new ArrayList<>();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memberId);
+            pstmt.setInt(2, limit);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                trades.add(mapToTrade(rs));
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        return trades;
+    }
 }
 
