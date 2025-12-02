@@ -19,8 +19,21 @@
         <h2 class="section-title">API 연동 상태</h2>
         <div class="status-card">
             <span>한국투자증권 API</span>
-            <span class="status-badge active">정상</span>
+            <c:set var="apiStatus" value="${requestScope.apiStatus}" />
+            <c:choose>
+                <c:when test="${not empty apiStatus and apiStatus.connected}">
+                    <span class="status-badge active">${apiStatus.status}</span>
+                </c:when>
+                <c:otherwise>
+                    <span class="status-badge" style="background: #FFEBEE; color: #C62828;">${not empty apiStatus ? apiStatus.status : '오류'}</span>
+                </c:otherwise>
+            </c:choose>
         </div>
+        <c:if test="${not empty apiStatus and apiStatus.responseTime > 0}">
+            <div style="font-size: 12px; color: #666; margin-top: 8px; padding-left: 20px;">
+                응답 시간: ${apiStatus.responseTime}ms
+            </div>
+        </c:if>
     </div>
 
     <!-- 서버 상태 -->

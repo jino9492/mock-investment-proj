@@ -1,10 +1,12 @@
 package com.dongyang.mock.controller.admin;
 
+import com.dongyang.mock.model.DTO.ApiStatusDTO;
 import com.dongyang.mock.model.DTO.MemberStatsDTO;
 import com.dongyang.mock.model.DTO.ServerStatsDTO;
 import com.dongyang.mock.model.DTO.TradeStatsDTO;
 import com.dongyang.mock.service.MemberService;
 import com.dongyang.mock.service.TradeService;
+import com.dongyang.mock.util.ApiStatusUtil;
 import com.dongyang.mock.util.ServerStatsUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,26 +27,29 @@ public class AdminDashboardController extends BaseAdminController {
             throws ServletException, IOException {
         try {
             // 회원 통계 조회
-            MemberStatsDTO memberStats = memberService.getMemberStats();
-            if (memberStats == null) {
-                memberStats = new MemberStatsDTO();
-            }
+            MemberStatsDTO memberStats = orDefault(
+                memberService.getMemberStats(),
+                MemberStatsDTO::new
+            );
 
             // 거래 통계 조회
-            TradeStatsDTO tradeStats = tradeService.getTradeStats();
-            if (tradeStats == null) {
-                tradeStats = new TradeStatsDTO();
-            }
+            TradeStatsDTO tradeStats = orDefault(
+                tradeService.getTradeStats(),
+                TradeStatsDTO::new
+            );
 
             // 서버 상태 조회
             ServerStatsDTO serverStats = ServerStatsUtil.getServerStats();
 
+            // API 연동 상태 조회
+            ApiStatusDTO apiStatus = ApiStatusUtil.getApiStatus();
+
             req.setAttribute("memberStats", memberStats);
             req.setAttribute("tradeStats", tradeStats);
             req.setAttribute("serverStats", serverStats);
+            req.setAttribute("apiStatus", apiStatus);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException("Failed to load dashboard statistics", e);
+            handleSQLException(e, "Failed to load dashboard statistics");
         }
 
         setCurrentPath(req, "/admin/dashboard");

@@ -39,10 +39,10 @@ public class AdminTradesController extends BaseAdminController {
                     startDate, endDate, typeFilter, statusFilter, stockKeyword, userKeyword);
 
             // 거래 통계 조회
-            TradeStatsDTO tradeStats = tradeService.getTradeStats();
-            if (tradeStats == null) {
-                tradeStats = new TradeStatsDTO();
-            }
+            TradeStatsDTO tradeStats = orDefault(
+                tradeService.getTradeStats(),
+                TradeStatsDTO::new
+            );
 
             // JSP에 데이터 전달
             req.setAttribute("tradeList", tradeList);
@@ -54,8 +54,7 @@ public class AdminTradesController extends BaseAdminController {
             req.setAttribute("stockKeyword", stockKeyword);
             req.setAttribute("userKeyword", userKeyword);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException("Failed to load trade list", e);
+            handleSQLException(e, "Failed to load trade list");
         }
 
         setCurrentPath(req, "/admin/trades");
