@@ -415,10 +415,17 @@ public class MemberDAO {
      * @return 회원 통계 정보
      */
     public MemberStatsDTO fetchMemberStats(Connection conn) throws SQLException {
-        String sql = "SELECT COUNT(*) AS total_count, " +
+        String sql = "SELECT " +
+                "COUNT(*) AS total_count, " +
                 "SUM(CASE WHEN DATE(mem_last_login_at) = CURDATE() THEN 1 ELSE 0 END) AS today_login_count, " +
                 "SUM(CASE WHEN mem_last_login_at IS NOT NULL AND mem_last_login_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) THEN 1 ELSE 0 END) AS active_count, " +
-                "SUM(CASE WHEN mem_last_login_at IS NULL OR mem_last_login_at < DATE_SUB(NOW(), INTERVAL 6 MONTH) THEN 1 ELSE 0 END) AS dormant_count " +
+                "SUM(CASE WHEN mem_last_login_at IS NULL OR mem_last_login_at < DATE_SUB(NOW(), INTERVAL 6 MONTH) THEN 1 ELSE 0 END) AS dormant_count, " +
+                "0 AS deleted_count, " + // 탈퇴 사용자 수는 현재 논리적 삭제가 없으므로 0
+                "COUNT(*) - SUM(CASE WHEN DATE(mem_join_at) = CURDATE() THEN 1 ELSE 0 END) AS yesterday_total_count, " + // 전일 전체 회원 수 = 오늘 전체 - 오늘 가입
+                "SUM(CASE WHEN DATE(mem_last_login_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS yesterday_login_count, " +
+                "SUM(CASE WHEN mem_last_login_at IS NOT NULL AND mem_last_login_at >= DATE_SUB(DATE_SUB(CURDATE(), INTERVAL 1 DAY), INTERVAL 6 MONTH) AND mem_last_login_at < DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS yesterday_active_count, " +
+                "SUM(CASE WHEN mem_last_login_at IS NULL OR mem_last_login_at < DATE_SUB(DATE_SUB(CURDATE(), INTERVAL 1 DAY), INTERVAL 6 MONTH) THEN 1 ELSE 0 END) AS yesterday_dormant_count, " +
+                "0 AS yesterday_deleted_count " + // 전일 탈퇴 사용자 수
                 "FROM member";
 
         PreparedStatement pstmt = null;
@@ -432,6 +439,12 @@ public class MemberDAO {
                 stats.setTodayLoginCount(rs.getInt("today_login_count"));
                 stats.setActiveCount(rs.getInt("active_count"));
                 stats.setDormantCount(rs.getInt("dormant_count"));
+                stats.setDeletedCount(rs.getInt("deleted_count"));
+                stats.setYesterdayTotalCount(rs.getInt("yesterday_total_count"));
+                stats.setYesterdayLoginCount(rs.getInt("yesterday_login_count"));
+                stats.setYesterdayActiveCount(rs.getInt("yesterday_active_count"));
+                stats.setYesterdayDormantCount(rs.getInt("yesterday_dormant_count"));
+                stats.setYesterdayDeletedCount(rs.getInt("yesterday_deleted_count"));
             }
             return stats;
         } finally {

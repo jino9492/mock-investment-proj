@@ -48,7 +48,11 @@ public abstract class BaseAdminController extends HttpServlet {
      * URL 인코딩 유틸리티
      */
     protected String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (Exception e) {
+            return value;
+        }
     }
 
     /**

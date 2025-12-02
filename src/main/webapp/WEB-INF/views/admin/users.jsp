@@ -28,23 +28,69 @@
             <article class="stat-card">
                 <div class="stat-card__label">전체 회원 수</div>
                 <div class="stat-card__value">
-                    <c:out value="${memberStats.totalCount}" default="0" />
-                    명
+                    <fmt:formatNumber value="${not empty memberStats ? memberStats.totalCount : 0}" pattern="#,###"/>명
                 </div>
-                <div class="stat-card__change stat-card__change--down">
-                    전일 대비 변동 없음
-                </div>
+                <c:choose>
+                    <c:when test="${not empty memberStats}">
+                        <c:set var="totalCountChange" value="${memberStats.totalCountChange}" />
+                        <c:choose>
+                            <c:when test="${totalCountChange > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${totalCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:when test="${totalCountChange < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${totalCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0명
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="stat-card__change stat-card__change--down">
+                            전일 대비 -명
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </article>
 
             <article class="stat-card">
                 <div class="stat-card__label">당일 접속자 수</div>
                 <div class="stat-card__value">
-                    <c:out value="${memberStats.todayLoginCount}" default="0" />
-                    명
+                    <fmt:formatNumber value="${not empty memberStats ? memberStats.todayLoginCount : 0}" pattern="#,###"/>명
                 </div>
-                <div class="stat-card__change stat-card__change--up">
-                    전일 대비 변동 없음
-                </div>
+                <c:choose>
+                    <c:when test="${not empty memberStats}">
+                        <c:set var="loginCountChange" value="${memberStats.todayLoginCountChange}" />
+                        <c:choose>
+                            <c:when test="${loginCountChange > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${loginCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:when test="${loginCountChange < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${loginCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0명
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="stat-card__change stat-card__change--down">
+                            전일 대비 -명
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </article>
         </section>
 
@@ -53,31 +99,108 @@
             <article class="stat-card">
                 <div class="stat-card__label">활동 사용자 수</div>
                 <div class="stat-card__value">
-                    <c:out value="${memberStats.activeCount}" default="0" />
-                    명
+                    <fmt:formatNumber value="${not empty memberStats ? memberStats.activeCount : 0}" pattern="#,###"/>명
                 </div>
-                <div class="stat-card__change stat-card__change--down">
-                    전일 대비 변동 없음
-                </div>
+                <c:choose>
+                    <c:when test="${not empty memberStats}">
+                        <c:set var="activeCountChange" value="${memberStats.activeCountChange}" />
+                        <c:choose>
+                            <c:when test="${activeCountChange > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${activeCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:when test="${activeCountChange < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${activeCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0명
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="stat-card__change stat-card__change--down">
+                            전일 대비 -명
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </article>
 
             <article class="stat-card">
                 <div class="stat-card__label">휴면 사용자 수</div>
                 <div class="stat-card__value">
-                    <c:out value="${memberStats.dormantCount}" default="0" />
-                    명
+                    <fmt:formatNumber value="${not empty memberStats ? memberStats.dormantCount : 0}" pattern="#,###"/>명
                 </div>
-                <div class="stat-card__change stat-card__change--up">
-                    전일 대비 변동 없음
-                </div>
+                <c:choose>
+                    <c:when test="${not empty memberStats}">
+                        <c:set var="dormantCountChange" value="${memberStats.dormantCountChange}" />
+                        <c:choose>
+                            <c:when test="${dormantCountChange > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${dormantCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:when test="${dormantCountChange < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${dormantCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0명
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="stat-card__change stat-card__change--down">
+                            전일 대비 -명
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </article>
 
             <article class="stat-card">
                 <div class="stat-card__label">탈퇴 사용자 수</div>
-                <div class="stat-card__value">-</div>
-                <div class="stat-card__change stat-card__change--down">
-                    전일 대비 변동 없음
+                <div class="stat-card__value">
+                    <c:choose>
+                        <c:when test="${not empty memberStats and memberStats.deletedCount > 0}">
+                            <fmt:formatNumber value="${memberStats.deletedCount}" pattern="#,###"/>명
+                        </c:when>
+                        <c:otherwise>-</c:otherwise>
+                    </c:choose>
                 </div>
+                <c:choose>
+                    <c:when test="${not empty memberStats}">
+                        <c:set var="deletedCountChange" value="${memberStats.deletedCountChange}" />
+                        <c:choose>
+                            <c:when test="${deletedCountChange > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${deletedCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:when test="${deletedCountChange < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${deletedCountChange}" pattern="#,###"/>명
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0명
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="stat-card__change stat-card__change--down">
+                            전일 대비 -명
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </article>
         </section>
 
