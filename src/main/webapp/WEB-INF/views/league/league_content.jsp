@@ -16,7 +16,6 @@
  * - 빈 상태 메시지: /WEB-INF/fragments/league/empty_state_message.jsp
  * - 테이블 행: /WEB-INF/fragments/league/table_row_*.jsp
 --%>
-<%@ page import="com.dongyang.mock.model.DTO.MemberDTO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -38,7 +37,7 @@
 </script>
 
 <main class="league__content">
-    <%-- 페이지 제목 영역 --%>
+
     <div class="main__sub-title">
         <span class="main__dot-green"></span>
         <strong>국내 장 열림/닫힘</strong>
