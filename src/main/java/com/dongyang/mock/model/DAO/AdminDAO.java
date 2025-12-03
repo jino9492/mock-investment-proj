@@ -16,34 +16,6 @@ import static com.dongyang.mock.util.db.DBManager.close;
 public class AdminDAO {
 
     /**
-     * admin 테이블에서 첫 번째 관리자 데이터 조회
-     * 
-     * @param conn 데이터베이스 연결
-     * @return 첫 번째 관리자 정보, 없으면 null
-     * @throws SQLException DB 오류 발생 시
-     */
-    public AdminDTO getFirstAdmin(Connection conn) throws SQLException {
-        String sql = "SELECT admin_id, admin_username, admin_password, admin_name, " +
-                     "last_login_at, last_login_ip, created_at, updated_at " +
-                     "FROM admin ORDER BY admin_id ASC LIMIT 1";
-        
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return mapToAdmin(rs);
-            }
-            return null;
-        } finally {
-            close(null, pstmt, rs);
-        }
-    }
-
-    /**
      * 관리자 로그인 처리
      * - 아이디와 비밀번호로 관리자 조회
      * - 로그인 성공 시 마지막 로그인 시간 및 IP 업데이트
@@ -72,13 +44,23 @@ public class AdminDAO {
                 
                 // 비밀번호 검증
                 if (PasswordHasher.checkPassword(plainPassword, hashedPassword)) {
-                    AdminDTO admin = mapToAdmin(rs);
+                    int adminId = rs.getInt("admin_id");
                     
-                    // 마지막 로그인 정보 업데이트
-                    updateLastLogin(admin.getAdminId(), loginIp, conn);
+                    // 로그인 정보 업데이트
+                    updateLastLogin(adminId, loginIp, conn);
                     
-                    // 비밀번호는 반환하지 않음
-                    admin.setAdminPassword(null);
+                    // AdminDTO 생성 (비밀번호 제외, 업데이트된 로그인 정보 포함)
+                    AdminDTO admin = new AdminDTO();
+                    admin.setAdminId(adminId);
+                    admin.setAdminUsername(rs.getString("admin_username"));
+                    admin.setAdminPassword(null); // 비밀번호는 반환하지 않음
+                    admin.setAdminName(rs.getString("admin_name"));
+                    // 업데이트된 로그인 정보 설정 (NOW()로 업데이트했으므로 현재 시간, 입력 IP)
+                    admin.setLastLoginAt(new Timestamp(System.currentTimeMillis()));
+                    admin.setLastLoginIp(loginIp);
+                    admin.setCreatedAt(rs.getTimestamp("created_at"));
+                    admin.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    
                     return admin;
                 }
             }
@@ -140,14 +122,14 @@ public class AdminDAO {
     }
 
     /**
-     * 전체 관리자 목록 조회
+     * 전체 관리자 목록 조회 (비밀번호 제외, 보안 및 성능 최적화)
      * 
      * @param conn 데이터베이스 연결
      * @return 관리자 목록
      * @throws SQLException DB 오류 발생 시
      */
     public List<AdminDTO> getAllAdmins(Connection conn) throws SQLException {
-        String sql = "SELECT admin_id, admin_username, admin_password, admin_name, " +
+        String sql = "SELECT admin_id, admin_username, admin_name, " +
                      "last_login_at, last_login_ip, created_at, updated_at " +
                      "FROM admin ORDER BY admin_id ASC";
         
@@ -160,12 +142,42 @@ public class AdminDAO {
             rs = pstmt.executeQuery();
             
             while (rs.next()) {
-                admins.add(mapToAdmin(rs));
+                admins.add(mapToAdminWithoutPassword(rs));
             }
             return admins;
         } finally {
             close(null, pstmt, rs);
         }
+    }
+    
+    /**
+     * 비밀번호를 제외한 AdminDTO 매핑 (목록 조회용)
+     */
+    private AdminDTO mapToAdminWithoutPassword(ResultSet rs) throws SQLException {
+        AdminDTO admin = new AdminDTO();
+        admin.setAdminId(rs.getInt("admin_id"));
+        admin.setAdminUsername(rs.getString("admin_username"));
+        admin.setAdminPassword(null); // 비밀번호는 조회하지 않음
+        admin.setAdminName(rs.getString("admin_name"));
+        
+        // last_login_at은 NULL일 수 있음
+        Timestamp lastLoginAt = rs.getTimestamp("last_login_at");
+        admin.setLastLoginAt(lastLoginAt);
+        
+        // last_login_ip는 NULL일 수 있음
+        String lastLoginIp = rs.getString("last_login_ip");
+        if (rs.wasNull()) {
+            lastLoginIp = null;
+        }
+        admin.setLastLoginIp(lastLoginIp);
+        
+        admin.setCreatedAt(rs.getTimestamp("created_at"));
+        
+        // updated_at은 NULL일 수 있음
+        Timestamp updatedAt = rs.getTimestamp("updated_at");
+        admin.setUpdatedAt(updatedAt);
+        
+        return admin;
     }
 
     /**
@@ -214,12 +226,12 @@ public class AdminDAO {
         
         try {
             if (excludeAdminId != null) {
-                sql = "SELECT admin_id FROM admin WHERE admin_username = ? AND admin_id != ?";
+                sql = "SELECT 1 FROM admin WHERE admin_username = ? AND admin_id != ? LIMIT 1";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, loginId);
                 pstmt.setInt(2, excludeAdminId);
             } else {
-                sql = "SELECT admin_id FROM admin WHERE admin_username = ?";
+                sql = "SELECT 1 FROM admin WHERE admin_username = ? LIMIT 1";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, loginId);
             }

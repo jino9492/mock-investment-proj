@@ -122,15 +122,6 @@ public class AdminAdminsController extends BaseAdminController {
         }
 
         try {
-            // 로그인 ID 중복 체크
-            boolean isDuplicate = DBManager.withConnection(conn -> 
-                adminDAO.isLoginIdDuplicate(loginId, null, conn));
-            
-            if (isDuplicate) {
-                redirectWithStatus(req, resp, "/admin/admins", "duplicate_login_id");
-                return;
-            }
-
             // 비밀번호 해시화
             String hashedPassword = PasswordHasher.hashPassword(password);
 
@@ -139,13 +130,24 @@ public class AdminAdminsController extends BaseAdminController {
             newAdmin.setAdminPassword(hashedPassword);
             newAdmin.setAdminName(name);
 
+            // 중복 체크와 INSERT를 하나의 트랜잭션으로 통합
             boolean success = DBManager.executeInTransaction(conn -> {
+                // 로그인 ID 중복 체크
+                if (adminDAO.isLoginIdDuplicate(loginId, null, conn)) {
+                    return DBManager.TransactionResult.rollback(Boolean.FALSE);
+                }
+                
                 int inserted = adminDAO.insertAdmin(newAdmin, conn);
                 if (inserted > 0) {
                     return DBManager.TransactionResult.commit(Boolean.TRUE);
                 }
                 return DBManager.TransactionResult.rollback(Boolean.FALSE);
             });
+            
+            if (!success) {
+                redirectWithStatus(req, resp, "/admin/admins", "duplicate_login_id");
+                return;
+            }
 
             if (success) {
                 redirectWithStatus(req, resp, "/admin/admins", "create_success");
@@ -175,16 +177,6 @@ public class AdminAdminsController extends BaseAdminController {
         }
 
         try {
-            // 로그인 ID 중복 체크 (자기 자신 제외)
-            boolean isDuplicate = DBManager.withConnection(conn -> 
-                adminDAO.isLoginIdDuplicate(loginId, adminId, conn));
-            
-            if (isDuplicate) {
-                redirectWithQuery(req, resp, "/admin/admins/form", 
-                    "adminId=" + adminId + "&status=" + encode("duplicate_login_id"));
-                return;
-            }
-
             AdminDTO admin = new AdminDTO();
             admin.setAdminId(adminId);
             admin.setAdminUsername(loginId);
@@ -195,13 +187,25 @@ public class AdminAdminsController extends BaseAdminController {
                 admin.setAdminPassword(PasswordHasher.hashPassword(password));
             }
 
+            // 중복 체크와 UPDATE를 하나의 트랜잭션으로 통합
             boolean success = DBManager.executeInTransaction(conn -> {
+                // 로그인 ID 중복 체크 (자기 자신 제외)
+                if (adminDAO.isLoginIdDuplicate(loginId, adminId, conn)) {
+                    return DBManager.TransactionResult.rollback(Boolean.FALSE);
+                }
+                
                 int updated = adminDAO.updateAdmin(admin, conn);
                 if (updated > 0) {
                     return DBManager.TransactionResult.commit(Boolean.TRUE);
                 }
                 return DBManager.TransactionResult.rollback(Boolean.FALSE);
             });
+            
+            if (!success) {
+                redirectWithQuery(req, resp, "/admin/admins/form", 
+                    "adminId=" + adminId + "&status=" + encode("duplicate_login_id"));
+                return;
+            }
 
             if (success) {
                 redirectWithStatus(req, resp, "/admin/admins", "update_success");
