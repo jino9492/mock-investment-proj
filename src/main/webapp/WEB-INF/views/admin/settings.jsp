@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<c:set var="pageTitle" value="시스템 설정" scope="request" />
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<c:set var="pageTitle" value="시스템 설정" scope="request" />
 <jsp:useBean id="now" class="java.util.Date" />
 <c:set var="pageStyles" value="admin/dashboard.css" scope="request" />
 <jsp:include page="/WEB-INF/fragments/admin/admin_layout_head.jsp" />
