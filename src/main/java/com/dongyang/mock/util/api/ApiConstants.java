@@ -20,6 +20,8 @@ public final class ApiConstants {
 
     private ApiConstants() { }
 
+    public static final String SOCKET_URL = props.getProperty("kw.socket.url");
+
     // 국내 지수 (KOSPI/KOSDAQ ...) 분봉 시세
     public static final String TR_DOMESTIC_INDEX = props.getProperty("kw.index.tr");
     public static final String PATH_DOMESTIC_INDEX = props.getProperty("kw.api.domain") + props.getProperty("kw.index.endpoint");
