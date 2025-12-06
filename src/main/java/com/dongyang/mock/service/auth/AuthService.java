@@ -54,17 +54,10 @@ public class AuthService {
 
                 String tokenType = (String) responseMap.get("token_type");
                 String accessToken = (String) responseMap.get("token");
-                Object expiresInObj = responseMap.get("expires_dt");
-
-                long expiresIn = 0;
-                if (expiresInObj instanceof Number) {
-                    expiresIn = ((Number) expiresInObj).longValue();
-                } else if (expiresInObj instanceof String) {
-                    expiresIn = Long.parseLong((String) expiresInObj);
-                }
+                String expiresIn = (String) responseMap.get("expires_dt");
 
                 // TokenManager에 저장
-                if (accessToken != null && expiresIn > 0) {
+                if (accessToken != null && expiresIn != null) {
                     tokenManager.setToken(accessToken, tokenType, expiresIn);
                     return tokenManager.getAccessToken();
                 } else {
