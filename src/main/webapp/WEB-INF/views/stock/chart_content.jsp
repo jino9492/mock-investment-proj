@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/chart.css"/>
 <script src="${pageContext.request.contextPath}/static/js/stock/chart.js"></script>
@@ -21,14 +20,11 @@
         <div class="stock-header__left">
             <div class="stock-header__logo"></div>
             <div class="stock-header__info">
-                <div class="stock-header__name">${stock.getStockName()} ${stock.getStockSymbol()}</div>
+                <div class="stock-header__name">기업A 000000</div>
                 <div class="stock-header__price-row">
-                    <span class="stock-header__price"><fmt:formatNumber value="${daily.getClosePrice().abs()}" pattern="#,###" />원</span>
+                    <span class="stock-header__price">000,000원</span>
                     <span class="stock-header__diff">
-                        <c:set var="isUp" value="${daily.getChangePrice() > 0}" />
-                        어제보다&nbsp;<span class="stock-header__diff-value" style="color:${isUp ? "#F04452" : "#3182F6"}">
-                        ${isUp ? "+" : ""}<fmt:formatNumber value="${daily.getChangePrice()}" pattern="#,###" />원 (${daily.getChangeRate().abs()}%)
-                    </span>
+                        어제보다 <span class="stock-header__diff-value">+00,000원 (0.00%)</span>
                     </span>
                 </div>
             </div>
@@ -38,7 +34,7 @@
     <!-- 상단 탭 -->
     <nav class="stock-tabs">
         <button class="stock-tabs__item stock-tabs__item--active">차트 · 호가</button>
-        <a href="${pageContext.request.contextPath}/stock_info?stockID=${param.stockID}" class="stock-tabs__item">종목정보</a>
+        <a href="/stock_info" class="stock-tabs__item">종목정보</a>
         <button class="stock-tabs__item">뉴스 · 공시</button>
         <button class="stock-tabs__item">커뮤니티</button>
     </nav>
@@ -81,7 +77,7 @@
         <jsp:include page="/WEB-INF/fragments/stock/order_card.jsp" />
 
 
-            <!-- 내 주식 카드 -->
+        <!-- 내 주식 카드 -->
             <section class="my-stock-card">
                 <h2 class="my-stock-card__title">내 주식</h2>
 

@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/info.css"/>
 <script src="${pageContext.request.contextPath}/static/js/stock/info.js"></script>
@@ -14,14 +13,11 @@
         <div class="stock-header__left">
             <div class="stock-header__logo"></div>
             <div class="stock-header__info">
-                <div class="stock-header__name">${stock.getStockName()} ${stock.getStockSymbol()}</div>
+                <div class="stock-header__name">기업A 000000</div>
                 <div class="stock-header__price-row">
-                    <span class="stock-header__price"><fmt:formatNumber value="${daily.getClosePrice().abs()}" pattern="#,###" />원</span>
+                    <span class="stock-header__price">000,000원</span>
                     <span class="stock-header__diff">
-                        <c:set var="isUp" value="${daily.getChangePrice() > 0}" />
-                        어제보다&nbsp;<span class="stock-header__diff-value" style="color:${isUp ? "#F04452" : "#3182F6"}">
-                        ${isUp ? "+" : ""}<fmt:formatNumber value="${daily.getChangePrice()}" pattern="#,###" />원 (${daily.getChangeRate().abs()}%)
-                    </span>
+                        어제보다 <span class="stock-header__diff-value">+00,000원 (0.00%)</span>
                     </span>
                 </div>
             </div>
@@ -30,7 +26,7 @@
 
     <!-- 상단 탭 -->
     <nav class="stock-tabs">
-        <a href="${pageContext.request.contextPath}/stock?stockID=${param.stockID}" class="stock-tabs__item">차트 · 호가</a>
+        <a href="/stock" class="stock-tabs__item">차트 · 호가</a>
         <button class="stock-tabs__item stock-tabs__item--active">종목정보</button>
         <button class="stock-tabs__item">뉴스 · 공시</button>
         <button class="stock-tabs__item">커뮤니티</button>
@@ -43,8 +39,8 @@
             <!-- 상단 기업 정보 헤더 -->
             <header class="stock-info__header">
                 <div class="stock-info__header-left">
-                    <h1 class="stock-info__header-title">${stock.getStockName()}</h1>
-                    <span class="stock-info__header-meta">${stock.getStockSymbol()} · ${stock.getMarketType() == 0 ? "코스피" : "코스닥"}</span>
+                    <h1 class="stock-info__header-title">기업A</h1>
+                    <span class="stock-info__header-meta">000000 · 코스피/코스닥</span>
                 </div>
                 <div class="stock-info__header-update">! 매 주 1회 업데이트</div>
             </header>
@@ -59,7 +55,7 @@
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">기업명</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value">${stock.getStockName()}</div>
+                            <div class="stock-info__basic-value">기업A</div>
                         </div>
                     </div>
 
@@ -67,7 +63,7 @@
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">시가총액</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value"><fmt:formatNumber value="${detail.getMarketCap()}" pattern="#,###" />억 원</div>
+                            <div class="stock-info__basic-value">000조 0,000억원</div>
                         </div>
                     </div>
 
@@ -79,14 +75,14 @@
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">권면액</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value"><fmt:formatNumber value="${detail.getFaceValue()}" pattern="#,###" />원</div>
+                            <div class="stock-info__basic-value">000원</div>
                         </div>
                     </div>
 
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">결산월</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value">${detail.getSettlementMonth()}월</div>
+                            <div class="stock-info__basic-value">00월</div>
                         </div>
                     </div>
 
@@ -99,17 +95,18 @@
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">상장일</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
                             <div class="stock-info__basic-value">
-                                ${detail.getListingDate()}
+                                0000년 00월 00일
+                                <div class="stock-info__basic-subtext">0000년 설립</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="stock-info__basic-group">
-                        <div class="stock-info__basic-cell stock-info__basic-cell--label">현재 상태</div>
+                        <div class="stock-info__basic-cell stock-info__basic-cell--label">발행주식수</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
                             <div class="stock-info__basic-value">
-                                ${stock.getStatus()}
-<%--                                <div class="stock-info__basic-subtext">25년 11월 30일 기준</div>--%>
+                                000,000,000주
+                                <div class="stock-info__basic-subtext">25년 11월 30일 기준</div>
                             </div>
                         </div>
                     </div>
@@ -120,10 +117,10 @@
 
 
             <!-- 주요 사업 -->
-<%--            <section class="stock-info-section">--%>
-<%--                <h2 class="stock-info-section__title">주요 사업</h2>--%>
-<%--                <div class="stock-info__business-card"></div>--%>
-<%--            </section>--%>
+            <section class="stock-info-section">
+                <h2 class="stock-info-section__title">주요 사업</h2>
+                <div class="stock-info__business-card"></div>
+            </section>
 
             <!-- 투자 지표 및 재무 상태 -->
             <section class="stock-info-section">
@@ -134,11 +131,11 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PER</span>
-                            <span class="stock-info__metrics-value">${indicator.getPer()}배</span>
+                            <span class="stock-info__metrics-value">기업A</span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PBR</span>
-                            <span class="stock-info__metrics-value">${indicator.getPbr()}배</span>
+                            <span class="stock-info__metrics-value">000원</span>
                         </div>
                     </div>
 
@@ -146,15 +143,15 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">ROE</span>
-                            <span class="stock-info__metrics-value">${indicator.getRoe()}%</span>
+                            <span class="stock-info__metrics-value">000조 0,000억원</span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">EPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getEps().intValue()}" pattern="#,###" />원</span>
+                            <span class="stock-info__metrics-value">00월</span>
                         </div>
                         <div class="stock-info__metrics-row stock-info__metrics-row--last">
                             <span class="stock-info__metrics-label">BPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getBps().intValue()}" pattern="#,###" />원</span>
+                            <span class="stock-info__metrics-value">000,000,000주</span>
                         </div>
                     </div>
                 </div>
@@ -163,20 +160,20 @@
                 <div class="stock-info__finance-card">
                     <div class="stock-info__finance-row">
                         <span class="stock-info__finance-label">매출액</span>
-                        <span class="stock-info__finance-value"><fmt:formatNumber value="${summary.getRevenue().intValue()}" pattern="#,###" />억 원</span>
+                        <span class="stock-info__finance-value">0,000원</span>
                     </div>
                     <div class="stock-info__finance-row">
                         <span class="stock-info__finance-label">영업이익</span>
-                        <span class="stock-info__finance-value"><fmt:formatNumber value="${summary.getOperatingProfit().intValue()}" pattern="#,###" />억 원</span>
+                        <span class="stock-info__finance-value">+/-0000</span>
                     </div>
                     <div class="stock-info__finance-row">
                         <span class="stock-info__finance-label">신용비율</span>
-                        <span class="stock-info__finance-value">${summary.getCreditRatio()}</span>
+                        <span class="stock-info__finance-value">0.00</span>
                     </div>
-<%--                    <div class="stock-info__finance-row stock-info__finance-row--last">--%>
-<%--                        <span class="stock-info__finance-label">잔고율</span>--%>
-<%--                        <span class="stock-info__finance-value">0.00</span>--%>
-<%--                    </div>--%>
+                    <div class="stock-info__finance-row stock-info__finance-row--last">
+                        <span class="stock-info__finance-label">잔고율</span>
+                        <span class="stock-info__finance-value">0.00</span>
+                    </div>
                 </div>
 
             </section>

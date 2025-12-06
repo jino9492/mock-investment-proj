@@ -11,9 +11,4 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.xhtml</welcome-file>
   </welcome-file-list>
-  
-  <!-- JDBC 드라이버 정리 리스너 -->
-  <listener>
-    <listener-class>com.dongyang.mock.listener.DatabaseCleanupListener</listener-class>
-  </listener>
 </web-app>

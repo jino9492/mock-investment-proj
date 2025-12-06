@@ -1,10 +1,22 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<c:set var="pageTitle" value="대시보드" scope="request" />
-<c:set var="pageStyles" value="admin/dashboard.css" scope="request" />
-<jsp:include page="/WEB-INF/fragments/admin/admin_layout_head.jsp" />
-<jsp:include page="/WEB-INF/fragments/admin/admin_layout_header.jsp" />
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>대시보드</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/sidebar_left/sidebar.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/sidebar_left/sidebar_button.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/header.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/admin/dashboard.css">
+</head>
+<body>
+<jsp:include page="/WEB-INF/fragments/common/header_admin.jsp" />
+<jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
+    <jsp:param name="menuItems" value="대시보드,회원 관리,거래 관리" />
+    <jsp:param name="menuLinks" value="/admin/dashboard,/admin/users,/admin/trades" />
+</jsp:include>
 
 <main id="dashboard__content">
     <div class="dashboard__header">
@@ -192,4 +204,5 @@
         </div>
     </div>
 </main>
-<jsp:include page="/WEB-INF/fragments/admin/admin_layout_footer.jsp" />
+</body>
+</html>

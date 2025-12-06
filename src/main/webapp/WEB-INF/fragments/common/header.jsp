@@ -6,12 +6,12 @@
   <div class="header__top-inner">
     <div class="header__top-left">
       <div class="header__logo">MOCK</div>
-        <ul class="header__top-menu">
-          <li class="selected"><a href="/">홈</a></li>
-          <li class="selected"><a href="/league">리그</a></li>
-          <li class="selected"><a href="/">탐색</a></li>
-          <li class="selected"><a href="/">뉴스</a></li>
-        </ul>
+      <ul class="header__top-menu">
+        <li class="selected"><a href="/">홈</a></li>
+        <li>리그</li>
+        <li>탐색</li>
+        <li>뉴스</li>
+      </ul>
     </div>
 
     <div class="header__top-right">

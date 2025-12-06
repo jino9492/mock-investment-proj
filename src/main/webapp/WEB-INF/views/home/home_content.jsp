@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/main_page.css"/>
-<script type="module" src="${pageContext.request.contextPath}/static/js/home/main_page.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/home/main_page.js"></script>
 <main class="main__content">
   <div class="main__sub-title">
     <span class="main__dot-green"></span>
@@ -148,18 +148,32 @@
 
   <section class="main__index-section">
     <div class="main__index-row">
-      <c:forEach var="id" items="${['KOSPI', 'KOSDAQ', 'KRX100']}">
-        <div class="main__index-thumb">
-          <jsp:include page="/WEB-INF/fragments/common/chart/sparkline.jsp">
-            <jsp:param name="identifier" value="${id}"/>
-          </jsp:include>
-        </div>
-        <div class="main__index-card">
-          <div class="main__index-name">${id}</div>
-          <div class="main__index-value">0,000.00</div>
-        </div>
-      </c:forEach>
-<%--      <button class="main__index-arrow"> › </button>--%>
+      <div class="main__index-thumb"></div>
+      <div class="main__index-card">
+        <div class="main__index-name">달러환율</div>
+        <div class="main__index-value">0,000.00</div>
+      </div>
+      <div class="main__index-thumb"></div>
+      <div class="main__index-card">
+        <div class="main__index-name">나스닥</div>
+        <div class="main__index-value">0,000.00</div>
+      </div>
+      <div class="main__index-thumb"></div>
+      <div class="main__index-card">
+        <div class="main__index-name">S&P 500</div>
+        <div class="main__index-value">0,000.00</div>
+      </div>
+      <div class="main__index-thumb"></div>
+      <div class="main__index-card">
+        <div class="main__index-name">다우존스</div>
+        <div class="main__index-value">0,000.00</div>
+      </div>
+      <div class="main__index-thumb"></div>
+      <div class="main__index-card">
+        <div class="main__index-name">코스피</div>
+        <div class="main__index-value">0,000.00</div>
+      </div>
+      <button class="main__index-arrow"> › </button>
     </div>
   </section>
 

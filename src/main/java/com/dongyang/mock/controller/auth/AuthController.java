@@ -1,6 +1,6 @@
 package com.dongyang.mock.controller.auth;
 
-import com.dongyang.mock.service.auth.AuthService;
+import com.dongyang.mock.service.AuthService;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,12 +12,12 @@ import com.google.gson.Gson;
 
 @WebServlet("/auth/issue-token")
 public class AuthController extends HttpServlet {
-    private AuthService kisAuthService;
+    private AuthService authService;
     private final Gson gson = new Gson(); // Gson 인스턴스 생성
 
     @Override
     public void init() throws ServletException {
-        this.kisAuthService = new AuthService();
+        this.authService = new AuthService();
     }
 
     @Override
@@ -25,7 +25,7 @@ public class AuthController extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        String token = kisAuthService.issueAccessToken();
+        String token = authService.issueAccessToken();
 
         AuthResponseDTO responseDTO;
 

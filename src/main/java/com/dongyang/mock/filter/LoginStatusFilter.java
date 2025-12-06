@@ -18,6 +18,7 @@ public class LoginStatusFilter implements Filter {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
+        // 1. 세션에서 "member" 객체 가져오기 (새 세션 생성 방지)
         HttpSession session = httpRequest.getSession(false);
 
         MemberDTO member = null;
@@ -32,9 +33,14 @@ public class LoginStatusFilter implements Filter {
             }
         }
 
+        // 2. 로그인 상태와 MemberDTO 객체를 request 속성으로 설정
+        // JSP 페이지에서 ${isLoggedIn} 와 ${member} 로 바로 사용 가능
         httpRequest.setAttribute("isLoggedIn", isLoggedIn);
         httpRequest.setAttribute("member", member);
 
+        // 3. 다음 필터나 최종 대상(JSP/서블릿)으로 요청 전달
         chain.doFilter(request, response);
     }
+
+    // init()과 destroy() 메서드는 생략 가능
 }

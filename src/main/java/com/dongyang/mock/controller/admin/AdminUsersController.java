@@ -4,13 +4,17 @@ import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.model.DTO.MemberStatsDTO;
 import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.service.MemberService;
-import com.dongyang.mock.util.DateUtility;
+import com.dongyang.mock.util.DateParser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -24,7 +28,7 @@ import java.util.List;
  * - 회원 삭제
  */
 @WebServlet(urlPatterns = {"/admin/users", "/admin/users/detail"})
-public class AdminUsersController extends BaseAdminController {
+public class AdminUsersController extends HttpServlet {
 
     private final MemberService memberService = new MemberService();
 
@@ -34,14 +38,17 @@ public class AdminUsersController extends BaseAdminController {
      * - /admin/users/detail: 회원 상세 페이지
      */
     @Override
-    protected void handleGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        if (!ensureAdminSession(req, resp)) {
+            return;
+        }
         String servletPath = req.getServletPath();
         if ("/admin/users/detail".equals(servletPath)) {
-            setCurrentPath(req, "/admin/users");
+            req.setAttribute("currentPath", "/admin/users");
             handleUserDetail(req, resp);
         } else {
-            setCurrentPath(req, "/admin/users");
+            req.setAttribute("currentPath", "/admin/users");
             handleUsersPage(req, resp);
         }
     }
@@ -52,14 +59,31 @@ public class AdminUsersController extends BaseAdminController {
      * - /admin/users/detail: 회원 정보 수정/삭제
      */
     @Override
-    protected void handlePost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        if (!ensureAdminSession(req, resp)) {
+            return;
+        }
         String servletPath = req.getServletPath();
         if ("/admin/users/detail".equals(servletPath)) {
             handleDetailAction(req, resp);
         } else {
             handleCreateMember(req, resp);
         }
+    }
+
+    /**
+     * 관리자 세션 확인
+     * @return 관리자 세션이 존재하면 true, 없으면 false (로그인 페이지로 리다이렉트)
+     */
+    private boolean ensureAdminSession(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("adminUser") == null) {
+            resp.sendRedirect(req.getContextPath() + "/admin");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -123,9 +147,9 @@ public class AdminUsersController extends BaseAdminController {
         newMember.setMemNickname(nickname);
         newMember.setMemLastLoginIP(req.getRemoteAddr());
         newMember.setMemLastLoginAt(null);
-        newMember.setAgreePrivacyAt(DateUtility.getCheckTime(req.getParameter("agreePrivacy"), now));
-        newMember.setAgreeThirdAt(DateUtility.getCheckTime(req.getParameter("agreeThird"), now));
-        newMember.setAgreeNotificationAt(DateUtility.getCheckTime(req.getParameter("agreeNotification"), now));
+        newMember.setAgreePrivacyAt(DateParser.getCheckTime(req.getParameter("agreePrivacy"), now));
+        newMember.setAgreeThirdAt(DateParser.getCheckTime(req.getParameter("agreeThird"), now));
+        newMember.setAgreeNotificationAt(DateParser.getCheckTime(req.getParameter("agreeNotification"), now));
         newMember.setVirtualCash(1000000); // 기본 예치금 1,000,000원
 
         MemberStatus.JoinResult status = MemberStatus.JoinResult.FAIL_INSERT;
@@ -145,9 +169,24 @@ public class AdminUsersController extends BaseAdminController {
     private void redirectWithStatus(HttpServletRequest req, HttpServletResponse resp, String status) throws IOException {
         StringBuilder target = new StringBuilder(req.getContextPath()).append("/admin/users");
         if (status != null && !status.isEmpty()) {
-            target.append("?status=").append(encode(status));
+            target.append("?status=")
+                    .append(URLEncoder.encode(status, StandardCharsets.UTF_8));
         }
         resp.sendRedirect(target.toString());
+    }
+
+    /**
+     * 문자열 앞뒤 공백 제거
+     */
+    private String trim(String value) {
+        return value == null ? null : value.trim();
+    }
+
+    /**
+     * 문자열이 null이거나 공백인지 확인
+     */
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     /**
@@ -287,6 +326,13 @@ public class AdminUsersController extends BaseAdminController {
             e.printStackTrace();
             resp.sendRedirect(req.getContextPath() + "/admin/users/detail?memberId=" + memberId + "&status=" + encode("delete_fail"));
         }
+    }
+
+    /**
+     * URL 인코딩 유틸리티
+     */
+    private String encode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 }
 

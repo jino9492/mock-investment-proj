@@ -28,9 +28,9 @@ public class SignupController extends HttpServlet {
         String nickname = request.getParameter("nickname");
         String password = request.getParameter("password");
         String lastLoginIP = request.getRemoteAddr();
-        Timestamp agreePrivacy = DateUtility.getCheckTime(request.getParameter("agreePrivacy"), now);
-        Timestamp agreeThird = DateUtility.getCheckTime(request.getParameter("agreeThird"), now);
-        Timestamp agreeNotification = DateUtility.getCheckTime(request.getParameter("agreeNotification"), now);
+        Timestamp agreePrivacy = DateParser.getCheckTime(request.getParameter("agreePrivacy"), now);
+        Timestamp agreeThird = DateParser.getCheckTime(request.getParameter("agreeThird"), now);
+        Timestamp agreeNotification = DateParser.getCheckTime(request.getParameter("agreeNotification"), now);
 
         MemberDTO newMember = new MemberDTO();
         newMember.setMemEmail(email);

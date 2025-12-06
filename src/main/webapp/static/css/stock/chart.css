@@ -16,10 +16,9 @@ body.stock-page {
 
 
 .stock-page__container {
-    display: flex;
-    flex-direction: column;
-    margin: 24px auto;
-    width: 90%;
+    margin-top: 20px;
+    margin-left: 70px;
+    margin-right: 80px;
     transition: margin-right 0.3s ease;
 }
 
@@ -153,7 +152,6 @@ body.stock-page {
 
 .stock-chart-card,
 .stock-quote-card {
-    width: 100%;
     background-color: #ffffff;
     border-radius: 20px;
     padding: 20px;
@@ -163,9 +161,11 @@ body.stock-page {
     height: 450px;
     width: 100%;
     margin-bottom: 16px;
+    max-width: 930px;
 }
 
 .stock-chart-card__content {
+    max-width: 100%;
     width: 100%;
     height: 365px;
     background-color: #dcdcdc;
@@ -178,6 +178,7 @@ body.stock-page {
 .stock-quote-card {
     height: 308px;
     width: 100%;
+    max-width: 930px;
 }
 
 .stock-quote-card__content {
@@ -382,6 +383,7 @@ body.stock-page {
     max-width: calc(100% - 75px);
     height: 778px;
 }
+
 
 .my-stock-card__title {
     font-size: 17px;

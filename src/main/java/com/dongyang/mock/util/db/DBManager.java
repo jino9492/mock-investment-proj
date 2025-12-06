@@ -91,8 +91,6 @@ public class DBManager {
                 }
             }
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         } finally {
             if (conn != null) {
                 try {
@@ -117,7 +115,7 @@ public class DBManager {
      */
     @FunctionalInterface
     public interface TransactionCallback<T> {
-        TransactionResult<T> doInTransaction(Connection conn) throws Exception;
+        TransactionResult<T> doInTransaction(Connection conn) throws SQLException;
     }
 
     /**
