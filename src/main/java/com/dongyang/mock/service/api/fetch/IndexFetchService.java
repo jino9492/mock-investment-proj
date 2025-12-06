@@ -63,6 +63,7 @@ public class IndexFetchService extends FetchService {
         return "{\"inds_cd\" : \"%s\",\"tic_scope\" : \"%d\"}".formatted(indexCode, tick);
     }
 
+    @SuppressWarnings("unchecked")
     private List<IndexDTO> parseResponse(Map<String, Object> response, String indexName, String latestTimeStr) {
         List<IndexDTO> result = new ArrayList<>();
         Timestamp latestTime = null;

@@ -10,4 +10,16 @@ public class AuthResponseDTO {
         this.accessToken = accessToken;
         this.message = message;
     }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

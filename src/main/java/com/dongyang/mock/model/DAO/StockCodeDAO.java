@@ -8,20 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public class StockCodeDAO {
-    private StockCodeDTO mapResultSetToStockCode(ResultSet rs) throws SQLException {
-        StockCodeDTO sc = new StockCodeDTO();
-        sc.setStockCodeId(rs.getLong("stock_code_id"));
-        sc.setCode(rs.getString("code"));
-        sc.setCodeName(rs.getString("code_name"));
-        sc.setDescription(rs.getString("description"));
-
-        Timestamp ts = rs.getTimestamp("created_at");
-        if (ts != null) {
-            sc.setCreatedAt(ts.toLocalDateTime());
-        }
-        return sc;
-    }
-
     public int[] insertStockCodeBatch(List<StockCodeDTO> dataList, Connection conn) throws SQLException {
         if (dataList == null || dataList.isEmpty()) {
             return new int[0];

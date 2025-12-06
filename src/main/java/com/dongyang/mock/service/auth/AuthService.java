@@ -2,9 +2,11 @@ package com.dongyang.mock.service.auth;
 
 import com.dongyang.mock.util.api.TokenManager;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.lang.reflect.Type;
 import java.util.Map;
 
 public class AuthService {
@@ -50,7 +52,8 @@ public class AuthService {
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 String responseJson = readResponse(conn.getInputStream());
 
-                Map<String, Object> responseMap = gson.fromJson(responseJson, Map.class);
+                Type mapType = new TypeToken<Map<String, Object>>(){}.getType();
+                Map<String, Object> responseMap = gson.fromJson(responseJson, mapType);
 
                 String tokenType = (String) responseMap.get("token_type");
                 String accessToken = (String) responseMap.get("token");

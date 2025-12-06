@@ -7,7 +7,6 @@ import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.util.*;
 import com.dongyang.mock.util.db.DBManager;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 

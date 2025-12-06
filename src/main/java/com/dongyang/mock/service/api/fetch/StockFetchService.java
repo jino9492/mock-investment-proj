@@ -2,7 +2,6 @@ package com.dongyang.mock.service.api.fetch;
 
 import com.dongyang.mock.model.DAO.StockCodeDAO;
 import com.dongyang.mock.model.DAO.StockDAO;
-import com.dongyang.mock.model.DTO.StockCodeDTO;
 import com.dongyang.mock.model.DTO.StockDTO;
 import com.dongyang.mock.service.auth.AuthService;
 import com.dongyang.mock.util.api.ApiConstants;
@@ -77,15 +76,22 @@ public class StockFetchService extends  FetchService implements ServletContextLi
         });
     }
 
+    @SuppressWarnings("unchecked")
     private List<StockDTO> parseResponse(Map<String, Object> response) {
         List<StockDTO> result = new ArrayList<>();
 
-        List<Map<String, String>> outputList = (List<Map<String, String>>) response.get("list");
-
-        if (outputList == null) {
+        Object listObj = response.get("list");
+        if (listObj == null) {
             System.err.println("종목 파싱 실패: 응답 상세 리스트(list)가 없습니다.");
             return result;
         }
+
+        if (!(listObj instanceof List)) {
+            System.err.println("종목 파싱 실패: 응답 상세 리스트(list)가 올바른 형식이 아닙니다.");
+            return result;
+        }
+
+        List<Map<String, String>> outputList = (List<Map<String, String>>) listObj;
 
         for (Map<String, String> item : outputList) {
             try {
@@ -117,3 +123,4 @@ public class StockFetchService extends  FetchService implements ServletContextLi
         return result;
     }
 }
+

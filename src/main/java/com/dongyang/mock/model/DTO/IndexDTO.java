@@ -1,6 +1,5 @@
 package com.dongyang.mock.model.DTO;
 
-import java.sql.Date;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 

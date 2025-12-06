@@ -1,12 +1,14 @@
 package com.dongyang.mock.service.api.fetch;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.lang.reflect.Type;
 import java.util.Map;
 
 public abstract class FetchService {
@@ -57,6 +59,7 @@ public abstract class FetchService {
         String jsonResponse = response.toString();
         System.out.println("API 응답 (" + tr + "): " + jsonResponse.substring(0, Math.min(jsonResponse.length(), 200)) + "...");
 
-        return gson.fromJson(jsonResponse, Map.class);
+        Type mapType = new TypeToken<Map<String, Object>>(){}.getType();
+        return gson.fromJson(jsonResponse, mapType);
     }
 }

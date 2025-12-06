@@ -1,12 +1,10 @@
 package com.dongyang.mock.service.api.fetch;
 
 import com.dongyang.mock.model.DAO.StockCodeDAO;
-import com.dongyang.mock.model.DTO.IndexDTO;
 import com.dongyang.mock.model.DTO.StockCodeDTO;
 import com.dongyang.mock.service.auth.AuthService;
 import com.dongyang.mock.util.api.ApiConstants;
 import com.dongyang.mock.util.db.DBManager;
-import com.google.gson.Gson;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
@@ -76,6 +74,7 @@ public class StockCodeFetchService extends  FetchService implements ServletConte
         });
     }
 
+    @SuppressWarnings("unchecked")
     private List<StockCodeDTO> parseResponse(Map<String, Object> response) {
         List<StockCodeDTO> result = new ArrayList<>();
 
