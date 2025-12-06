@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<section class="order-card">
+<section class="order-card" data-is-logged-in="${isLoggedIn}">
     <h2 class="order-card__title">주문하기</h2>
 
     <!-- 주문 타입 hidden (LIMIT / MARKET) -->
@@ -75,6 +76,20 @@
         <span class="order-card__summary-value">원</span>
     </div>
 
-    <!-- 버튼 -->
-    <button class="order-card__submit-btn">구매하기</button>
+
+    <!-- 로그인 안내 + 버튼 -->
+    <div class="order-card__footer">
+
+        <button type="button"
+                class="order-card__submit-btn">
+            <c:choose>
+                <c:when test="${not isLoggedIn}">
+                    로그인하고 구매하기
+                </c:when>
+                <c:otherwise>
+                    구매하기
+                </c:otherwise>
+            </c:choose>
+        </button>
+    </div>
 </section>

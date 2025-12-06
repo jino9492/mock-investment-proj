@@ -1,9 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="isLoggedIn" value="${not empty sessionScope.member}" />
+
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/chart.css"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/stock/order-card.css">
 <script src="${pageContext.request.contextPath}/static/js/stock/chart.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/common/stock/order_card.js"></script>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -35,7 +39,7 @@
     <nav class="stock-tabs">
         <button class="stock-tabs__item stock-tabs__item--active">차트 · 호가</button>
         <a href="/stock_info" class="stock-tabs__item">종목정보</a>
-        <button class="stock-tabs__item">뉴스 · 공시</button>
+        <a href="stock_news" class="stock-tabs__item">뉴스 · 공시</a>
         <button class="stock-tabs__item">커뮤니티</button>
     </nav>
 
