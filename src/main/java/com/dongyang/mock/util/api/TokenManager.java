@@ -43,7 +43,6 @@ public class TokenManager {
      * 현재 유효한 Access Token을 반환합니다. 만료되었으면 null을 반환합니다.
      */
     public String getAccessToken() {
-        System.out.println(tokenExpiryTime);
         if (accessToken != null && System.currentTimeMillis() < tokenExpiryTime) {
             return tokenType + " " + accessToken;
         }

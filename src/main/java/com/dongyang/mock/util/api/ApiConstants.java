@@ -34,4 +34,7 @@ public final class ApiConstants {
 
     public static final String TR_STOCK_DETAIL = props.getProperty("kw.stockdetail.tr");
     public static final String PATH_STOCK_DETAIL = props.getProperty("kw.api.domain") + props.getProperty("kw.stockdetail.endpoint");
+
+    public static final String TR_RANKING = props.getProperty("kw.ranking.tr");
+    public static final String PATH_RANKING = props.getProperty("kw.api.domain") + props.getProperty("kw.ranking.endpoint");
 }

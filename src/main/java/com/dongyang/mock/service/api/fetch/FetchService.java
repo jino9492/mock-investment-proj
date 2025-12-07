@@ -10,8 +10,7 @@ import java.net.URL;
 import java.util.Map;
 
 public abstract class FetchService {
-    protected final long DELAY_TIME = 1000;
-    protected final Gson gson = new Gson();
+    protected final long DELAY_TIME = 1000; final Gson gson = new Gson();
 
     public abstract void runUpdate() throws Exception;
 

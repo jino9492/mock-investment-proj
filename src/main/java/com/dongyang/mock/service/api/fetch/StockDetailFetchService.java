@@ -39,7 +39,6 @@ public class StockDetailFetchService extends FetchService implements ServletCont
 
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            System.out.println("====================== Stock Detail 로드 중 ======================");
             Thread initThread = new Thread(() -> {
                 try {
                     stockMap = DBManager.withConnection(conn->stockDAO.selectAllStockSymbolMap(conn));
@@ -51,7 +50,6 @@ public class StockDetailFetchService extends FetchService implements ServletCont
             });
             initThread.setName("Stock-Detail-Init-Thread");
             initThread.start();
-            System.out.println("====================== Stock Detail 로드 종료 ======================");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -14,18 +14,25 @@ public class ApiFetchScheduler implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        // 스케줄러 생성 (단일 스레드)
-        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler = Executors.newScheduledThreadPool(2);
 
         // 5분(300초)마다 실행하도록 예약
         scheduler.scheduleAtFixedRate(
-                new SparklineFetchTask(),
+                new SparklineFetchWorker(),
                 0, // 초기 지연 시간 (0초 후 바로 시작)
                 5, // 반복 주기 (5)
                 TimeUnit.MINUTES // 시간 단위 (분)
         );
+        System.out.println("지수 데이터 Scheduler started. Running MyTask every 5 minutes.");
 
-        System.out.println("Scheduler started. Running MyTask every 5 minutes.");
+        // 1분(60초)마다 실행하도록 예약
+        scheduler.scheduleAtFixedRate(
+                new RankingFetchWorker(),
+                0, // 초기 지연 시간 (0초 후 바로 시작)
+                1, // 반복 주기 (1)
+                TimeUnit.MINUTES // 시간 단위 (분)
+        );
+        System.out.println("랭킹 데이터 Scheduler started. Running every 1 second (API limit).");
     }
 
     @Override
