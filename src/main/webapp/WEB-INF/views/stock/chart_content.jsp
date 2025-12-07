@@ -6,8 +6,10 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/chart.css"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/stock/order-card.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/stock/mystock.css">
 <script src="${pageContext.request.contextPath}/static/js/stock/chart.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/common/stock/order_card.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/common/stock/mystock.js"></script>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -82,26 +84,7 @@
 
 
         <!-- 내 주식 카드 -->
-            <section class="my-stock-card">
-                <h2 class="my-stock-card__title">내 주식</h2>
-
-                <div class="my-stock-card__row">
-                    <span>총 수익</span>
-                    <span class="my-stock-card__profit">+00,000</span>
-                </div>
-                <div class="my-stock-card__row">
-                    <span>총 금액</span>
-                    <span>000,000원</span>
-                </div>
-                <div class="my-stock-card__row">
-                    <span>수량</span>
-                    <span>0주</span>
-                </div>
-                <div class="my-stock-card__row">
-                    <span>1주 평균 금액</span>
-                    <span>000,000원</span>
-                </div>
-            </section>
+        <jsp:include page="/WEB-INF/fragments/stock/mystock.jsp" />
 
     </main>
 </div>

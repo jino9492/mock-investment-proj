@@ -60,7 +60,6 @@ function checkInputs(allInputs) {
 
         else if (e.type === 'checkbox') {
 
-            // ⭐ 이 부분이 요청하신 '기본 상태의 반대' 로직입니다. ⭐
             const isDefaultChecked = e.defaultChecked;
             return e.checked !== isDefaultChecked;
         }

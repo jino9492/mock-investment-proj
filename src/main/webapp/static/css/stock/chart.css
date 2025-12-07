@@ -192,31 +192,3 @@ body.stock-page {
 
 
 
-/* 내 주식 카드 */
-
-.my-stock-card {
-    background-color: #ffffff;
-    border-radius: 20px;
-    padding: 20px 24px 24px;
-    width: 380px;
-    max-width: calc(100% - 75px);
-    height: 778px;
-}
-
-
-.my-stock-card__title {
-    font-size: 17px;
-    font-weight: 600;
-    margin-bottom: 16px;
-}
-
-.my-stock-card__row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 17px;
-    margin-bottom: 10px;
-}
-
-.my-stock-card__profit {
-    color: #9000FF;
-}
