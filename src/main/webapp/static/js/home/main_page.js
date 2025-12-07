@@ -77,6 +77,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const selector = `.main__list-row--${rank}`;
                 const targetRow = document.querySelector(selector);
 
+                if (index === 0) {
+                    activeHoverElement = targetRow;
+                    targetRow.classList.add('is-active-hover');
+                }
+
                 if (targetRow) {
 
                     // 1. 순위 번호 (첫 번째 <span>)

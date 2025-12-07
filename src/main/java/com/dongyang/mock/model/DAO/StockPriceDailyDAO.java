@@ -136,6 +136,32 @@ public class StockPriceDailyDAO {
         return priceDaily;
     }
 
+    public StockPriceDailyDTO selectLatestPriceDailyById(Long stockId, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, price_date, open_price, high_price, low_price, close_price, volume, amount, " +
+                "prev_close, change_price, change_rate, created_at " +
+                "FROM stock_price_daily " +
+                "WHERE stock_id = ? " +
+                "ORDER BY price_date DESC " + // ⭐️ 날짜를 내림차순 정렬
+                "LIMIT 1"; // ⭐️ 가장 위의 1개만 가져옴
+
+        StockPriceDailyDTO priceDaily = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, stockId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    priceDaily = mapResultSetToDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("최신 일별 주가 조회 실패 (Stock ID: " + stockId + "): " + e.getMessage());
+            throw e;
+        }
+
+        return priceDaily;
+    }
+
     private StockPriceDailyDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
         StockPriceDailyDTO dto = new StockPriceDailyDTO();
         dto.setStockId(rs.getLong("stock_id"));

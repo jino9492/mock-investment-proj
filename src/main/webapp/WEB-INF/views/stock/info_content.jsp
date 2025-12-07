@@ -134,11 +134,11 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PER</span>
-                            <span class="stock-info__metrics-value">${indicator.getPer()}배</span>
+                            <span class="stock-info__metrics-value">${indicator.getPer() ? indicator.getPer() + "배" : "정보를 찾을 수 없습니다."}</span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PBR</span>
-                            <span class="stock-info__metrics-value">${indicator.getPbr()}배</span>
+                            <span class="stock-info__metrics-value">${indicator.getPer() ? indicator.getPbr() + "배" : "정보를 찾을 수 없습니다."}</span>
                         </div>
                     </div>
 
@@ -146,15 +146,15 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">ROE</span>
-                            <span class="stock-info__metrics-value">${indicator.getRoe()}%</span>
+                            <span class="stock-info__metrics-value">${indicator.getPer() ? indicator.getRoe() + "배" : "정보를 찾을 수 없습니다."}</span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">EPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getEps().intValue()}" pattern="#,###" />원</span>
+                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getEps().intValue()}" pattern="#,###" />${indicator.getEps() ? "배" : "정보를 찾을 수 없습니다."}</span>
                         </div>
                         <div class="stock-info__metrics-row stock-info__metrics-row--last">
                             <span class="stock-info__metrics-label">BPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getBps().intValue()}" pattern="#,###" />원</span>
+                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getBps().intValue()}" pattern="#,###" />${indicator.getBps() ? "배" : "정보를 찾을 수 없습니다."}</span>
                         </div>
                     </div>
                 </div>

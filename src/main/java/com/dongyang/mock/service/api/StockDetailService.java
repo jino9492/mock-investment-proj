@@ -40,8 +40,6 @@ public class StockDetailService {
     }
 
     public StockPriceDailyDTO getStockPriceDailyById(long stockId) throws Exception {
-        Date todaySqlDate = Date.valueOf(LocalDate.now());
-
-        return DBManager.withConnection(conn -> priceDAO.selectPriceDailyByIdAndDate(stockId, todaySqlDate, conn));
+        return DBManager.withConnection(conn -> priceDAO.selectLatestPriceDailyById(stockId, conn));
     }
 }

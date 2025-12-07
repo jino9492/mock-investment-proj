@@ -148,7 +148,7 @@
 
   <section class="main__index-section">
     <div class="main__index-row">
-      <c:forEach var="id" items="${['KOSPI', 'KOSDAQ', 'KRX100']}">
+      <c:forEach var="id" items="${['KOSPI', 'KOSDAQ', 'KRX100', '대형주', '중형주', '소형주']}">
         <div class="main__index-thumb">
           <jsp:include page="/WEB-INF/fragments/common/chart/sparkline.jsp">
             <jsp:param name="identifier" value="${id}"/>

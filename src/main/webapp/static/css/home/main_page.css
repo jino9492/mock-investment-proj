@@ -229,8 +229,7 @@ ul {
 .main__index-row {
   display: flex;
   align-items: center;
-  /* overflow: hidden; */
-  gap: 16px;
+  justify-content: space-between;
 }
 
 .main__index-thumb {
@@ -370,7 +369,7 @@ section{
 }
 
 .main__bottom-section {
-  margin-top: 10px;
+  margin-top: 18px;
   display: grid;
   grid-template-columns: 1.4fr 0.9fr; 
   gap: 32px;
@@ -446,7 +445,7 @@ section{
   gap: 8px 16px;
   font-size: 10px;
   margin-bottom: 14px;
-  border: 1px solid #BABABA;
+  border: 1px solid #E2E2E2;
   border-radius: 10px;
   padding: 14px;
 }
@@ -460,12 +459,14 @@ section{
 
 .main__chart-info-label {
   color: #17171B;
+  font-size: 16px;
 }
 
 
 .main__chart-info div span:last-child {
   text-align: right;
-  flex-shrink: 0; 
+  flex-shrink: 0;
+  font-size: 16px;
 }
 
 
@@ -473,12 +474,12 @@ section{
   display: flex;
   flex-direction: column;  
   gap: 4px;
-  font-size: 12px;
+  font-size: 16px;
   margin-bottom: 12px;
 }
 
 .main__chart-header strong {
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 600;
 }
 
@@ -507,9 +508,10 @@ section{
 
 .main__card{
   position: sticky;
-  top: 200px;
+  top: 224px;
   display: inline-block;
-  height: 400px;
+  height: 800px;
+  margin-top: 24px;
 }
 
 .main__section-title{
