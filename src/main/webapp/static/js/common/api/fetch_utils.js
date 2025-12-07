@@ -36,3 +36,34 @@ export function loadIndexSparklineData(indexName) {
             });
     });
 }
+
+export function loadRankingData(limit = 100) {
+    const url = `/api/rank/items`;
+
+    return new Promise((resolve, reject) => {
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP Error! Status: ${response.status} - Could not load ranking data for ${rankingCode}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`순수 JS로 로드된 랭킹 데이터:`, data);
+
+                const rankingList = data || [];
+
+                resolve(rankingList);
+            })
+            .catch(error => {
+
+                console.error(`랭킹 데이터 로드 중 오류 발생 :`, error.message);
+                reject(error);
+            });
+    });
+}

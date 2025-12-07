@@ -38,7 +38,7 @@
     <!-- 상단 탭 -->
     <nav class="stock-tabs">
         <button class="stock-tabs__item stock-tabs__item--active">차트 · 호가</button>
-        <a href="${pageContext.request.contextPath}/stock_info?stockID=${param.stockID}" class="stock-tabs__item">종목정보</a>
+        <a href="${pageContext.request.contextPath}/stock_info?code=${stock.getStockSymbol()}" class="stock-tabs__item">종목정보</a>
         <button class="stock-tabs__item">뉴스 · 공시</button>
         <button class="stock-tabs__item">커뮤니티</button>
     </nav>

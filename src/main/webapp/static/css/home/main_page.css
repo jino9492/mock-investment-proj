@@ -209,9 +209,21 @@ ul {
   color: #a65af7;
 }
 
+.main__text-red {
+  color: #FF5252;
+}
+
+.main__text-blue {
+  color: #42A5F5
+}
+
 /* 인덱스 카드 */
 .main__index-section {
-  margin-bottom: 24px;
+  position: sticky;
+  top: 70px;
+  padding-bottom: 24px;
+  background: white;
+  z-index: 100;
 }
 
 .main__index-row {
@@ -352,9 +364,9 @@ section{
 .main__section-title {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 12px;
   border-bottom: 1px solid #E8E8E8;
   padding-bottom: 12px;
+  padding-top: 12px;
 }
 
 .main__bottom-section {
@@ -362,15 +374,16 @@ section{
   display: grid;
   grid-template-columns: 1.4fr 0.9fr; 
   gap: 32px;
+  margin-bottom: 48px;
 }
 
 .main__table-header-row {
   color: #797979;
-  padding: 10px 16px;
+  padding: 12px 16px;
+  background: white;
   font-size: 14px;
   display: grid;
   grid-template-columns: 30% 30% 20% 20%;
-  margin-bottom: 4px;
 }
 
 .main__table-header-row span:nth-child(3),
@@ -408,7 +421,7 @@ section{
   justify-content: center;
 }
 
-.main__list-row:hover {
+.main__list-row:hover, .is-active-hover {
   background-color: #F8F8F8;  
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -485,4 +498,26 @@ section{
   border-radius: 7px;
   height: 48px;
   width: 137px;
+}
+
+.main__table-header-row{
+  position: sticky;
+  top: 190px;
+}
+
+.main__card{
+  position: sticky;
+  top: 200px;
+  display: inline-block;
+  height: 400px;
+}
+
+.main__section-title{
+  z-index: 100;
+  background: white;
+}
+
+.main__stock-section > *{
+  position: sticky;
+  top: 140px;
 }

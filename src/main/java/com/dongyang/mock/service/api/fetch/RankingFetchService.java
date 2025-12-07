@@ -6,6 +6,7 @@ import com.dongyang.mock.service.auth.AuthService;
 import com.dongyang.mock.util.api.ApiConstants;
 import com.dongyang.mock.util.api.InmemoryCacheManager;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,6 @@ public class RankingFetchService extends FetchService {
     public static final String RANKING_CACHE_KEY = "stock:top100:ranking";
     AuthService authService = new AuthService();
     private final InmemoryCacheManager cacheManager = InmemoryCacheManager.getInstance();
-    private final StockDAO stockDAO = new StockDAO();
 
     @Override
     public void runUpdate() {
@@ -65,15 +65,18 @@ public class RankingFetchService extends FetchService {
                 String rankStr = item.get("now_rank");
                 String stkCodeStr = item.get("stk_cd");
                 String stkNameStr = item.get("stk_nm");
+                BigDecimal curPrice = new BigDecimal(item.get("cur_prc"));
+                BigDecimal fluRt = new BigDecimal(item.get("flu_rt"));
+
 
                 if(stkCodeStr == null || stkNameStr == null){
                     System.err.println("랭킹" + rankStr + "누락");
                     continue;
                 }
 
-                result.add(new RankingItemDTO(rankStr, stkCodeStr, stkNameStr));
+                result.add(new RankingItemDTO(rankStr, stkCodeStr, stkNameStr, curPrice, fluRt));
             } catch (Exception e) {
-                System.err.println("랭킹 아이템 파싱 중 오류 발생");
+                e.printStackTrace();
             }
         }
 

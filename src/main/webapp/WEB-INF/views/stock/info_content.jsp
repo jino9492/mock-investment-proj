@@ -30,7 +30,7 @@
 
     <!-- 상단 탭 -->
     <nav class="stock-tabs">
-        <a href="${pageContext.request.contextPath}/stock?stockID=${param.stockID}" class="stock-tabs__item">차트 · 호가</a>
+        <a href="${pageContext.request.contextPath}/stock?code=${stock.getStockSymbol()}" class="stock-tabs__item">차트 · 호가</a>
         <button class="stock-tabs__item stock-tabs__item--active">종목정보</button>
         <button class="stock-tabs__item">뉴스 · 공시</button>
         <button class="stock-tabs__item">커뮤니티</button>

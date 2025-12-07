@@ -20,7 +20,7 @@ public class StockInfoController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        Long stkId = Long.parseLong(req.getParameter("stockID"));
+        Long stkCode = Long.parseLong(req.getParameter("code"));
 
         StockDetailService stockDetailService = new StockDetailService();
 
@@ -31,7 +31,8 @@ public class StockInfoController extends HttpServlet {
         StockPriceDailyDTO stockPriceDailyDTO;
 
         try{
-            stockDTO = stockDetailService.getStockById(stkId);
+            stockDTO = stockDetailService.getStockByCode(stkCode);
+            Long stkId = stockDTO.getStockId();
             stockDetailDTO = stockDetailService.getStockDetailById(stkId);
             stockFinancialIndicatorDTO = stockDetailService.getFinancialIndicatorById(stkId);
             stockFinancialSummaryDTO = stockDetailService.getFinancialSummaryById(stkId);

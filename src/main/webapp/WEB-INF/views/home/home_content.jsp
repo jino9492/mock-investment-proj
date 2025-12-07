@@ -164,60 +164,23 @@
   </section>
 
   <!-- 실시간 차트 -->
-  <section>
+  <section class="main__stock-section">
     <div class="main__section-title">실시간 차트</div>
-
     <div class="main__bottom-section">
 
       <section>
         <div class="main__table-header-row">
-          <span>순위 · 오늘 13:11 기준</span>
+          <span>순위 · 오늘 XX:XX 기준</span>
           <span></span>
           <span>현재가</span>
           <span>등락률</span>
         </div>
 
-        <div class="main__list-row">
-          <span>1</span>
-          <span><span class="main__company-profile"></span>주식회사이름</span>
-          <span>000원</span>
-          <span class="main__text-purple">+/-0.00%</span>
-        </div>
-
-        <div class="main__list-row">
-          <span>2</span>
-          <span><span class="main__company-profile"></span>주식회사이름</span>
-          <span>000원</span>
-          <span class="main__text-purple">+/-0.00%</span>
-        </div>
-
-        <div class="main__list-row">
-          <span>3</span>
-          <span><span class="main__company-profile"></span>주식회사이름</span>
-          <span>000원</span>
-          <span class="main__text-purple">+/-0.00%</span>
-        </div>
-
-        <div class="main__list-row">
-          <span>4</span>
-          <span><span class="main__company-profile"></span>주식회사이름</span>
-          <span>000원</span>
-          <span class="main__text-purple">+/-0.00%</span>
-        </div>
-
-        <div class="main__list-row">
-          <span>5</span>
-          <span><span class="main__company-profile"></span>주식회사이름</span>
-          <span>000원</span>
-          <span class="main__text-purple">+/-0.00%</span>
-        </div>
-
-        <div class="main__list-row">
-          <span>6</span>
-          <span><span class="main__company-profile"></span>주식회사이름</span>
-          <span>000원</span>
-          <span class="main__text-purple">+/-0.00%</span>
-        </div>
+        <c:forEach var="rank" begin="1" end="100" step="1">
+          <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/home/rank_item.jsp">
+            <jsp:param name="rank" value="${rank}"/>
+          </jsp:include>
+        </c:forEach>
       </section>
 
       <!-- 오른쪽 차트 카드 -->

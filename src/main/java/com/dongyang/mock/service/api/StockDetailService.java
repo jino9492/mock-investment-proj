@@ -20,6 +20,11 @@ public class StockDetailService {
         return stock;
     }
 
+    public StockDTO getStockByCode(long stockCode) throws Exception {
+        StockDTO stock = DBManager.withConnection(conn->stockDAO.selectStockByCode(stockCode, conn));
+        return stock;
+    }
+
     public StockDetailDTO getStockDetailById(long stockId) throws Exception {
         return DBManager.withConnection(conn -> stockDetailDAO.selectStockDetailById(stockId, conn));
     }

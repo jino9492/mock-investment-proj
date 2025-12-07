@@ -109,6 +109,30 @@ public class StockDAO {
         return stock;
     }
 
+    public StockDTO selectStockByCode(Long stockCode, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, stock_symbol, stock_name, market_type, stock_code_id, " +
+                "listing_date, status, created_at, updated_at " +
+                "FROM stock WHERE stock_symbol = ?";
+
+        StockDTO stock = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, stockCode);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    stock = mapResultSetToStockDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Stock ID " + stockCode + " 조회 실패: " + e.getMessage());
+            throw e;
+        }
+
+        return stock;
+    }
+
     private StockDTO mapResultSetToStockDTO(ResultSet rs) throws SQLException {
         StockDTO dto = new StockDTO();
         dto.setStockId(rs.getLong("stock_id"));
