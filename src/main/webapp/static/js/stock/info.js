@@ -147,9 +147,25 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         const activeTab = document.querySelector(".order-card__trade-tab[aria-checked='true']");
         const isBuy = activeTab && activeTab.textContent.trim().includes("구매");
         
+        // 주문 유형 확인 (일반/조건)
+        const orderTypeDropdown = document.querySelector("[data-order-type-dropdown]");
+        const orderTypeInput = orderTypeDropdown ? orderTypeDropdown.querySelector("[data-dropdown-input]") : null;
+        const isConditional = orderTypeInput && orderTypeInput.value === "conditional";
+        
         if (isBuy) {
             // 구매: 예치금 / 주가
-            const price = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
+            let price = 0;
+            if (isConditional) {
+                // 조건 주문일 경우 조건 주문 가격 필드 확인
+                const conditionalPriceInput = document.getElementById("conditional-order-price-input");
+                if (conditionalPriceInput) {
+                    price = parseFloat(conditionalPriceInput.value.replace(/,/g, "")) || 0;
+                }
+            } else {
+                // 일반 주문일 경우 일반 가격 필드 확인
+                price = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
+            }
+            
             if (price > 0) {
                 return Math.floor(availableCash / price);
             }
@@ -215,8 +231,7 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         conditionalSellPriceInput.addEventListener("change", updateQuantityMax);
     }
     
-    // 탭 전환 시 최대값 재계산
-    const tradeTabs = document.querySelectorAll(".order-card__trade-tab");
+    // 탭 전환 시 최대값 재계산 (기존 tradeTabs 재사용)
     tradeTabs.forEach(tab => {
         tab.addEventListener("click", () => {
             setTimeout(updateQuantityMax, 100); // 탭 전환 후 DOM 업데이트 대기
@@ -304,6 +319,9 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                     if (orderType === "conditional") {
                         // 조건 주문 필드가 표시될 때 구매/판매 가격 초기화
                         initializeConditionalOrderPriceFields();
+                    } else {
+                        // 일반 주문으로 변경 시 최대값 재계산
+                        setTimeout(updateQuantityMax, 100);
                     }
                 }
             });
