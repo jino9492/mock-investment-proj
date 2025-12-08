@@ -87,6 +87,9 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                 conditionalSellPriceInput.value = formatNumber(parseInt(currentPrice));
             }
         }
+        
+        // 조건 주문 필드 초기화 후 최대값 재계산
+        updateQuantityMax();
     }
 
     // 주문 섹션 표시/숨김 헬퍼 함수
@@ -296,9 +299,25 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         const activeTab = document.querySelector(".order-card__trade-tab[aria-checked='true']");
         const isBuy = activeTab && activeTab.textContent.trim().includes("구매");
         
+        // 주문 유형 확인 (일반/조건)
+        const orderTypeDropdown = document.querySelector("[data-order-type-dropdown]");
+        const orderTypeInput = orderTypeDropdown ? orderTypeDropdown.querySelector("[data-dropdown-input]") : null;
+        const isConditional = orderTypeInput && orderTypeInput.value === "conditional";
+        
         if (isBuy) {
             // 구매: 예치금 / 주가
-            const price = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
+            let price = 0;
+            if (isConditional) {
+                // 조건 주문일 경우 조건 주문 가격 필드 확인
+                const conditionalPriceInput = document.getElementById("conditional-order-price-input");
+                if (conditionalPriceInput) {
+                    price = parseFloat(conditionalPriceInput.value.replace(/,/g, "")) || 0;
+                }
+            } else {
+                // 일반 주문일 경우 일반 가격 필드 확인
+                price = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
+            }
+            
             if (price > 0) {
                 return Math.floor(availableCash / price);
             }
@@ -315,9 +334,34 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     // 수량 관련 이벤트는 최대값을 동적으로 계산
     const updateQuantityMax = () => {
         const maxQty = calculateMaxQuantity();
-        // 기존 이벤트 리스너 제거 후 재설정 (간단한 방법)
+        
+        // 일반 주문 수량 필드
         setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quantityInputElement, priceInputElement, totalAmountElement, maxQty);
         setupQuantityInput(quantityInputElement, priceInputElement, totalAmountElement, maxQty);
+        
+        // 조건 주문 수량 필드 (구매)
+        const conditionalBuyQuantityInput = document.getElementById("conditional-order-quantity-input");
+        const conditionalBuyQuantityMinus = document.getElementById("conditional-order-quantity-minus");
+        const conditionalBuyQuantityPlus = document.getElementById("conditional-order-quantity-plus");
+        const conditionalBuyPriceInput = document.getElementById("conditional-order-price-input");
+        const conditionalBuyTotalAmount = document.querySelector(".order-card__conditional-order .order-card__summary-value:last-child");
+        
+        if (conditionalBuyQuantityInput && conditionalBuyQuantityMinus && conditionalBuyQuantityPlus) {
+            setupQuantityStepButtons(conditionalBuyQuantityMinus, conditionalBuyQuantityPlus, conditionalBuyQuantityInput, conditionalBuyPriceInput, conditionalBuyTotalAmount, maxQty);
+            setupQuantityInput(conditionalBuyQuantityInput, conditionalBuyPriceInput, conditionalBuyTotalAmount, maxQty);
+        }
+        
+        // 조건 주문 수량 필드 (판매)
+        const conditionalSellQuantityInput = document.getElementById("conditional-sell-quantity-input");
+        const conditionalSellQuantityMinus = document.getElementById("conditional-sell-quantity-minus");
+        const conditionalSellQuantityPlus = document.getElementById("conditional-sell-quantity-plus");
+        const conditionalSellPriceInput = document.getElementById("conditional-sell-price-input");
+        const conditionalSellTotalAmount = document.querySelector(".order-card__conditional-order--sell .order-card__summary-value:last-child");
+        
+        if (conditionalSellQuantityInput && conditionalSellQuantityMinus && conditionalSellQuantityPlus) {
+            setupQuantityStepButtons(conditionalSellQuantityMinus, conditionalSellQuantityPlus, conditionalSellQuantityInput, conditionalSellPriceInput, conditionalSellTotalAmount, maxQty);
+            setupQuantityInput(conditionalSellQuantityInput, conditionalSellPriceInput, conditionalSellTotalAmount, maxQty);
+        }
     };
     
     // 초기 설정
@@ -327,8 +371,19 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     priceInputElement.addEventListener("input", updateQuantityMax);
     priceInputElement.addEventListener("change", updateQuantityMax);
     
-    // 탭 전환 시 최대값 재계산
-    const tradeTabs = document.querySelectorAll(".order-card__trade-tab");
+    // 조건 주문 가격 필드 변경 시 최대값 재계산
+    const conditionalBuyPriceInput = document.getElementById("conditional-order-price-input");
+    const conditionalSellPriceInput = document.getElementById("conditional-sell-price-input");
+    if (conditionalBuyPriceInput) {
+        conditionalBuyPriceInput.addEventListener("input", updateQuantityMax);
+        conditionalBuyPriceInput.addEventListener("change", updateQuantityMax);
+    }
+    if (conditionalSellPriceInput) {
+        conditionalSellPriceInput.addEventListener("input", updateQuantityMax);
+        conditionalSellPriceInput.addEventListener("change", updateQuantityMax);
+    }
+    
+    // 탭 전환 시 최대값 재계산 (기존 tradeTabs 재사용)
     tradeTabs.forEach(tab => {
         tab.addEventListener("click", () => {
             setTimeout(updateQuantityMax, 100); // 탭 전환 후 DOM 업데이트 대기
@@ -455,6 +510,9 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                     // 조건 주문 선택 시 가격 필드 초기화 (updateOrderSections에서도 호출되지만 명시적으로 호출)
                     if (orderType === "conditional") {
                         setTimeout(() => initializeConditionalOrderPriceFields(), 0);
+                    } else {
+                        // 일반 주문으로 변경 시 최대값 재계산
+                        setTimeout(updateQuantityMax, 100);
                     }
                 }
             });
