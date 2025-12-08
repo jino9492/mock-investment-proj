@@ -42,7 +42,7 @@ export function setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputEle
  * @param {HTMLElement} quantityInputElement - 수량 입력 요소
  * @param {HTMLElement} priceInputElement - 가격 입력 요소
  * @param {HTMLElement} totalAmountElement - 총 금액 표시 요소
- * @param {number} maxQuantity - 최대 수량 (구매: 예치금/주가, 판매: 보유 수량)
+ * @param {number|Function} maxQuantity - 최대 수량 (구매: 예치금/주가, 판매: 보유 수량) 또는 최대값을 계산하는 함수
  */
 export function setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quantityInputElement, priceInputElement, totalAmountElement, maxQuantity = null) {
     if (!quantityMinusBtn || !quantityPlusBtn || !quantityInputElement) return;
@@ -58,9 +58,14 @@ export function setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quan
         let currentQuantity = parseInt(quantityInputElement.value.replace(/,/g, "")) || 0;
         let newQuantity = currentQuantity + 1;
         
-        // 최대값 제한
-        if (maxQuantity !== null && newQuantity > maxQuantity) {
-            newQuantity = maxQuantity;
+        // 최대값 제한 (함수인 경우 호출하여 계산)
+        let maxQty = maxQuantity;
+        if (typeof maxQuantity === 'function') {
+            maxQty = maxQuantity();
+        }
+        
+        if (maxQty !== null && maxQty !== undefined && newQuantity > maxQty) {
+            newQuantity = maxQty;
         }
         
         quantityInputElement.value = newQuantity.toString();
@@ -92,7 +97,7 @@ export function setupPriceInput(priceInputElement, quantityInputElement, totalAm
  * @param {HTMLElement} quantityInputElement - 수량 입력 요소
  * @param {HTMLElement} priceInputElement - 가격 입력 요소
  * @param {HTMLElement} totalAmountElement - 총 금액 표시 요소
- * @param {number} maxQuantity - 최대 수량 (구매: 예치금/주가, 판매: 보유 수량)
+ * @param {number|Function} maxQuantity - 최대 수량 (구매: 예치금/주가, 판매: 보유 수량) 또는 최대값을 계산하는 함수
  */
 export function setupQuantityInput(quantityInputElement, priceInputElement, totalAmountElement, maxQuantity = null) {
     if (!quantityInputElement) return;
@@ -105,9 +110,14 @@ export function setupQuantityInput(quantityInputElement, priceInputElement, tota
             if (num < 0) {
                 this.value = "";
             } else {
-                // 최대값 제한
-                if (maxQuantity !== null && num > maxQuantity) {
-                    num = maxQuantity;
+                // 최대값 제한 (함수인 경우 호출하여 계산)
+                let maxQty = maxQuantity;
+                if (typeof maxQuantity === 'function') {
+                    maxQty = maxQuantity();
+                }
+                
+                if (maxQty !== null && maxQty !== undefined && num > maxQty) {
+                    num = maxQty;
                 }
                 this.value = num.toString();
             }
@@ -122,8 +132,15 @@ export function setupQuantityInput(quantityInputElement, priceInputElement, tota
         let value = this.value.replace(/[^0-9]/g, "");
         if (value) {
             let num = parseInt(value);
-            if (maxQuantity !== null && num > maxQuantity) {
-                num = maxQuantity;
+            
+            // 최대값 제한 (함수인 경우 호출하여 계산)
+            let maxQty = maxQuantity;
+            if (typeof maxQuantity === 'function') {
+                maxQty = maxQuantity();
+            }
+            
+            if (maxQty !== null && maxQty !== undefined && num > maxQty) {
+                num = maxQty;
                 this.value = num.toString();
             }
         }

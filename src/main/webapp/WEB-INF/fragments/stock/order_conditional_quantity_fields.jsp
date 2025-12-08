@@ -27,7 +27,7 @@
         <input type="text" 
                class="order-card__input" 
                id="${quantityInputId}" 
-               placeholder="최대 <fmt:formatNumber value="${maxQuantity}" pattern="#,###"/>주 가능" />
+               placeholder="수량을 입력하세요" />
         <div class="order-card__step-btn-group">
             <button type="button" class="order-card__step-btn order-card__step-btn--minus" id="${quantityMinusBtnId}">-</button>
             <div class="order-card__step-btn-divider"></div>
