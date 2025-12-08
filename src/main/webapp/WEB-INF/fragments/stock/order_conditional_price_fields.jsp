@@ -49,7 +49,7 @@
                    placeholder="가격을 입력하세요"
                    aria-label="${priceLabel}"
                    <c:if test="${not empty daily and not empty daily.closePrice}">
-                   data-current-price="${daily.closePrice.intValue()}"
+                   data-current-price="${daily.closePrice.abs().intValue()}"
                    </c:if> />
             <span class="unit-text">원</span>
         </div>

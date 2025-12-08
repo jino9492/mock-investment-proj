@@ -113,7 +113,7 @@
                            placeholder="가격을 입력하세요"
                            aria-label="구매가격"
                            <c:if test="${not empty daily and not empty daily.closePrice}">
-                           data-current-price="${daily.closePrice.intValue()}"
+                           data-current-price="${daily.closePrice.abs().intValue()}"
                            </c:if> />
                     <span class="unit-text">원</span>
                 </div>
@@ -132,7 +132,7 @@
                 <input type="text" 
                        class="order-card__input" 
                        id="order-quantity-input" 
-                       placeholder="최대 <fmt:formatNumber value="${maxQuantity}" pattern="#,###"/>주 가능" />
+                       placeholder="수량을 입력하세요" />
                 <div class="order-card__step-btn-group">
                     <button type="button" class="order-card__step-btn order-card__step-btn--minus" id="order-quantity-minus">-</button>
                     <div class="order-card__step-btn-divider"></div>

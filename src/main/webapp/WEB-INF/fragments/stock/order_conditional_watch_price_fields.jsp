@@ -30,7 +30,7 @@
                    placeholder="가격을 입력하세요"
                    aria-label="감시 가격"
                    <c:if test="${not empty daily and not empty daily.closePrice}">
-                   data-current-price="${daily.closePrice.intValue()}"
+                   data-current-price="${daily.closePrice.abs().intValue()}"
                    </c:if> />
             <span class="unit-text">원</span>
         </div>
@@ -43,7 +43,7 @@
 </div>
 <div class="order-card__watch-price-info" id="${watchPriceInfoId}"
      <c:if test="${not empty daily and not empty daily.closePrice}">
-     data-current-price="${daily.closePrice.intValue()}"
+     data-current-price="${daily.closePrice.abs().intValue()}"
      </c:if>
      <c:if test="${not empty holding}">
      data-avg-price="${holding.averagePrice}"

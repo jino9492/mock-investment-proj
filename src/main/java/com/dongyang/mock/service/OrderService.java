@@ -159,6 +159,12 @@ public class OrderService {
                 }
                 
                 BigDecimal currentPrice = priceDaily.getClosePrice();
+                
+                // 현재가가 음수인 경우 절댓값 사용 (데이터 오류 방지)
+                if (currentPrice.compareTo(BigDecimal.ZERO) < 0) {
+                    System.err.println("[OrderService] 경고: 종목 ID " + order.getStockId() + "의 현재가가 음수입니다: " + currentPrice + ". 절댓값을 사용합니다.");
+                    currentPrice = currentPrice.abs();
+                }
                 BigDecimal orderPrice = order.getPrice();
                 boolean canExecute = false;
                 BigDecimal executionPrice = null;
