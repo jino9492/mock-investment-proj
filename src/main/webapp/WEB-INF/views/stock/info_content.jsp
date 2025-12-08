@@ -5,8 +5,10 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/info.css"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/stock/order-card.css">
+
 <script src="${pageContext.request.contextPath}/static/js/stock/info.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/common/stock/order_card.js"></script>
+
 
 <body class="stock-info-page">
 <main class="stock-info__container">

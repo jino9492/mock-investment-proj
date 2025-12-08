@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<section class="order-card" data-is-logged-in="true">
+<section class="order-card" data-is-logged-in="${not empty sessionScope.member}">
     <h2 class="order-card__title">주문하기</h2>
 
     <!-- 주문 타입 hidden (LIMIT / MARKET) -->
