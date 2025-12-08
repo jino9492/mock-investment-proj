@@ -205,32 +205,52 @@ public class OrderService {
                 
                 // 체결 금액 계산
                 BigDecimal totalAmount = executionPrice.multiply(BigDecimal.valueOf(order.getQuantity()));
+                System.out.println("[OrderService] 체결 금액 계산: " + executionPrice + " * " + order.getQuantity() + " = " + totalAmount);
                 
                 // 매수 주문 체결
                 if ("BUY".equals(order.getSide())) {
                     // 예치금 확인
+                    System.out.println("[OrderService] 예치금 확인 중...");
                     int virtualCash = memberDAO.getVirtualCash(order.getMemId(), conn);
+                    System.out.println("[OrderService] 현재 예치금: " + virtualCash + ", 필요 금액: " + totalAmount.intValue());
+                    
                     if (virtualCash < totalAmount.intValue()) {
                         System.out.println("[OrderService] 예치금이 부족합니다. 주문 ID: " + order.getOrderId());
                         return DBManager.TransactionResult.rollback(false);
                     }
                     
                     // trade 테이블에 체결 내역 저장
+                    System.out.println("[OrderService] trade 테이블에 체결 내역 저장 중...");
                     tradeDAO.insertTrade(order.getMemId(), order.getStockId(), order.getOrderId(),
                                        executionPrice, order.getQuantity(), conn);
+                    System.out.println("[OrderService] trade 테이블 저장 완료");
                     
                     // holding 테이블 업데이트 (매수)
+                    System.out.println("[OrderService] holding 테이블 업데이트 중...");
                     holdingDAO.insertOrUpdateHolding(order.getMemId(), order.getStockId(),
                                                     order.getQuantity(), executionPrice, conn);
+                    System.out.println("[OrderService] holding 테이블 업데이트 완료");
                     
                     // cash_history 테이블에 기록 저장 (매수는 음수)
+                    System.out.println("[OrderService] 예치금 차감 중...");
                     int newBalance = memberDAO.updateVirtualCash(order.getMemId(), -totalAmount.intValue(), conn);
-                    cashHistoryDAO.insertCashHistory(order.getMemId(), "BUY",
-                                                    totalAmount.negate(),
-                                                    BigDecimal.valueOf(newBalance), conn);
+                    System.out.println("[OrderService] 예치금 차감 완료. 새 잔액: " + newBalance);
+                    
+                    System.out.println("[OrderService] cash_history 테이블에 기록 저장 중...");
+                    try {
+                        cashHistoryDAO.insertCashHistory(order.getMemId(), "BUY",
+                                                        totalAmount.negate(),
+                                                        BigDecimal.valueOf(newBalance), conn);
+                        System.out.println("[OrderService] cash_history 테이블 저장 완료");
+                    } catch (SQLException e) {
+                        System.err.println("[OrderService] cash_history 저장 실패: " + e.getMessage());
+                        throw e;
+                    }
                     
                     // 주문 상태를 FILLED로 변경
+                    System.out.println("[OrderService] 주문 상태를 FILLED로 변경 중...");
                     orderDAO.updateOrderStatus(order.getOrderId(), "FILLED", conn);
+                    System.out.println("[OrderService] 주문 상태 변경 완료");
                     
                     System.out.println("[OrderService] 매수 주문 체결 완료. 주문 ID: " + order.getOrderId() + 
                                      ", 체결가: " + executionPrice + ", 수량: " + order.getQuantity());

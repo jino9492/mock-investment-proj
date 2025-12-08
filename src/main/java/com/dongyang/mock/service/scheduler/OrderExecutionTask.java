@@ -19,15 +19,21 @@ public class OrderExecutionTask implements Runnable {
     @Override
     public synchronized void run() {
         try {
-            System.out.println("[OrderExecutionTask] 주문 체결 처리 시작");
+            long startTime = System.currentTimeMillis();
+            System.out.println("========================================");
+            System.out.println("[OrderExecutionTask] 주문 체결 처리 시작 - " + new java.util.Date());
             
             // 모든 PENDING 주문 조회
-            List<OrderDTO> pendingOrders = DBManager.withConnection(conn -> 
-                orderDAO.findAllPendingOrders(conn)
-            );
+            List<OrderDTO> pendingOrders = DBManager.withConnection(conn -> {
+                System.out.println("[OrderExecutionTask] DB 연결 완료, PENDING 주문 조회 중...");
+                List<OrderDTO> orders = orderDAO.findAllPendingOrders(conn);
+                System.out.println("[OrderExecutionTask] DB 조회 완료: " + orders.size() + "개 주문 발견");
+                return orders;
+            });
             
             if (pendingOrders.isEmpty()) {
                 System.out.println("[OrderExecutionTask] 처리할 PENDING 주문이 없습니다.");
+                System.out.println("========================================");
                 return;
             }
             
@@ -63,13 +69,18 @@ public class OrderExecutionTask implements Runnable {
                 }
             }
             
+            long endTime = System.currentTimeMillis();
             System.out.println("[OrderExecutionTask] 처리 완료. 체결 성공: " + executedCount + 
                              ", 체결 실패: " + failedCount + 
-                             ", 총 처리: " + pendingOrders.size());
+                             ", 총 처리: " + pendingOrders.size() +
+                             ", 소요 시간: " + (endTime - startTime) + "ms");
+            System.out.println("========================================");
             
         } catch (Exception e) {
+            System.err.println("========================================");
             System.err.println("[OrderExecutionTask] 주문 체결 처리 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
+            System.err.println("========================================");
         }
     }
 }
