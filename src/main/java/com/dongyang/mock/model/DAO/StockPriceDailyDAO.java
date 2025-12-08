@@ -136,6 +136,36 @@ public class StockPriceDailyDAO {
         return priceDaily;
     }
 
+    /**
+     * 특정 종목의 최신 일일 가격 정보 조회
+     * @param stockId 종목 ID
+     * @param conn DB 연결 객체
+     * @return 최신 일일 가격 정보 (없으면 null)
+     * @throws SQLException
+     */
+    public StockPriceDailyDTO selectLatestPriceDailyById(Long stockId, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, price_date, open_price, high_price, low_price, close_price, volume, amount, " +
+                "prev_close, change_price, change_rate, created_at " +
+                "FROM stock_price_daily WHERE stock_id = ? ORDER BY price_date DESC LIMIT 1";
+
+        StockPriceDailyDTO priceDaily = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, stockId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    priceDaily = mapResultSetToDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("최신 일별 주가 조회 실패 (Stock ID: " + stockId + "): " + e.getMessage());
+            throw e;
+        }
+
+        return priceDaily;
+    }
+
     private StockPriceDailyDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
         StockPriceDailyDTO dto = new StockPriceDailyDTO();
         dto.setStockId(rs.getLong("stock_id"));

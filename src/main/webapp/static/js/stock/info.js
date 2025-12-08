@@ -1,3 +1,21 @@
+import {
+    formatNumber,
+    calculateTotalAmount as calcTotalAmount,
+    initializeAvailableAmount as initAvailableAmount,
+    initializeCurrentPrice as initCurrentPrice,
+    initializeQuantity as initQuantity
+} from '../common/stock/stock_order_utils.js';
+
+import {
+    setupPriceStepButtons,
+    setupQuantityStepButtons,
+    setupPriceInput,
+    setupQuantityInput,
+    setupSubmitButton,
+    setupPriceModePills,
+    setupWatchPriceInput
+} from '../common/stock/stock_order_card.js';
+
 document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
 
 
@@ -51,7 +69,12 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                     if (orderCard) orderCard.classList.add("order-card--sell");
                     priceLabel.textContent = "판매가격";
                     amountLabel.textContent = "판매가능 금액";
-                    submitButton.textContent = "판매하기";
+                    // 로그인 상태 확인 (버튼이면 로그인, 링크면 비로그인)
+                    if (submitButton.tagName === "BUTTON") {
+                        submitButton.textContent = "판매하기";
+                    } else {
+                        submitButton.textContent = "로그인하고 판매하기";
+                    }
                 } else if (text.includes("구매")) {
                     // 구매 탭
                     tab.classList.add("order-card__trade-tab--active");
@@ -60,7 +83,12 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                     if (orderCard) orderCard.classList.add("order-card--buy");
                     priceLabel.textContent = "구매가격";
                     amountLabel.textContent = "구매가능 금액";
-                    submitButton.textContent = "구매하기";
+                    // 로그인 상태 확인 (버튼이면 로그인, 링크면 비로그인)
+                    if (submitButton.tagName === "BUTTON") {
+                        submitButton.textContent = "구매하기";
+                    } else {
+                        submitButton.textContent = "로그인하고 구매하기";
+                    }
                 }
                 else if (text.includes("대기")) {
                     // 대기 탭
@@ -76,12 +104,24 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         });
     }
 
+    // 주문 관련 요소들 (먼저 정의)
+    const priceInputElement = document.getElementById("order-price-input");
+    const quantityInputElement = document.getElementById("order-quantity-input");
+    const priceMinusBtn = document.getElementById("order-price-minus");
+    const pricePlusBtn = document.getElementById("order-price-plus");
+    const quantityMinusBtn = document.getElementById("order-quantity-minus");
+    const quantityPlusBtn = document.getElementById("order-quantity-plus");
+    const totalAmountElement = document.getElementById("order-total-amount");
+    const availableAmountElement = document.getElementById("order-available-amount");
+    const submitBtn = document.getElementById("order-submit-btn");
+
     // 시장가 / 지정가 모드 전환
 
     const priceModePills = document.querySelectorAll(
         ".order-card__field--split .order-card__pill"
     );
-    const priceInput = document.querySelector(
+    // priceInputElement가 있으면 그것을 사용, 없으면 기존 방식으로 선택
+    const priceInput = priceInputElement || document.querySelector(
         ".order-card__field--price .order-card__input"
     );
     const orderTypeHidden = document.querySelector(
@@ -90,47 +130,33 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
 
     const unitText = document.querySelector(".order-card__field--price .unit-text");
 
-    if (priceModePills.length && priceInput) {
-        priceModePills.forEach(function (pill) {
-            pill.addEventListener("click", function () {
-
-                // pill 활성화 변경
-                priceModePills.forEach(p => {
-                    p.classList.remove("order-card__pill--active");
-                    p.setAttribute("aria-checked", "false");
-                    p.setAttribute("data-state", "unchecked");
-                });
-                pill.classList.add("order-card__pill--active");
-                pill.setAttribute("aria-checked", "true");
-                pill.setAttribute("data-state", "checked");
-
-                const mode = pill.textContent.trim();
-
-                if (mode === "시장가") {
-                    // 시장가 모드
-                    priceInput.value = "";
-                    priceInput.readOnly = true;
-                    priceInput.placeholder = "최대한 빠른가격";
-                    priceInput.classList.add("order-card__input--readonly");
-
-                    if (orderTypeHidden) orderTypeHidden.value = "MARKET";
-
-                    if (unitText) unitText.style.display = "none";
-
-
-                } else {
-                    // 지정가 모드
-                    priceInput.readOnly = false;
-                    priceInput.placeholder = "가격을 입력하세요";
-                    priceInput.classList.remove("order-card__input--readonly");
-
-                    if (orderTypeHidden) orderTypeHidden.value = "LIMIT";
-
-                    if (unitText) unitText.style.display = "";
-                }
-            });
-        });
+    // 총 주문 금액 계산 함수 (로컬 래퍼)
+    function calculateTotalAmount() {
+        calcTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
     }
+
+    // 가격/수량 증감 버튼 및 입력 필드 이벤트 설정
+    setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputElement, quantityInputElement, totalAmountElement);
+    setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quantityInputElement, priceInputElement, totalAmountElement);
+    setupPriceInput(priceInputElement, quantityInputElement, totalAmountElement);
+    setupQuantityInput(quantityInputElement, priceInputElement, totalAmountElement);
+    setupSubmitButton(submitBtn, priceInputElement, quantityInputElement, orderTypeHidden);
+
+    // 초기화
+    initAvailableAmount(availableAmountElement);
+    initCurrentPrice(priceInputElement, orderTypeHidden);
+    initQuantity(quantityInputElement);
+    
+    // 현재가 설정 후 총 금액 계산
+    if (priceInputElement && orderTypeHidden && orderTypeHidden.value === "LIMIT") {
+        const currentPrice = priceInputElement.getAttribute("data-current-price");
+        if (currentPrice && priceInputElement.value) {
+            calculateTotalAmount();
+        }
+    }
+
+    // 시장가/지정가 모드 전환 설정
+    setupPriceModePills(priceModePills, priceInput, orderTypeHidden, unitText, priceMinusBtn, pricePlusBtn, priceInputElement, calculateTotalAmount);
 
     /* 커스텀 드롭다운 (주문유형 등) */
 
@@ -187,6 +213,15 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                 dropdown.classList.remove("is-open");
                 dropdown.setAttribute("aria-expanded", "false");
                 toggle.focus({ preventScroll: true });
+                
+                // 주문 유형 드롭다운 변경 시 조건 주문 필드 초기화
+                if (dropdown.hasAttribute("data-order-type-dropdown")) {
+                    const orderType = option.getAttribute("data-value");
+                    if (orderType === "conditional") {
+                        // 조건 주문 필드가 표시될 때 구매/판매 가격 초기화
+                        initializeConditionalOrderPriceFields();
+                    }
+                }
             });
 
             option.addEventListener("keydown", function (e) {
@@ -221,5 +256,41 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         }
     });
 
+    // 조건 주문 - 감시 가격 정보 업데이트
+    const watchPriceInput = document.getElementById("watch-price-input");
+    const watchPriceInfo = document.getElementById("watch-price-info");
+    const watchPriceMinusBtn = document.getElementById("watch-price-minus");
+    const watchPricePlusBtn = document.getElementById("watch-price-plus");
+
+    // 감시 가격 입력 필드 및 버튼 이벤트 설정
+    setupWatchPriceInput(watchPriceInput, watchPriceInfo, watchPriceMinusBtn, watchPricePlusBtn);
+
+    // 조건 주문 구매/판매 가격 필드 초기화 함수
+    function initializeConditionalOrderPriceFields() {
+        const conditionalOrderPriceInput = document.getElementById("conditional-order-price-input");
+        const conditionalSellPriceInput = document.getElementById("conditional-sell-price-input");
+        
+        // 구매 조건 주문 가격 필드 초기화
+        // 조건 주문은 항상 지정가 모드이므로 orderTypeHidden 체크 없이 초기화
+        if (conditionalOrderPriceInput) {
+            const currentPrice = conditionalOrderPriceInput.getAttribute("data-current-price");
+            if (currentPrice && !conditionalOrderPriceInput.value) {
+                // 감시 가격처럼 초기값 설정
+                conditionalOrderPriceInput.value = formatNumber(parseInt(currentPrice));
+            }
+        }
+        
+        // 판매 조건 주문 가격 필드 초기화
+        if (conditionalSellPriceInput) {
+            const currentPrice = conditionalSellPriceInput.getAttribute("data-current-price");
+            if (currentPrice && !conditionalSellPriceInput.value) {
+                // 감시 가격처럼 초기값 설정
+                conditionalSellPriceInput.value = formatNumber(parseInt(currentPrice));
+            }
+        }
+    }
+    
+    // 초기 로딩 시 조건 주문 가격 필드 초기화
+    initializeConditionalOrderPriceFields();
 
 });
