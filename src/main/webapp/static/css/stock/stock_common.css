@@ -83,3 +83,6 @@
     background-color: #D9D9D9;
 }
 
+.order-card__order-type-hidden, .order-card__conditional-order--hidden, .order-card__wait-orders--hidden {
+    display: none;
+}

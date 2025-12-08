@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     /* 주문하기 탭 전환 */
 
     const tradeTabs = document.querySelectorAll(".order-card__trade-tab");
+    console.log(tradeTabs);
 
     // 구매가격 / 판매가격 라벨
     const priceLabel = Array.from(

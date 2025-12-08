@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/info.css"/>
-<script src="${pageContext.request.contextPath}/static/js/stock/info.js"></script>
+<script type="module" src="${pageContext.request.contextPath}/static/js/stock/info.js"></script>
 
 <body class="stock-info-page">
 <main class="stock-info__container">
