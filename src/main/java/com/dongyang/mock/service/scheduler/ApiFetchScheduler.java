@@ -14,8 +14,12 @@ public class ApiFetchScheduler implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
+        System.out.println("========================================");
+        System.out.println("[ApiFetchScheduler] 서버 시작 - 스케줄러 초기화 중...");
+        
         // 스케줄러 생성 (단일 스레드)
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        System.out.println("[ApiFetchScheduler] 스케줄러 스레드 풀 생성 완료");
 
         // 5분마다 실행: 주가 데이터 가져오기
         scheduler.scheduleAtFixedRate(
@@ -25,7 +29,7 @@ public class ApiFetchScheduler implements ServletContextListener {
                 TimeUnit.MINUTES // 시간 단위 (분)
         );
 
-        System.out.println("Scheduler started. Running SparklineFetchTask every 5 minutes.");
+        System.out.println("[ApiFetchScheduler] SparklineFetchTask 등록 완료 (5분마다 실행)");
 
         // 1분마다 실행: 조건 주문 체크 및 자동 주문 생성
         scheduler.scheduleAtFixedRate(
@@ -35,7 +39,7 @@ public class ApiFetchScheduler implements ServletContextListener {
                 TimeUnit.MINUTES // 시간 단위 (분)
         );
 
-        System.out.println("Scheduler started. Running ConditionalOrderCheckTask every 1 minute.");
+        System.out.println("[ApiFetchScheduler] ConditionalOrderCheckTask 등록 완료 (10초 후 시작, 1분마다 실행)");
 
         // 30초마다 실행: PENDING 주문 체결 처리
         scheduler.scheduleAtFixedRate(
@@ -45,7 +49,8 @@ public class ApiFetchScheduler implements ServletContextListener {
                 TimeUnit.SECONDS // 시간 단위 (초)
         );
 
-        System.out.println("Scheduler started. Running OrderExecutionTask every 30 seconds.");
+        System.out.println("[ApiFetchScheduler] OrderExecutionTask 등록 완료 (20초 후 시작, 30초마다 실행)");
+        System.out.println("========================================");
     }
 
     @Override

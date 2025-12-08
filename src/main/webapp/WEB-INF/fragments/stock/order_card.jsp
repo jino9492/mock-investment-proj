@@ -7,14 +7,20 @@
 <c:set var="maxQuantity" value="${empty maxQuantity ? 0 : maxQuantity}" scope="page" />
 <c:set var="submitButtonText" value="${empty submitButtonText ? '구매하기' : submitButtonText}" scope="page" />
 <c:set var="availableCashAmount" value="0" scope="page" />
+<c:set var="holdingQuantity" value="0" scope="page" />
 <c:if test="${not empty member}">
     <c:set var="availableCashAmount" value="${member.virtualCash}" scope="page" />
+</c:if>
+<c:if test="${not empty holding}">
+    <c:set var="holdingQuantity" value="${holding.quantity}" scope="page" />
 </c:if>
 
 <section class="order-card order-card--buy"
          <c:if test="${not empty stock and not empty stock.stockId}">
          data-stock-id="${stock.getStockId()}"
-         </c:if>>
+         </c:if>
+         data-available-cash="${availableCashAmount}"
+         data-holding-quantity="${holdingQuantity}">
     <h2 class="order-card__title">주문하기</h2>
 
     <!-- 주문 타입 hidden (LIMIT / MARKET) -->

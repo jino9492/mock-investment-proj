@@ -73,25 +73,42 @@ public class DBManager {
     public static <T> T executeInTransaction(TransactionCallback<T> callback) throws SQLException {
         Connection conn = null;
         try {
+            System.out.println("[DBManager] 트랜잭션 시작");
             conn = DBManager.getConnection();
             conn.setAutoCommit(false);
+            System.out.println("[DBManager] AutoCommit 비활성화 완료");
+            
             TransactionResult<T> result = callback.doInTransaction(conn);
+            System.out.println("[DBManager] 트랜잭션 콜백 실행 완료. commit: " + result.commit());
+            
             if (result.commit()) {
+                System.out.println("[DBManager] 트랜잭션 커밋 중...");
                 conn.commit();
+                System.out.println("[DBManager] 트랜잭션 커밋 완료");
             } else {
+                System.out.println("[DBManager] 트랜잭션 롤백 중...");
                 conn.rollback();
+                System.out.println("[DBManager] 트랜잭션 롤백 완료");
             }
             return result.value();
         } catch (SQLException e) {
+            System.err.println("[DBManager] 트랜잭션 중 SQLException 발생: " + e.getMessage());
+            System.err.println("[DBManager] SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode());
             if (conn != null) {
                 try {
+                    System.err.println("[DBManager] 예외 발생으로 인한 롤백 시도...");
                     conn.rollback();
+                    System.err.println("[DBManager] 롤백 완료");
                 } catch (SQLException rollbackEx) {
+                    System.err.println("[DBManager] 롤백 중 오류 발생: " + rollbackEx.getMessage());
                     rollbackEx.printStackTrace();
                 }
             }
+            e.printStackTrace();
             throw e;
         } catch (Exception e) {
+            System.err.println("[DBManager] 트랜잭션 중 예상치 못한 예외 발생: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             if (conn != null) {

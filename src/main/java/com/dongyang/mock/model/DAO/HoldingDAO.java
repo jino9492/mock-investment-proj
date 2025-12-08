@@ -127,15 +127,17 @@ public class HoldingDAO {
                 close(null, pstmt);
             }
         } else {
-            // 수량만 감소 (평균단가는 유지)
-            String sql = "UPDATE holding SET quantity = ? WHERE mem_id = ? AND stock_id = ?";
+            // 수량만 감소 (평균단가는 유지, total_buy_amount 재계산)
+            BigDecimal newTotalBuyAmount = existing.avgBuyPrice.multiply(BigDecimal.valueOf(newQuantity));
+            String sql = "UPDATE holding SET quantity = ?, total_buy_amount = ? WHERE mem_id = ? AND stock_id = ?";
             
             PreparedStatement pstmt = null;
             try {
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setLong(1, newQuantity);
-                pstmt.setInt(2, memId);
-                pstmt.setLong(3, stockId);
+                pstmt.setBigDecimal(2, newTotalBuyAmount);
+                pstmt.setInt(3, memId);
+                pstmt.setLong(4, stockId);
                 
                 int affectedRows = pstmt.executeUpdate();
                 if (affectedRows == 0) {

@@ -284,11 +284,58 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         calcTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
     }
 
+    // 최대 수량 계산 함수
+    function calculateMaxQuantity() {
+        const orderCard = document.querySelector(".order-card");
+        if (!orderCard) return null;
+        
+        const availableCash = parseInt(orderCard.getAttribute("data-available-cash") || "0");
+        const holdingQuantity = parseInt(orderCard.getAttribute("data-holding-quantity") || "0");
+        
+        // 현재 활성화된 탭 확인
+        const activeTab = document.querySelector(".order-card__trade-tab[aria-checked='true']");
+        const isBuy = activeTab && activeTab.textContent.trim().includes("구매");
+        
+        if (isBuy) {
+            // 구매: 예치금 / 주가
+            const price = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
+            if (price > 0) {
+                return Math.floor(availableCash / price);
+            }
+            return 0;
+        } else {
+            // 판매: 보유 수량
+            return holdingQuantity;
+        }
+    }
+    
     // 가격/수량 증감 버튼 및 입력 필드 이벤트 설정
     setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputElement, quantityInputElement, totalAmountElement);
-    setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quantityInputElement, priceInputElement, totalAmountElement);
+    
+    // 수량 관련 이벤트는 최대값을 동적으로 계산
+    const updateQuantityMax = () => {
+        const maxQty = calculateMaxQuantity();
+        // 기존 이벤트 리스너 제거 후 재설정 (간단한 방법)
+        setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quantityInputElement, priceInputElement, totalAmountElement, maxQty);
+        setupQuantityInput(quantityInputElement, priceInputElement, totalAmountElement, maxQty);
+    };
+    
+    // 초기 설정
+    updateQuantityMax();
+    
+    // 가격 변경 시 최대값 재계산
+    priceInputElement.addEventListener("input", updateQuantityMax);
+    priceInputElement.addEventListener("change", updateQuantityMax);
+    
+    // 탭 전환 시 최대값 재계산
+    const tradeTabs = document.querySelectorAll(".order-card__trade-tab");
+    tradeTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            setTimeout(updateQuantityMax, 100); // 탭 전환 후 DOM 업데이트 대기
+        });
+    });
+    
     setupPriceInput(priceInputElement, quantityInputElement, totalAmountElement);
-    setupQuantityInput(quantityInputElement, priceInputElement, totalAmountElement);
     setupSubmitButton(submitBtn, priceInputElement, quantityInputElement, orderTypeHidden);
 
     // 초기화
