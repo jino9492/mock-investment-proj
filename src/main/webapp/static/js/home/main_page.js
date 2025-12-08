@@ -8,9 +8,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadRankingPromises = [];
     let activeHoverElement = null;
 
-    // 💡 전역 변수로 관리할 맵 (종목 코드 -> DOM 요소 및 데이터)
+    // 전역 변수로 관리할 맵 (종목 코드 -> DOM 요소)
     const realtimeDOMMap = {};
-    const updateInterval = 1000; // 1초마다 폴링
+    const updateInterval = 2000; // 2초마다 폴링 간격
+
+    // =========================================================================
+    // ⭐ 반짝임 효과 적용 함수
+    // =========================================================================
+    /**
+     * DOM 요소에 반짝임 효과 클래스를 적용하고 지정된 시간 후 제거합니다.
+     * @param {HTMLElement} element - 효과를 적용할 DOM 요소
+     * @param {boolean} isPositive - 양수(빨강)인지 여부
+     */
+    function applyFlashEffect(element, isPositive) {
+        const className = isPositive ? 'text-highlight-up' : 'text-highlight-down';
+
+        element.classList.remove('text-highlight-up', 'text-highlight-down');
+
+        // 강제로 Reflow를 유도하여 애니메이션을 재실행
+        void element.offsetWidth;
+
+        element.classList.add(className);
+
+        // 500ms(0.5초) 후 클래스 제거
+        setTimeout(() => {
+            element.classList.remove(className);
+        }, 500);
+    }
+    // =========================================================================
+
 
     indexNames.forEach((e) => {
         const indexName = e.innerHTML;
@@ -78,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const selector = `.main__list-row--${rank}`;
                 const targetRow = document.querySelector(selector);
 
-                subscribedCodes.push(stkCode); // 실시간 구독 리스트에 추가
+                subscribedCodes.push(stkCode);
 
                 if (index === 0) {
                     activeHoverElement = targetRow;
@@ -87,30 +113,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (targetRow) {
 
-                    // 1. 순위 번호 (첫 번째 <span>)
                     const rankSpan = targetRow.querySelector('span:nth-child(1)');
                     if(rankSpan) rankSpan.textContent = item.nowRank;
 
-                    // 2. 회사 이름 (두 번째 <span>)
                     const nameSpan = targetRow.querySelector('span:nth-child(2)');
                     if (nameSpan) {
                         nameSpan.innerHTML = `<span class="main__company-profile"></span>${item.stkName}`;
                     }
 
-                    // 3. 현재가 (세 번째 <span>)
                     const priceSpan = targetRow.querySelector('span:nth-child(3)');
                     if (priceSpan) {
                         priceSpan.textContent = actualPrice.toLocaleString() + "원";
                     }
 
-                    // 4. 등락률 (네 번째 <span>)
                     const rateSpan = targetRow.querySelector('span:nth-child(4)');
                     if (rateSpan) {
                         rateSpan.textContent = `${rateSign}${Math.abs(item.fluRt).toFixed(2)}%`;
                         rateSpan.className = 'main__text-rate ' + priceClass;
                     }
 
-                    // 💡 DOM 맵핑 (실시간 업데이트를 위해 필요)
+                    // ⭐ DOM 맵에 priceSpan과 rateSpan을 저장
                     realtimeDOMMap[stkCode] = {
                         priceSpan: priceSpan,
                         rateSpan: rateSpan
@@ -147,7 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            // 💡 랭킹 로드 완료 후 실시간 업데이트 시작
             startRealtimeUpdates(subscribedCodes);
 
         })
@@ -161,63 +182,63 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-    /**
-     * 서버에 실시간 데이터를 폴링 방식으로 요청하고 화면을 업데이트합니다.
-     * loadRealtimeData는 HTTP 기반이므로 setInterval을 사용합니다.
-     */
     function startRealtimeUpdates(codes) {
         if (codes.length === 0) return;
 
-        // 모든 코드를 쉼표로 연결하여 쿼리 파라미터로 전송
-        const codeString = codes.join(',');
-        const url = `/api/socket?code=${codeString}`;
+        const ITEM_DELAY_MS = 40; // 개별 종목 요청 사이의 지연 시간 (ms)
 
-        const fetchAndUpdate = () => {
+        const fetchAndUpdate = async () => {
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP Error! Status: ${response.status}`);
+            for (const code of codes) {
+
+                try {
+                    const dataArray = await loadRealtimeData(code);
+                    const realtimeItem = dataArray && dataArray.length > 0 ? dataArray[0] : null;
+
+                    if (!realtimeItem) {
+                        continue;
                     }
-                    return response.json();
-                })
-                .then(realtimeDataList => {
 
-                    realtimeDataList.forEach(realtimeItem => {
-                        const code = realtimeItem.item;
+                    const mappedElements = realtimeDOMMap[code];
+                    const priceString = realtimeItem.curPrice;
+                    const rateString = realtimeItem.fluRt;
 
-                        const mappedElements = realtimeDOMMap[code];
+                    if (mappedElements && priceString && rateString) {
 
-                        if (mappedElements) {
-                            // 현재가 ('20')와 등락률 ('12') 키를 사용하여 업데이트
-                            const currentPrice = parseFloat(realtimeItem.values['20']);
-                            const changeRate = parseFloat(realtimeItem.values['12']);
+                        const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
+                        const changeRate = parseFloat(rateString);
 
-                            // 현재가 업데이트
-                            mappedElements.priceSpan.textContent = Math.abs(currentPrice).toLocaleString() + "원";
+                        if (!isNaN(currentPrice) && !isNaN(changeRate)) {
+                            const oldRateTextRaw = mappedElements.rateSpan.textContent.replace(/[%]/g, '');
 
-                            // 등락률 업데이트
+                            const newRateText = `${rateString}%`;
+
                             const isPositive = changeRate > 0;
-                            const isNegative = changeRate < 0;
+                            const priceClass = isPositive ? 'main__text-red' : (changeRate < 0 ? 'main__text-blue' : 'main__text-zero');
 
-                            const rateSign = isPositive ? '+' : (isNegative ? '' : '');
-                            const priceClass = isPositive ? 'main__text-red' : (isNegative ? 'main__text-blue' : 'main__text-zero');
+                            const oldRateFormatted = parseFloat(oldRateTextRaw).toFixed(2);
+                            const newRateFormatted = parseFloat(rateString).toFixed(2);
 
-                            mappedElements.rateSpan.textContent = `${rateSign}${Math.abs(changeRate).toFixed(2)}%`;
-                            mappedElements.rateSpan.className = 'main__text-rate ' + priceClass;
+                            if (newRateFormatted !== oldRateFormatted) {
+                                mappedElements.rateSpan.textContent = newRateText;
+                                mappedElements.rateSpan.className = 'main__text-rate ' + priceClass;
+                                applyFlashEffect(mappedElements.rateSpan, isPositive);
+                            }
                         }
-                    });
+                    }
 
-                })
-                .catch(error => {
-                    console.error("실시간 데이터 업데이트 중 오류 발생:", error.message);
-                });
+                    await new Promise(resolve => setTimeout(resolve, ITEM_DELAY_MS));
+
+                } catch (error) {
+                    console.error(`[${code}] 데이터 업데이트 중 오류 발생:`, error.message);
+                }
+            }
+
+            console.log("순차 업데이트 주기 완료.");
         };
 
-        // 1초마다 함수 실행 시작
         setInterval(fetchAndUpdate, updateInterval);
 
-        // 최초 1회 즉시 실행
         fetchAndUpdate();
     }
 });

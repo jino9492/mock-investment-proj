@@ -24,11 +24,18 @@ public class SocketController extends HttpServlet {
     Gson gson = new Gson();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void init() throws ServletException {
+        super.init();
+
         List<RankingItemDTO> cachedRanking = cacheManager.getList(RankingFetchService.RANKING_CACHE_KEY);
         List<String> list = new ArrayList<>();
         for (RankingItemDTO rankingItemDTO : cachedRanking) { list.add(rankingItemDTO.getStkCode()); }
-        realtimeStockService.connectSocket(list, "1");
+        realtimeStockService.connectSocket(list, "1");  
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
 
         String code = req.getParameter("code");
 

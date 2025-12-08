@@ -523,3 +523,23 @@ section{
   position: sticky;
   top: 140px;
 }
+
+@keyframes flash-red {
+  0% { background-color: #ffcccc; } /* 밝은 빨강 */
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-blue {
+  0% { background-color: #cceeff; } /* 밝은 파랑 */
+  100% { background-color: transparent; }
+}
+
+/* 텍스트가 반짝이는 클래스 (양수인 경우) */
+.text-highlight-up {
+  animation: flash-red 0.5s ease-out;
+}
+
+/* 텍스트가 반짝이는 클래스 (음수인 경우) */
+.text-highlight-down {
+  animation: flash-blue 0.5s ease-out;
+}
