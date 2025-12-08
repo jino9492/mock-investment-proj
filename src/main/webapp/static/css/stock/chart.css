@@ -1,10 +1,4 @@
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+@import url('stock_common.css');
 
 body.stock-page {
     background-color: #F6F7F9;
@@ -21,82 +15,6 @@ body.stock-page {
     margin: 24px auto;
     width: 90%;
     transition: margin-right 0.3s ease;
-}
-
-
-
-/* 상단 종목 정보 */
-.stock-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.stock-header__left {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-.stock-header__logo {
-    width: 65px;
-    height: 65px;
-    border-radius: 10px;
-    background-color: #d9d9d9;
-}
-
-.stock-header__info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.stock-header__name {
-    font-size: 18px;
-    font-weight: 500;
-}
-
-.stock-header__price-row {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-}
-
-.stock-header__price {
-    font-size: 30px;
-    font-weight: 500;
-}
-
-.stock-header__diff {
-    font-size: 17px;
-
-}
-
-.stock-header__diff-value {
-    color: #9000FF;
-}
-
-/* 상단 탭 */
-
-.stock-tabs {
-    display: flex;
-    margin-bottom: 15px;
-}
-
-.stock-tabs__item {
-    border: none;
-    padding: 6px 16px;
-    border-radius: 20px;
-    background-color: #F9F9F9;
-    font-size: 15px;
-    cursor: pointer;
-    text-decoration: none;
-    color: black;
-
-}
-
-.stock-tabs__item--active {
-    background-color: #D9D9D9;
 }
 
 /* 메인 레이아웃 */
@@ -209,7 +127,7 @@ body.stock-page {
 .order-card__trade-type {
     display: flex;
     margin-bottom: 16px;
-    height: 40px;
+    height: 35px;
     padding: 3px;
     border-radius: 8px;
     background-color: #f2f4f6;
@@ -332,7 +250,7 @@ body.stock-page {
 
 .order-card__dropdown-toggle {
     width: 100%;
-    height: 40px;
+    height: 35px;
     padding: 0 12px;
     border-radius: 8px;
     border: 1px solid #e5e8eb;
@@ -421,7 +339,7 @@ body.stock-page {
 
 .order-card__field--split {
     display: flex;
-    height: 40px;
+    height: 35px;
     padding: 1px 3px;
     border-radius: 8px;
     background-color: #f2f4f6;
@@ -504,7 +422,7 @@ body.stock-page {
 
 .order-card__input {
     width: 100%;
-    height: 40px;
+    height: 35px;
     border-radius: 8px;
     border: 1px solid #e5e8eb;
     padding: 0 12px;
@@ -516,7 +434,7 @@ body.stock-page {
     align-items: center;
     width: 70px;
     min-width: 70px;
-    height: 40px;
+    height: 35px;
     border-radius: 8px;
     background-color: #f2f4f6;
     overflow: hidden;

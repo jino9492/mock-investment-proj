@@ -9,32 +9,10 @@
 <body class="stock-info-page">
 <main class="stock-info__container">
 
-    <!-- 상단 종목 정보 -->
-    <header class="stock-header">
-        <div class="stock-header__left">
-            <div class="stock-header__logo"></div>
-            <div class="stock-header__info">
-                <div class="stock-header__name">${stock.getStockName()} ${stock.getStockSymbol()}</div>
-                <div class="stock-header__price-row">
-                    <span class="stock-header__price"><fmt:formatNumber value="${daily.getClosePrice().abs()}" pattern="#,###" />원</span>
-                    <span class="stock-header__diff">
-                        <c:set var="isUp" value="${daily.getChangePrice() > 0}" />
-                        어제보다&nbsp;<span class="stock-header__diff-value" style="color:${isUp ? "#F04452" : "#3182F6"}">
-                        ${isUp ? "+" : ""}<fmt:formatNumber value="${daily.getChangePrice()}" pattern="#,###" />원 (${daily.getChangeRate().abs()}%)
-                    </span>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- 상단 탭 -->
-    <nav class="stock-tabs">
-        <a href="${pageContext.request.contextPath}/stock?code=${stock.getStockSymbol()}" class="stock-tabs__item">차트 · 호가</a>
-        <button class="stock-tabs__item stock-tabs__item--active">종목정보</button>
-        <button class="stock-tabs__item">뉴스 · 공시</button>
-        <button class="stock-tabs__item">커뮤니티</button>
-    </nav>
+    <!-- 상단 종목 정보 및 탭 -->
+    <jsp:include page="/WEB-INF/fragments/stock/stock_header.jsp">
+        <jsp:param name="activeTab" value="info"/>
+    </jsp:include>
 
     <div class="stock-info__layout">
         <!-- 왼쪽 메인 영역 -->
@@ -134,11 +112,11 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PER</span>
-                            <span class="stock-info__metrics-value">${indicator.getPer() ? indicator.getPer() + "배" : "정보를 찾을 수 없습니다."}</span>
+                            <span class="stock-info__metrics-value">${indicator.getPer()}배</span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PBR</span>
-                            <span class="stock-info__metrics-value">${indicator.getPer() ? indicator.getPbr() + "배" : "정보를 찾을 수 없습니다."}</span>
+                            <span class="stock-info__metrics-value">${indicator.getPbr()}배</span>
                         </div>
                     </div>
 
@@ -146,15 +124,15 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">ROE</span>
-                            <span class="stock-info__metrics-value">${indicator.getPer() ? indicator.getRoe() + "배" : "정보를 찾을 수 없습니다."}</span>
+                            <span class="stock-info__metrics-value">${indicator.getRoe()}%</span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">EPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getEps().intValue()}" pattern="#,###" />${indicator.getEps() ? "배" : "정보를 찾을 수 없습니다."}</span>
+                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getEps().intValue()}" pattern="#,###" />원</span>
                         </div>
                         <div class="stock-info__metrics-row stock-info__metrics-row--last">
                             <span class="stock-info__metrics-label">BPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getBps().intValue()}" pattern="#,###" />${indicator.getBps() ? "배" : "정보를 찾을 수 없습니다."}</span>
+                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getBps().intValue()}" pattern="#,###" />원</span>
                         </div>
                     </div>
                 </div>

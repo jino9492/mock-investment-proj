@@ -410,6 +410,33 @@ public class MemberDAO {
     }
 
     /**
+     * 회원의 예치금 조회
+     * @param memberId 회원 ID
+     * @param conn DB 연결
+     * @return 예치금
+     * @throws SQLException
+     */
+    public int getVirtualCash(int memberId, Connection conn) throws SQLException {
+        String sql = "SELECT virtual_cash FROM member WHERE mem_id = ?";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memberId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("virtual_cash");
+            } else {
+                throw new SQLException("회원을 찾을 수 없습니다.");
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+    }
+
+    /**
      * 회원 통계 정보 조회
      * - 전체 회원 수
      * - 당일 접속자 수
@@ -574,5 +601,93 @@ public class MemberDAO {
             close(null, pstmt, rs);
         }
         return holdings;
+    }
+
+    /**
+     * 회원의 특정 종목 보유 정보 조회
+     * @param memberId 회원 ID
+     * @param stockId 종목 ID
+     * @param conn DB 연결
+     * @return 보유 정보 (없으면 null)
+     * @throws SQLException
+     */
+    public MemberHoldingDTO findHoldingByStock(int memberId, long stockId, Connection conn) throws SQLException {
+        String sql = "SELECT " +
+                "s.stock_name, " +
+                "h.quantity, " +
+                "h.avg_buy_price as average_price, " +
+                "spd.close_price as current_price, " +
+                "h.quantity * spd.close_price as evaluation_amount, " +
+                "(spd.close_price - h.avg_buy_price) * h.quantity as profit_loss, " +
+                "CASE " +
+                "  WHEN h.avg_buy_price > 0 " +
+                "  THEN ((spd.close_price - h.avg_buy_price) / h.avg_buy_price) * 100 " +
+                "  ELSE 0 " +
+                "END as profit_rate " +
+                "FROM holding h " +
+                "INNER JOIN stock s ON h.stock_id = s.stock_id " +
+                "INNER JOIN stock_price_daily spd ON h.stock_id = spd.stock_id " +
+                "AND spd.price_date = (SELECT MAX(price_date) FROM stock_price_daily WHERE stock_id = h.stock_id) " +
+                "WHERE h.mem_id = ? AND h.stock_id = ? AND h.quantity > 0";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memberId);
+            pstmt.setLong(2, stockId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                MemberHoldingDTO holding = new MemberHoldingDTO();
+                holding.setStockName(rs.getString("stock_name"));
+                holding.setQuantity(rs.getInt("quantity"));
+                holding.setAveragePrice(rs.getInt("average_price"));
+                holding.setCurrentPrice(rs.getInt("current_price"));
+                holding.setEvaluationAmount(rs.getLong("evaluation_amount"));
+                holding.setProfitLoss(rs.getLong("profit_loss"));
+                holding.setProfitRate(rs.getDouble("profit_rate"));
+                return holding;
+            }
+            return null;
+        } finally {
+            close(null, pstmt, rs);
+        }
+    }
+
+    /**
+     * 회원의 가상 자금 업데이트
+     * @param memberId 회원 ID
+     * @param amount 변경 금액 (양수: 증가, 음수: 감소)
+     * @param conn DB 연결
+     * @return 업데이트 후 잔액
+     * @throws SQLException
+     */
+    public int updateVirtualCash(int memberId, int amount, Connection conn) throws SQLException {
+        // 현재 잔액 조회
+        int currentCash = getVirtualCash(memberId, conn);
+        int newCash = currentCash + amount;
+        
+        if (newCash < 0) {
+            throw new SQLException("잔액이 부족합니다.");
+        }
+        
+        String sql = "UPDATE member SET virtual_cash = ? WHERE mem_id = ?";
+        
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, newCash);
+            pstmt.setInt(2, memberId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("가상 자금 업데이트에 실패했습니다.");
+            }
+            
+            return newCash;
+        } finally {
+            close(null, pstmt);
+        }
     }
 }

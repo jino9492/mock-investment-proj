@@ -45,6 +45,33 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         wait: "general"
     };
 
+    // 숫자 포맷팅 헬퍼 함수
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // 조건 주문 가격 필드 초기화 함수
+    function initializeConditionalOrderPriceFields() {
+        const conditionalOrderPriceInput = document.getElementById("conditional-order-price-input");
+        const conditionalSellPriceInput = document.getElementById("conditional-sell-price-input");
+        
+        // 구매 조건 주문 가격 필드 초기화
+        if (conditionalOrderPriceInput) {
+            const currentPrice = conditionalOrderPriceInput.getAttribute("data-current-price");
+            if (currentPrice && !conditionalOrderPriceInput.value) {
+                conditionalOrderPriceInput.value = formatNumber(parseInt(currentPrice));
+            }
+        }
+        
+        // 판매 조건 주문 가격 필드 초기화
+        if (conditionalSellPriceInput) {
+            const currentPrice = conditionalSellPriceInput.getAttribute("data-current-price");
+            if (currentPrice && !conditionalSellPriceInput.value) {
+                conditionalSellPriceInput.value = formatNumber(parseInt(currentPrice));
+            }
+        }
+    }
+
     // 주문 섹션 표시/숨김 헬퍼 함수
     function updateOrderSections(activeTab, orderType) {
         const generalOrder = document.querySelector(".order-card__general-order");
@@ -59,10 +86,14 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                 // 판매 탭 + 조건 주문
                 if (buyConditionalOrder) buyConditionalOrder.style.display = "none";
                 if (sellConditionalOrder) sellConditionalOrder.style.display = "block";
+                // 조건 주문 필드가 표시될 때 가격 필드 초기화
+                setTimeout(() => initializeConditionalOrderPriceFields(), 0);
             } else if (activeTab === "buy") {
                 // 구매 탭 + 조건 주문
                 if (buyConditionalOrder) buyConditionalOrder.style.display = "block";
                 if (sellConditionalOrder) sellConditionalOrder.style.display = "none";
+                // 조건 주문 필드가 표시될 때 가격 필드 초기화
+                setTimeout(() => initializeConditionalOrderPriceFields(), 0);
             } else {
                 // 대기 탭 등
                 if (buyConditionalOrder) buyConditionalOrder.style.display = "none";
@@ -290,6 +321,10 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                     // 현재 활성 탭의 주문 유형 상태 업데이트
                     orderTypeByTab[activeTabType] = orderType;
                     updateOrderSections(activeTabType, orderType);
+                    // 조건 주문 선택 시 가격 필드 초기화 (updateOrderSections에서도 호출되지만 명시적으로 호출)
+                    if (orderType === "conditional") {
+                        setTimeout(() => initializeConditionalOrderPriceFields(), 0);
+                    }
                 }
             });
 

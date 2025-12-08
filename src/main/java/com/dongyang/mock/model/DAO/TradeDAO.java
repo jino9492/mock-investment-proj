@@ -224,5 +224,50 @@ public class TradeDAO {
         }
         return trades;
     }
+
+    /**
+     * 체결 내역 저장
+     * @param memId 회원 ID
+     * @param stockId 종목 ID
+     * @param orderId 주문 ID
+     * @param tradePrice 체결 가격
+     * @param tradeQuantity 체결 수량
+     * @param conn DB 연결
+     * @return 생성된 trade ID
+     * @throws SQLException
+     */
+    public long insertTrade(int memId, long stockId, long orderId, 
+                           java.math.BigDecimal tradePrice, long tradeQuantity, 
+                           Connection conn) throws SQLException {
+        String sql = "INSERT INTO trade (mem_id, stock_id, order_id, trade_price, trade_quantity, traded_at) " +
+                     "VALUES (?, ?, ?, ?, ?, NOW())";
+        
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setInt(1, memId);
+            pstmt.setLong(2, stockId);
+            pstmt.setLong(3, orderId);
+            pstmt.setBigDecimal(4, tradePrice);
+            pstmt.setLong(5, tradeQuantity);
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows == 0) {
+                throw new SQLException("체결 내역 저장에 실패했습니다.");
+            }
+            
+            rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getLong(1);
+            } else {
+                throw new SQLException("체결 ID를 가져올 수 없습니다.");
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+    }
 }
 

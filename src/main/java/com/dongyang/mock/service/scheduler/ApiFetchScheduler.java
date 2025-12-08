@@ -33,6 +33,25 @@ public class ApiFetchScheduler implements ServletContextListener {
                 TimeUnit.MINUTES // 시간 단위 (분)
         );
         System.out.println("랭킹 데이터 Scheduler started. Running every 1 second (API limit).");
+
+        // 1분마다 실행: 조건 주문 체크 및 자동 주문 생성
+        scheduler.scheduleAtFixedRate(
+                new ConditionalOrderCheckTask(),
+                10, // 초기 지연 시간 (10초 후 시작)
+                1, // 반복 주기 (1분)
+                TimeUnit.MINUTES // 시간 단위 (분)
+        );
+        System.out.println("Scheduler started. Running ConditionalOrderCheckTask every 1 minute.");
+
+        // 30초마다 실행: PENDING 주문 체결 처리
+        scheduler.scheduleAtFixedRate(
+                new OrderExecutionTask(),
+                20, // 초기 지연 시간 (20초 후 시작)
+                30, // 반복 주기 (30초)
+                TimeUnit.SECONDS // 시간 단위 (초)
+        );
+        System.out.println("Scheduler started. Running OrderExecutionTask every 30 seconds.");
+
     }
 
     @Override

@@ -36,18 +36,24 @@ public class DatabaseCleanupListener implements ServletContextListener {
         // MySQL의 AbandonedConnectionCleanupThread 종료
         try {
             Class<?> cleanupThreadClass = Class.forName("com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
-            // checkedShutdown() 메서드가 있으면 호출
+            // MySQL Connector/J 8.0 이상에서는 checkedShutdown() 사용
             try {
-                cleanupThreadClass.getMethod("checkedShutdown").invoke(null);
-                logger.info("MySQL AbandonedConnectionCleanupThread 종료됨");
+                java.lang.reflect.Method checkedShutdown = cleanupThreadClass.getMethod("checkedShutdown");
+                checkedShutdown.invoke(null);
+                logger.info("MySQL AbandonedConnectionCleanupThread 종료됨 (checkedShutdown)");
             } catch (NoSuchMethodException e) {
-                // checkedShutdown()이 없으면 shutdown() 시도
+                // checkedShutdown()이 없으면 shutdown() 시도 (구버전)
                 try {
-                    cleanupThreadClass.getMethod("shutdown").invoke(null);
+                    java.lang.reflect.Method shutdown = cleanupThreadClass.getMethod("shutdown");
+                    shutdown.invoke(null);
                     logger.info("MySQL AbandonedConnectionCleanupThread 종료됨 (shutdown)");
-                } catch (Exception ex) {
+                } catch (NoSuchMethodException ex) {
                     logger.fine("MySQL cleanup thread 종료 메서드를 찾을 수 없음");
+                } catch (Exception ex) {
+                    logger.warning("MySQL cleanup thread 종료 중 오류: " + ex.getMessage());
                 }
+            } catch (Exception e) {
+                logger.warning("MySQL cleanup thread checkedShutdown 호출 중 오류: " + e.getMessage());
             }
         } catch (ClassNotFoundException e) {
             // MySQL 드라이버가 없는 경우 무시
