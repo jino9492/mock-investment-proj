@@ -20,7 +20,8 @@
          data-stock-id="${stock.getStockId()}"
          </c:if>
          data-available-cash="${availableCashAmount}"
-         data-holding-quantity="${holdingQuantity}">
+         data-holding-quantity="${holdingQuantity}"
+         data-pending-sell-quantity="${empty pendingSellQuantity ? 0 : pendingSellQuantity}">
     <h2 class="order-card__title">주문하기</h2>
 
     <!-- 주문 타입 hidden (LIMIT / MARKET) -->
@@ -165,7 +166,7 @@
         <!-- 구매 가능 금액 -->
         <div class="order-card__summary-row">
             <span class="order-card__summary-label">구매가능 금액</span>
-            <span class="order-card__summary-value">
+            <span class="order-card__summary-value" id="conditional-order-available-amount">
                 <fmt:formatNumber value="${availableCashAmount}" pattern="#,###"/>원
             </span>
         </div>

@@ -64,7 +64,9 @@ export function setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quan
             maxQty = maxQuantity();
         }
         
-        if (maxQty !== null && maxQty !== undefined && newQuantity > maxQty) {
+        // maxQty가 null이거나 0보다 큰 경우에만 제한 적용
+        // (시장가 모드에서 가격을 가져올 수 없는 경우를 위해)
+        if (maxQty !== null && maxQty !== undefined && maxQty > 0 && newQuantity > maxQty) {
             newQuantity = maxQty;
         }
         
@@ -116,7 +118,9 @@ export function setupQuantityInput(quantityInputElement, priceInputElement, tota
                     maxQty = maxQuantity();
                 }
                 
-                if (maxQty !== null && maxQty !== undefined && num > maxQty) {
+                // maxQty가 null이거나 0보다 큰 경우에만 제한 적용
+                // (시장가 모드에서 가격을 가져올 수 없는 경우를 위해)
+                if (maxQty !== null && maxQty !== undefined && maxQty > 0 && num > maxQty) {
                     num = maxQty;
                 }
                 this.value = num.toString();

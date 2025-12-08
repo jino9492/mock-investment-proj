@@ -60,25 +60,68 @@
 
 
             <!-- 내 주식 카드 -->
-            <section class="my-stock-card">
+            <section class="my-stock-card" 
+                     <c:if test="${not empty stock and not empty stock.stockId}">
+                     data-stock-id="${stock.stockId}"
+                     </c:if>>
                 <h2 class="my-stock-card__title">내 주식</h2>
 
-                <div class="my-stock-card__row">
-                    <span>총 수익</span>
-                    <span class="my-stock-card__profit">+00,000</span>
-                </div>
-                <div class="my-stock-card__row">
-                    <span>총 금액</span>
-                    <span>000,000원</span>
-                </div>
-                <div class="my-stock-card__row">
-                    <span>수량</span>
-                    <span>0주</span>
-                </div>
-                <div class="my-stock-card__row">
-                    <span>1주 평균 금액</span>
-                    <span>000,000원</span>
-                </div>
+                <c:choose>
+                    <c:when test="${not empty holding}">
+                        <div class="my-stock-card__row">
+                            <span>총 수익</span>
+                            <span class="my-stock-card__profit 
+                                <c:choose>
+                                    <c:when test="${holding.profitLoss > 0}">my-stock-card__profit--positive</c:when>
+                                    <c:when test="${holding.profitLoss < 0}">my-stock-card__profit--negative</c:when>
+                                    <c:otherwise>my-stock-card__profit--neutral</c:otherwise>
+                                </c:choose>">
+                                <c:choose>
+                                    <c:when test="${holding.profitLoss > 0}">+</c:when>
+                                    <c:when test="${holding.profitLoss < 0}">-</c:when>
+                                </c:choose>
+                                <c:set var="absProfitLoss" value="${holding.profitLoss >= 0 ? holding.profitLoss : -holding.profitLoss}" />
+                                <fmt:formatNumber value="${absProfitLoss}" pattern="#,###"/>
+                            </span>
+                        </div>
+                        <div class="my-stock-card__row">
+                            <span>총 금액</span>
+                            <span id="my-stock-evaluation-amount">
+                                <fmt:formatNumber value="${holding.evaluationAmount}" pattern="#,###"/>원
+                            </span>
+                        </div>
+                        <div class="my-stock-card__row">
+                            <span>수량</span>
+                            <span id="my-stock-quantity">
+                                <fmt:formatNumber value="${holding.quantity}" pattern="#,###"/>주
+                            </span>
+                        </div>
+                        <div class="my-stock-card__row">
+                            <span>1주 평균 금액</span>
+                            <span id="my-stock-average-price">
+                                <fmt:formatNumber value="${holding.averagePrice}" pattern="#,###"/>원
+                            </span>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="my-stock-card__row">
+                            <span>총 수익</span>
+                            <span class="my-stock-card__profit my-stock-card__profit--neutral">0</span>
+                        </div>
+                        <div class="my-stock-card__row">
+                            <span>총 금액</span>
+                            <span id="my-stock-evaluation-amount">0원</span>
+                        </div>
+                        <div class="my-stock-card__row">
+                            <span>수량</span>
+                            <span id="my-stock-quantity">0주</span>
+                        </div>
+                        <div class="my-stock-card__row">
+                            <span>1주 평균 금액</span>
+                            <span id="my-stock-average-price">0원</span>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </section>
 
     </main>

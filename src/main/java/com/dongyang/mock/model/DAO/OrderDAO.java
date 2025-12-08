@@ -100,6 +100,70 @@ public class OrderDAO {
     }
 
     /**
+     * 특정 종목에 대한 대기 중인 판매 주문 수량 합계 조회
+     * @param memId 회원 ID
+     * @param stockId 종목 ID
+     * @param conn DB 연결
+     * @return 대기 중인 판매 주문 수량 합계
+     * @throws SQLException
+     */
+    public long getPendingSellOrderQuantity(int memId, long stockId, Connection conn) throws SQLException {
+        String sql = "SELECT COALESCE(SUM(quantity), 0) as total_quantity " +
+                     "FROM trade_order " +
+                     "WHERE mem_id = ? AND stock_id = ? AND side = 'SELL' AND status = 'PENDING'";
+        
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memId);
+            pstmt.setLong(2, stockId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getLong("total_quantity");
+            }
+            return 0;
+        } finally {
+            close(null, pstmt, rs);
+        }
+    }
+
+    /**
+     * 주문 ID로 주문 조회
+     * @param orderId 주문 ID
+     * @param conn DB 연결
+     * @return 주문 정보, 없으면 null
+     * @throws SQLException
+     */
+    public OrderDTO findOrderById(long orderId, Connection conn) throws SQLException {
+        String sql = "SELECT o.order_id, o.mem_id, o.stock_id, o.side, o.order_type, o.price, " +
+                     "o.quantity, o.status, o.placed_at, o.cancelled_at, o.has_condition, " +
+                     "s.stock_name " +
+                     "FROM trade_order o " +
+                     "INNER JOIN stock s ON o.stock_id = s.stock_id " +
+                     "WHERE o.order_id = ?";
+        
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, orderId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return mapToOrder(rs);
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        
+        return null;
+    }
+
+    /**
      * 주문 상태 업데이트
      * @param orderId 주문 ID
      * @param status 새로운 상태

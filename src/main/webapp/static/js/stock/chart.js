@@ -307,6 +307,10 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         const orderTypeInput = orderTypeDropdown ? orderTypeDropdown.querySelector("[data-dropdown-input]") : null;
         const isConditional = orderTypeInput && orderTypeInput.value === "conditional";
         
+        // 주문 모드 확인 (지정가/시장가)
+        const orderTypeHidden = document.querySelector(".order-card__order-type-hidden");
+        const isMarket = orderTypeHidden && orderTypeHidden.value === "MARKET";
+        
         if (isBuy) {
             // 구매: 예치금 / 주가
             let price = 0;
@@ -317,17 +321,30 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                     price = parseFloat(conditionalPriceInput.value.replace(/,/g, "")) || 0;
                 }
             } else {
-                // 일반 주문일 경우 일반 가격 필드 확인
-                price = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
+                // 일반 주문일 경우
+                if (isMarket) {
+                    // 시장가 모드: 현재가 사용
+                    const currentPrice = priceInputElement ? priceInputElement.getAttribute("data-current-price") : null;
+                    if (currentPrice) {
+                        price = parseFloat(currentPrice) || 0;
+                    }
+                } else {
+                    // 지정가 모드: 입력된 가격 사용
+                    price = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
+                }
             }
             
             if (price > 0) {
                 return Math.floor(availableCash / price);
             }
-            return 0;
+            // 가격이 없으면 예치금으로 최대 수량 계산 (시장가 모드에서 현재가를 가져올 수 없는 경우)
+            // 이 경우는 매우 큰 값을 반환하여 사용자가 수량을 입력할 수 있도록 함
+            return availableCash > 0 ? 999999 : 0;
         } else {
-            // 판매: 보유 수량
-            return holdingQuantity;
+            // 판매: 보유 수량 - 대기 중인 판매 주문 수량
+            const pendingSellQuantity = parseInt(orderCard.getAttribute("data-pending-sell-quantity") || "0");
+            const availableQuantity = holdingQuantity - pendingSellQuantity;
+            return Math.max(0, availableQuantity); // 음수가 되지 않도록
         }
     }
     
@@ -443,12 +460,21 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     initCurrentPrice(priceInputElement, orderTypeHidden);
     initQuantity(quantityInputElement);
     
-    // 현재가 설정 후 총 금액 계산
+    // 현재가 설정 후 총 금액 계산 및 placeholder 업데이트
     if (priceInputElement && orderTypeHidden && orderTypeHidden.value === "LIMIT") {
         const currentPrice = priceInputElement.getAttribute("data-current-price");
         if (currentPrice && priceInputElement.value) {
             calculateTotalAmount();
         }
+        // 현재가가 설정된 후 placeholder 업데이트
+        setTimeout(function() {
+            updateQuantityPlaceholders();
+        }, 200);
+    } else {
+        // 시장가 모드이거나 가격이 없는 경우에도 placeholder 업데이트 (판매 탭일 수 있음)
+        setTimeout(function() {
+            updateQuantityPlaceholders();
+        }, 200);
     }
 
     // 시장가/지정가 모드 전환 설정
@@ -594,6 +620,221 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         }
     });
 
+    /* my-stock-card 실시간 업데이트 (폴링) */
+    let holdingPollingInterval = null;
+    
+    // 보유 정보 업데이트 함수
+    async function updateMyStockCard() {
+        const myStockCard = document.querySelector(".my-stock-card");
+        if (!myStockCard) return;
+        
+        const stockId = myStockCard.getAttribute("data-stock-id");
+        if (!stockId) return;
+        
+        try {
+            const response = await fetch(`/api/holding?stockId=${stockId}`);
+            
+            if (!response.ok) {
+                console.warn("[보유 정보 업데이트] 서버 응답 오류:", response.status);
+                return;
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                console.warn("[보유 정보 업데이트] 응답 데이터 오류:", result);
+                return;
+            }
+            
+            const holding = result.holding;
+            
+            if (holding) {
+                // 총 수익 업데이트
+                const profitElement = myStockCard.querySelector(".my-stock-card__profit");
+                if (profitElement) {
+                    const profitLoss = holding.profitLoss || 0;
+                    const profitClass = profitLoss > 0 ? "my-stock-card__profit--positive" : 
+                                      profitLoss < 0 ? "my-stock-card__profit--negative" : 
+                                      "my-stock-card__profit--neutral";
+                    profitElement.className = "my-stock-card__profit " + profitClass;
+                    profitElement.textContent = (profitLoss > 0 ? "+" : profitLoss < 0 ? "-" : "") + 
+                        Math.abs(profitLoss).toLocaleString('ko-KR');
+                }
+                
+                // 총 금액 업데이트
+                const evaluationAmountElement = document.getElementById("my-stock-evaluation-amount");
+                if (evaluationAmountElement) {
+                    evaluationAmountElement.textContent = (holding.evaluationAmount || 0).toLocaleString('ko-KR') + "원";
+                }
+                
+                // 수량 업데이트
+                const quantityElement = document.getElementById("my-stock-quantity");
+                if (quantityElement) {
+                    quantityElement.textContent = (holding.quantity || 0).toLocaleString('ko-KR') + "주";
+                }
+                
+                // 평균 단가 업데이트
+                const averagePriceElement = document.getElementById("my-stock-average-price");
+                if (averagePriceElement) {
+                    averagePriceElement.textContent = (holding.averagePrice || 0).toLocaleString('ko-KR') + "원";
+                }
+            } else {
+                // 보유 정보가 없으면 0으로 표시
+                const profitElement = myStockCard.querySelector(".my-stock-card__profit");
+                if (profitElement) {
+                    profitElement.className = "my-stock-card__profit my-stock-card__profit--neutral";
+                    profitElement.textContent = "0";
+                }
+                
+                const evaluationAmountElement = document.getElementById("my-stock-evaluation-amount");
+                if (evaluationAmountElement) evaluationAmountElement.textContent = "0원";
+                
+                const quantityElement = document.getElementById("my-stock-quantity");
+                if (quantityElement) quantityElement.textContent = "0주";
+                
+                const averagePriceElement = document.getElementById("my-stock-average-price");
+                if (averagePriceElement) averagePriceElement.textContent = "0원";
+            }
+            
+        } catch (error) {
+            console.error("[보유 정보 업데이트] 오류:", error);
+        }
+    }
+
+    // 폴링 시작 (5초마다 체크)
+    function startHoldingPolling() {
+        if (holdingPollingInterval) {
+            clearInterval(holdingPollingInterval);
+        }
+        
+        holdingPollingInterval = setInterval(updateMyStockCard, 5000); // 5초마다 업데이트
+    }
+
+    // 폴링 중지
+    function stopHoldingPolling() {
+        if (holdingPollingInterval) {
+            clearInterval(holdingPollingInterval);
+            holdingPollingInterval = null;
+        }
+    }
+
+    // 페이지가 보일 때만 폴링 시작
+    let isPageVisible = true;
+    
+    document.addEventListener("visibilitychange", function() {
+        isPageVisible = !document.hidden;
+        if (isPageVisible) {
+            startHoldingPolling();
+        } else {
+            stopHoldingPolling();
+        }
+    });
+
+    // 초기 폴링 시작
+    startHoldingPolling();
+    
+    // 페이지 언로드 시 폴링 중지
+    window.addEventListener("beforeunload", function() {
+        stopHoldingPolling();
+    });
+
+    /* 구매 가능 금액 실시간 업데이트 (폴링) */
+    let availableCashPollingInterval = null;
+    
+    // 구매 가능 금액 업데이트 함수
+    async function updateAvailableCash() {
+        try {
+            // stockId 가져오기
+            const orderCard = document.querySelector(".order-card");
+            const stockId = orderCard ? orderCard.getAttribute("data-stock-id") : null;
+            
+            // API 호출 (stockId가 있으면 포함)
+            let url = "/api/order";
+            if (stockId) {
+                url += "?stockId=" + stockId;
+            }
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                return;
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.availableCash !== undefined) {
+                const formattedAmount = result.availableCash.toLocaleString('ko-KR');
+                
+                // 일반 주문 구매가능 금액 업데이트
+                const availableAmountElement = document.getElementById("order-available-amount");
+                if (availableAmountElement) {
+                    availableAmountElement.textContent = formattedAmount + "원";
+                    availableAmountElement.setAttribute("data-available-cash", result.availableCash);
+                }
+                
+                // 조건 주문 구매가능 금액 업데이트
+                const conditionalAvailableAmountElement = document.getElementById("conditional-order-available-amount");
+                if (conditionalAvailableAmountElement) {
+                    conditionalAvailableAmountElement.textContent = formattedAmount + "원";
+                }
+                
+                // order-card의 data-available-cash도 업데이트
+                if (orderCard) {
+                    orderCard.setAttribute("data-available-cash", result.availableCash);
+                    
+                    // 대기 중인 판매 주문 수량 업데이트
+                    if (result.pendingSellQuantity !== undefined) {
+                        orderCard.setAttribute("data-pending-sell-quantity", result.pendingSellQuantity);
+                        // placeholder 업데이트 (판매 탭일 경우)
+                        if (typeof updateQuantityPlaceholders === 'function') {
+                            updateQuantityPlaceholders();
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("[구매 가능 금액 업데이트] 오류:", error);
+        }
+    }
+
+    // 구매 가능 금액 폴링 시작 (5초마다 체크)
+    function startAvailableCashPolling() {
+        if (availableCashPollingInterval) {
+            clearInterval(availableCashPollingInterval);
+        }
+        
+        availableCashPollingInterval = setInterval(updateAvailableCash, 5000); // 5초마다 업데이트
+    }
+
+    // 구매 가능 금액 폴링 중지
+    function stopAvailableCashPolling() {
+        if (availableCashPollingInterval) {
+            clearInterval(availableCashPollingInterval);
+            availableCashPollingInterval = null;
+        }
+    }
+
+    // 페이지가 보일 때만 폴링 시작
+    document.addEventListener("visibilitychange", function() {
+        const isPageVisible = !document.hidden;
+        if (isPageVisible) {
+            startAvailableCashPolling();
+        } else {
+            stopAvailableCashPolling();
+        }
+    });
+
+    // 초기 로드 시 즉시 업데이트
+    updateAvailableCash();
+    
+    // 초기 폴링 시작
+    startAvailableCashPolling();
+    
+    // 페이지 언로드 시 폴링 중지
+    window.addEventListener("beforeunload", function() {
+        stopAvailableCashPolling();
+    });
+
     // 조건 주문 - 감시 가격 정보 업데이트
     const watchPriceInput = document.getElementById("watch-price-input");
     const watchPriceInfo = document.getElementById("watch-price-info");
@@ -602,5 +843,91 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
 
     // 감시 가격 입력 필드 및 버튼 이벤트 설정
     setupWatchPriceInput(watchPriceInput, watchPriceInfo, watchPriceMinusBtn, watchPricePlusBtn);
+
+    /* 대기 주문 취소 버튼 이벤트 */
+    function attachCancelButtonListeners() {
+        const cancelOrderButtons = document.querySelectorAll(".order-card__wait-order-btn--cancel");
+        
+        cancelOrderButtons.forEach(function(button) {
+            // 이미 이벤트 리스너가 연결되어 있는지 확인
+            if (button.hasAttribute("data-listener-attached")) {
+                return;
+            }
+            
+            button.setAttribute("data-listener-attached", "true");
+            button.addEventListener("click", async function() {
+                const orderId = this.getAttribute("data-order-id");
+                
+                if (!orderId) {
+                    alert("주문 ID를 찾을 수 없습니다.");
+                    return;
+                }
+                
+                // 확인 메시지
+                const confirmed = window.confirm("정말로 이 주문을 취소하시겠습니까?");
+                if (!confirmed) {
+                    return;
+                }
+                
+                try {
+                    // DELETE 요청
+                    const params = new URLSearchParams();
+                    params.append("orderId", orderId);
+                    
+                    const response = await fetch("/api/order?" + params.toString(), {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+                        }
+                    });
+                    
+                    // 응답 처리
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (e) {
+                        console.error("[주문 취소] JSON 파싱 오류:", e);
+                        alert("서버 응답을 처리할 수 없습니다. 페이지를 새로고침해주세요.");
+                        return;
+                    }
+                    
+                    if (result.success) {
+                        alert(result.message || "주문이 성공적으로 취소되었습니다.");
+                        // 페이지 새로고침하여 대기 주문 목록 업데이트
+                        window.location.reload();
+                    } else {
+                        alert(result.message || "주문 취소에 실패했습니다.");
+                    }
+                } catch (error) {
+                    console.error("[주문 취소] 네트워크 오류:", error);
+                    if (error instanceof TypeError && error.message.includes("fetch")) {
+                        alert("네트워크 연결을 확인해주세요. 인터넷 연결이 끊어졌을 수 있습니다.");
+                    } else {
+                        alert("주문 취소 중 오류가 발생했습니다: " + error.message);
+                    }
+                }
+            });
+        });
+    }
+
+    // 초기 취소 버튼 이벤트 리스너 연결
+    attachCancelButtonListeners();
+    
+    // 동적으로 추가된 취소 버튼을 위한 MutationObserver
+    const waitOrdersContainer = document.querySelector(".order-card__wait-orders");
+    if (waitOrdersContainer) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length > 0) {
+                    attachCancelButtonListeners();
+                }
+            });
+        });
+        
+        observer.observe(waitOrdersContainer, {
+            childList: true,
+            subtree: true
+        });
+    }
 
 });

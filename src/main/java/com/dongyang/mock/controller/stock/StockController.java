@@ -66,6 +66,10 @@ public class StockController extends HttpServlet {
                     // 대기 주문 목록 조회
                     java.util.List<OrderDTO> pendingOrders = orderService.getPendingOrders(memId);
                     req.setAttribute("pendingOrders", pendingOrders);
+                    
+                    // 대기 중인 판매 주문 수량 조회
+                    long pendingSellQuantity = orderService.getPendingSellOrderQuantity(memId, stkId);
+                    req.setAttribute("pendingSellQuantity", pendingSellQuantity);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
