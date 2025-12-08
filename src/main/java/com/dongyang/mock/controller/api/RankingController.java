@@ -20,7 +20,6 @@ public class RankingController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             List<RankingItemDTO> cachedRanking = cacheManager.getList(RankingFetchService.RANKING_CACHE_KEY);
-            System.out.println(cachedRanking);
             Gson gson = new Gson();
             String jsonResponse = gson.toJson(cachedRanking);
 

@@ -24,13 +24,13 @@ public class InmemoryCacheManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <V> V get(String key, Class<V> type) {
-        Object value = cacheStore.get(key);
-        if (value != null && type.isInstance(value)) {
-            return (V) value;
+        public <V> V get(String key, Class<V> type) {
+            Object value = cacheStore.get(key);
+            if (value != null && type.isInstance(value)) {
+                return (V) value;
+            }
+            return null;
         }
-        return null;
-    }
 
     public <T> List<T> getList(String key) {
         Object value = cacheStore.get(key);
