@@ -88,6 +88,7 @@ export function loadRealtimeData(code) {
             })
             .then(data => {
                 // data가 null일 경우, 빈 배열을 반환하여 이후 처리 로직의 오류를 방지
+                console.log(data)
                 const realtimeData = data || [];
 
                 // loadRealtimeData는 단일 종목을 요청하므로, 결과는 [종목객체] 형태이거나 종목객체일 수 있음.

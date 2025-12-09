@@ -194,17 +194,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     const dataArray = await loadRealtimeData(code);
                     const realtimeItem = dataArray && dataArray.length > 0 ? dataArray[0] : null;
+                    console.log(realtimeItem)
 
                     if (!realtimeItem) {
                         continue;
                     }
 
                     const mappedElements = realtimeDOMMap[code];
-                    const priceString = realtimeItem.curPrice;
-                    const rateString = realtimeItem.fluRt;
+                    const priceString = realtimeItem.realtime.curPrice;
+                    const rateString = realtimeItem.realtime.fluRt;
 
                     if (mappedElements && priceString && rateString) {
-
                         const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
                         const changeRate = parseFloat(rateString);
 
@@ -218,7 +218,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             const oldRateFormatted = parseFloat(oldRateTextRaw).toFixed(2);
                             const newRateFormatted = parseFloat(rateString).toFixed(2);
-
                             if (newRateFormatted !== oldRateFormatted) {
                                 mappedElements.rateSpan.textContent = newRateText;
                                 mappedElements.rateSpan.className = 'main__text-rate ' + priceClass;

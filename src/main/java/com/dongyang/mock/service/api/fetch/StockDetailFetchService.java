@@ -72,6 +72,7 @@ public class StockDetailFetchService extends FetchService implements ServletCont
 
             try {
                 boolean exists = DBManager.withConnection(conn -> stockDetailDAO.existsByStockCode(stkId, conn));
+                // boolean exists = DBManager.withConnection(conn->stockPriceDailyDAO.existsByStockId(stkId, conn));
 
                 if (!exists) {
                     runFetch(token, stkCd, stkId);

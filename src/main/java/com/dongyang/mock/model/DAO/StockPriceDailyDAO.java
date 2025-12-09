@@ -195,4 +195,18 @@ public class StockPriceDailyDAO {
 
         return dto;
     }
+
+    public Boolean existsByStockId(Long stkId, Connection conn) throws SQLException {
+        final String sql = "SELECT COUNT(*) FROM stock_price_daily WHERE stock_id = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, stkId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
 }

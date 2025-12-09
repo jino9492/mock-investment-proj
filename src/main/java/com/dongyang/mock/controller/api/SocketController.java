@@ -52,18 +52,17 @@ public class SocketController extends HttpServlet {
         // 응답 데이터 구성
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("realtime", cachedReal);
-        
-        // 로그인한 사용자의 구매 가능 금액 조회
+
         HttpSession session = req.getSession(false);
         if (session != null && session.getAttribute("member") != null) {
             MemberDTO member = (MemberDTO) session.getAttribute("member");
             int memId = member.getMemId();
-            
+
             try {
                 // DB에서 최신 예치금 조회
-                int virtualCash = DBManager.withConnection(conn -> 
-                    memberDAO.getVirtualCash(memId, conn));
-                
+                int virtualCash = DBManager.withConnection(conn ->
+                        memberDAO.getVirtualCash(memId, conn));
+
                 responseData.put("availableCash", virtualCash);
                 responseData.put("memberId", memId);
             } catch (SQLException e) {
@@ -76,7 +75,6 @@ public class SocketController extends HttpServlet {
             // 로그인하지 않은 경우
             responseData.put("availableCash", 0);
         }
-        
         String jsonResponse = gson.toJson(responseData);
 
         resp.setContentType("application/json");
