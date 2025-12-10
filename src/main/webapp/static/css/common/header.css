@@ -4,7 +4,7 @@
     background: white;
     user-select: none;
     top: 0;
-    height: 70px;
+    height: 50px;
     display: flex;
     align-items: center;
     z-index: 100;
@@ -13,7 +13,7 @@
 .header__top-inner {
     width: 100%;
     padding-left: 24px;
-    padding-right: 75px;
+    padding-right: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -27,7 +27,7 @@
 .header__top-right {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 10px;
 }
 
 .header__logo {
@@ -40,7 +40,7 @@
 
 .header__top-menu {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
     line-height: 100%;
     align-self: center;
 }
@@ -49,28 +49,28 @@
     display: block;
     text-align: center;
     width: 4vw;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
 }
 
 .header__top-menu li.selected {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .header__top-menu li a {
-    color: black;
+    color: #17171B;
 }
 
 .header__search-box {
     cursor: pointer;
     display: flex;
     align-items: center;
-    border: 0;
+    border: 0.5px solid #e6eaed;
     justify-content: flex-start;
     width: 170px;
-    height: 34px;
-    margin-right: 10px;
-    background-color: #F2F2F2;
+    height: 30px;
+    margin-right: 5px;
+    background-color: #f2f4f6;
     border-radius: 8px;
     
 }
@@ -84,8 +84,8 @@
 }
 
 .header__btn-login {
-    width: 86px;
-    height: 34px;
+    width: 82px;
+    height: 30px;
     margin-right: 32px;
     font-size: 14px;
     border-radius: 8px;
