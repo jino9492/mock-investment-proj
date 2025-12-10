@@ -34,7 +34,7 @@ body.stock-info-page {
 
 .stock-tabs__item {
     border: none;
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 20px;
     background-color: #F9F9F9;
     font-size: 15px;
@@ -45,7 +45,8 @@ body.stock-info-page {
 }
 
 .stock-tabs__item--active {
-    background-color: #D9D9D9;
+    background-color: #e9ecf0;
+    font-weight: 550;
 }
 
 /* 상단 헤더 */
@@ -53,7 +54,7 @@ body.stock-info-page {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 32px;
+    margin-bottom: 15px;
 }
 
 .stock-info__header-left {
@@ -63,8 +64,8 @@ body.stock-info-page {
 }
 
 .stock-info__header-title {
-    font-size: 32px;
-    font-weight: 500;
+    font-size: 28px;
+    font-weight: 600;
 }
 
 .stock-info__header-meta {
@@ -86,7 +87,7 @@ body.stock-info-page {
 .stock-info__basic-row {
     display: flex;
     gap: 40px;
-    padding: 10px 0;
+    padding-top: 10px;
 }
 
 
@@ -102,7 +103,7 @@ body.stock-info-page {
     display: flex;
     align-items: center;
     white-space: nowrap;
-    padding-bottom: 15px;
+    padding-bottom: 5px;
     border-bottom: 1px solid #e8e8e8;
 }
 

@@ -35,7 +35,6 @@
 .stock-header__info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
 }
 
 .stock-header__name {
@@ -70,7 +69,7 @@
 
 .stock-tabs__item {
     border: none;
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 20px;
     background-color: #F9F9F9;
     font-size: 15px;
@@ -80,7 +79,8 @@
 }
 
 .stock-tabs__item--active {
-    background-color: #D9D9D9;
+    background-color: #e9ecf0;
+    font-weight: 550;
 }
 
 .order-card__order-type-hidden, .order-card__conditional-order--hidden, .order-card__wait-orders--hidden {
