@@ -15,9 +15,9 @@
                 <c:if test="${not empty daily and not empty daily.closePrice}">
                     <span class="stock-header__price"><fmt:formatNumber value="${daily.getClosePrice().abs()}" pattern="#,###" />원</span>
                     <span class="stock-header__diff">
-                        <c:set var="isUp" value="${daily.getChangePrice() > 0}" />
-                        어제보다&nbsp;<span class="stock-header__diff-value" style="color:${isUp ? "#F04452" : "#3182F6"}">
-                        ${isUp ? "+" : ""}<fmt:formatNumber value="${daily.getChangePrice()}" pattern="#,###" />원 (${daily.getChangeRate().abs()}%)
+                        <c:set var="changePrice" value="${daily.getChangePrice()}" />
+                        어제보다&nbsp;<span class="stock-header__diff-value <c:choose><c:when test="${changePrice > 0}">price-color--up</c:when><c:when test="${changePrice < 0}">price-color--down</c:when><c:otherwise>price-color--neutral</c:otherwise></c:choose>">
+                        <c:if test="${changePrice > 0}">+</c:if><fmt:formatNumber value="${daily.getChangePrice()}" pattern="#,###" />원 (${daily.getChangeRate().abs()}%)
                     </span>
                     </span>
                 </c:if>

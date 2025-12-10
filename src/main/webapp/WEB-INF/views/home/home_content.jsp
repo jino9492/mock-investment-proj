@@ -51,19 +51,19 @@
             <td>1</td>
             <td>주식회사이름</td>
             <td>000원</td>
-            <td><span class="main__text-purple">000원  +/-0.00%</span></td>
+            <td><span class="price-color--neutral">000원  +/-0.00%</span></td>
           </tr>
           <tr>
             <td>2</td>
             <td>주식회사이름</td>
             <td>000원</td>
-            <td><span class="main__text-purple">000원   +/-0.00%</span></td>
+            <td><span class="price-color--neutral">000원   +/-0.00%</span></td>
           </tr>
           <tr>
             <td>3</td>
             <td>주식회사이름</td>
             <td>000원</td>
-            <td><span class="main__text-purple">000원   +/-0.00%</span></td>
+            <td><span class="price-color--neutral">000원   +/-0.00%</span></td>
           </tr>
           </tbody>
         </table>

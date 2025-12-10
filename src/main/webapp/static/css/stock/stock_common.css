@@ -57,9 +57,7 @@
     font-size: 17px;
 }
 
-.stock-header__diff-value {
-    color: #9000FF;
-}
+/* .stock-header__diff-value의 색상은 price-color--* 클래스가 제어합니다 */
 
 /* 상단 탭 */
 .stock-tabs {

@@ -172,7 +172,7 @@ ul {
 
 .main__summary-value span {
   font-size: 14px;
-  color: #a65af7;
+  color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
 }
 
 .main__divider {
@@ -205,16 +205,17 @@ ul {
   text-align: center;
 }
 
-.main__text-purple {
-  color: #a65af7;
-}
-
+/* 호환성을 위한 기존 클래스 - 공통 클래스 사용 권장 */
 .main__text-red {
-  color: #FF5252;
+  color: #F04452; /* 공통 색상으로 통일 */
 }
 
 .main__text-blue {
-  color: #42A5F5
+  color: #3182F6; /* 공통 색상으로 통일 */
+}
+
+.main__text-zero {
+  color: #666666; /* 공통 색상으로 통일 */
 }
 
 /* 인덱스 카드 */

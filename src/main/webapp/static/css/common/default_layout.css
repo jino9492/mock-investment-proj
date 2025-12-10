@@ -1,3 +1,6 @@
+/* 공통 가격 색상 스타일 */
+@import url('price_color.css');
+
 .layout__page-wrap {
     display: flex;
     flex: 1;

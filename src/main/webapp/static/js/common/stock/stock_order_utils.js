@@ -2,6 +2,7 @@
  * Stock Order 공통 유틸리티 함수
  * 주문 관련 공통 함수들을 제공합니다.
  */
+import {getPriceColorCode, formatPriceChange} from "../price_color_utils.js";
 
 /**
  * 숫자를 천 단위 콤마가 포함된 문자열로 포맷팅
@@ -87,7 +88,7 @@ export function updateWatchPriceInfo(watchPriceInput, watchPriceInfo) {
     
     if (!currentPriceStr) {
         watchPriceInfo.textContent = "현재가 보다 0.00%";
-        watchPriceInfo.style.color = "#666"; // 회색
+        watchPriceInfo.style.color = getPriceColorCode(0);
         return;
     }
 
@@ -100,7 +101,7 @@ export function updateWatchPriceInfo(watchPriceInput, watchPriceInfo) {
         } else {
             watchPriceInfo.textContent = "현재가 보다 0.00%";
         }
-        watchPriceInfo.style.color = "#666"; // 회색
+        watchPriceInfo.style.color = getPriceColorCode(0);
         return;
     }
 
@@ -111,69 +112,38 @@ export function updateWatchPriceInfo(watchPriceInput, watchPriceInfo) {
     
     // 보유 주식이 있는 경우 평단가 비교
     let finalText = "";
-    let finalColor = "#666"; // 기본값: 회색
     
     if (avgPriceStr) {
         const avgPrice = parseFloat(avgPriceStr);
         if (!isNaN(avgPrice) && avgPrice > 0) {
             const avgPriceDiff = ((currentPrice - avgPrice) / avgPrice) * 100;
             
-            // 감시가격 기준 텍스트 생성 (음수일 때도 - 기호 표시)
-            let watchPriceText = "";
-            if (watchPriceDiff > 0) {
-                watchPriceText = `현재가 보다 +${watchPriceDiff.toFixed(2)}%`;
-            } else if (watchPriceDiff < 0) {
-                watchPriceText = `현재가 보다 ${watchPriceDiff.toFixed(2)}%`;
-            } else {
-                watchPriceText = `현재가 보다 0.00%`;
-            }
+            // 감시가격 기준 텍스트 생성
+            const watchPriceText = watchPriceDiff === 0 
+                ? `현재가 보다 0.00%`
+                : `현재가 보다 ${formatPriceChange(watchPriceDiff)}%`;
             
             // 평단가 기준 텍스트 생성
-            let avgPriceText = "";
-            if (avgPriceDiff > 0) {
-                avgPriceText = `평단 보다 +${avgPriceDiff.toFixed(2)}%`;
-            } else if (avgPriceDiff < 0) {
-                avgPriceText = `평단 보다 ${avgPriceDiff.toFixed(2)}%`;
-            } else {
-                avgPriceText = `평단 보다 0.00%`;
-            }
+            const avgPriceText = avgPriceDiff === 0
+                ? `평단 보다 0.00%`
+                : `평단 보다 ${formatPriceChange(avgPriceDiff)}%`;
             
             finalText = `${watchPriceText} 내 ${avgPriceText}`;
-            
-            // 색상 결정: watchPriceDiff 기준으로 색상 결정
-            if (watchPriceDiff > 0) {
-                finalColor = "#F04452"; // 빨간색 (양수)
-            } else if (watchPriceDiff < 0) {
-                finalColor = "#3182F6"; // 파란색 (음수)
-            } else {
-                finalColor = "#666"; // 회색 (0)
-            }
         } else {
             // 평단가가 없거나 유효하지 않은 경우
-            if (watchPriceDiff > 0) {
-                finalText = `현재가 보다 +${watchPriceDiff.toFixed(2)}%`;
-                finalColor = "#F04452"; // 빨간색
-            } else if (watchPriceDiff < 0) {
-                finalText = `현재가 보다 ${watchPriceDiff.toFixed(2)}%`;
-                finalColor = "#3182F6"; // 파란색
-            } else {
-                finalText = `현재가 보다 0.00%`;
-                finalColor = "#666"; // 회색
-            }
+            finalText = watchPriceDiff === 0
+                ? `현재가 보다 0.00%`
+                : `현재가 보다 ${formatPriceChange(watchPriceDiff)}%`;
         }
     } else {
         // 평단가 정보가 없는 경우
-        if (watchPriceDiff > 0) {
-            finalText = `현재가 보다 +${watchPriceDiff.toFixed(2)}%`;
-            finalColor = "#F04452"; // 빨간색
-        } else if (watchPriceDiff < 0) {
-            finalText = `현재가 보다 ${watchPriceDiff.toFixed(2)}%`;
-            finalColor = "#3182F6"; // 파란색
-        } else {
-            finalText = `현재가 보다 0.00%`;
-            finalColor = "#666"; // 회색
-        }
+        finalText = watchPriceDiff === 0
+            ? `현재가 보다 0.00%`
+            : `현재가 보다 ${formatPriceChange(watchPriceDiff)}%`;
     }
+    
+    // 색상 결정: watchPriceDiff 기준으로 색상 결정
+    const finalColor = getPriceColorCode(watchPriceDiff);
     
     watchPriceInfo.textContent = finalText;
     watchPriceInfo.style.color = finalColor;

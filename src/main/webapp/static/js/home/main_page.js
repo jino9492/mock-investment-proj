@@ -1,5 +1,6 @@
 // main_page.js
 import {loadIndexSparklineData, loadRankingData, loadRealtimeData} from "../common/api/fetch_utils.js";
+import {getPriceColorClass} from "../common/price_color_utils.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     const indexNames = document.querySelectorAll('.main__index-name');
@@ -97,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const isPositive = item.fluRt > 0;
                 const isNegative = item.fluRt < 0;
 
-                const priceClass = isPositive ? 'main__text-red' : (isNegative ? 'main__text-blue' : 'main__text-zero');
+                const priceClass = getPriceColorClass(item.fluRt);
 
                 const rateSign = isPositive ? '+' : (isNegative ? '-' : '');
 
@@ -214,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const newRateText = `${rateString}%`;
 
                             const isPositive = changeRate > 0;
-                            const priceClass = isPositive ? 'main__text-red' : (changeRate < 0 ? 'main__text-blue' : 'main__text-zero');
+                            const priceClass = getPriceColorClass(changeRate);
 
                             const oldRateFormatted = parseFloat(oldRateTextRaw).toFixed(2);
                             const newRateFormatted = parseFloat(rateString).toFixed(2);
