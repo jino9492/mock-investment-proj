@@ -369,7 +369,6 @@ ul {
 
 /* 인덱스 카드 */
 .main__index-section {
-  position: sticky;
   top: 70px;
   padding-bottom: 24px;
   background: white;
@@ -664,10 +663,7 @@ section{
   margin-top: 24px;
 }
 
-.main__section-title{
-  z-index: 100;
-  background: white;
-}
+
 
 .main__stock-section > *{
   position: sticky;
