@@ -665,10 +665,7 @@ section{
   margin-top: 24px;
 }
 
-.main__section-title{
-  z-index: 100;
-  background: white;
-}
+
 
 .main__stock-section > *{
   position: sticky;
