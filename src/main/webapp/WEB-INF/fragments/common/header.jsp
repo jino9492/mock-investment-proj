@@ -98,6 +98,7 @@
                         </div>
 
                         <ul class="search-modal__list">
+                            
                             <li class="search-modal__list-item">
                                 <span class="search-modal__rank">1</span>
                                 <span class="search-modal__name">주식회사A</span>
