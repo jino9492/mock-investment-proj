@@ -28,7 +28,7 @@ public class StockDetailController extends HttpServlet {
         String code = reqest.getParameter("code");
         try {
             stockDetailDTO = DBManager.withConnection(conn->{
-               Long stockId = Long.parseLong(stockDAO.getStockIdByCode(code, conn));
+               Long stockId = stockDAO.getStockIdByCode(code, conn);
                return stockDetailDAO.selectStockDetailById(stockId, conn);
             });
         } catch (SQLException e) {

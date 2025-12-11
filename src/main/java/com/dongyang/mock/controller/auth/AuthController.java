@@ -1,7 +1,10 @@
 package com.dongyang.mock.controller.auth;
 
+import com.dongyang.mock.service.api.StockChartService;
 import com.dongyang.mock.service.auth.AuthService;
 import java.io.IOException;
+import java.sql.SQLException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -28,6 +31,13 @@ public class AuthController extends HttpServlet {
         String token = authService.issueAccessToken();
 
         AuthResponseDTO responseDTO;
+
+        StockChartService stockChartService = new StockChartService();
+        try {
+            stockChartService.reCalculateAndUpateZeroChangeRates();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         if (token != null) {
             responseDTO = new AuthResponseDTO(true, token, "Access Token Issued");
