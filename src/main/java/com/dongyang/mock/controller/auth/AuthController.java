@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.dongyang.mock.model.DTO.AuthResponseDTO;
 import com.google.gson.Gson;
 
-@WebServlet("/auth")
+@WebServlet("/api/auth")
 public class AuthController extends HttpServlet {
     private AuthService authService;
     private final Gson gson = new Gson(); // Gson 인스턴스 생성
