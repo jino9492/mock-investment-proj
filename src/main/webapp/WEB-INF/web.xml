@@ -17,4 +17,15 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.xhtml</welcome-file>
   </welcome-file-list>
+  
+  <!-- JDBC 드라이버 정리 리스너 -->
+  <listener>
+    <listener-class>com.dongyang.mock.listener.DatabaseCleanupListener</listener-class>
+  </listener>
+  
+  <!-- 정적 리소스 서블릿 매핑 (기본 서블릿) -->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/static/*</url-pattern>
+  </servlet-mapping>
 </web-app>

@@ -15,6 +15,13 @@ class LeaguePage {
      * 초기화
      */
     init() {
+        // 서버 사이드에서 렌더링된 초기 데이터를 JavaScript 변수로 전달
+        // 초기 로드 시 API 호출하지 않고 서버 사이드 데이터 사용
+        window.leagueInitialData = {
+            hasInitialData: true,
+            lastUpdateTime: new Date().getTime()
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             this.initializePage();
         });
