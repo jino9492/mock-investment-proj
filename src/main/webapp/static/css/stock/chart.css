@@ -1,0 +1,222 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.stock-page {
+    background-color: #F6F7F9;
+    display: flex;
+    min-height: 100vh;
+    max-width: calc(100% - 20px);
+    width: 100%;
+}
+
+
+.stock-page__container {
+    margin-top: 20px;
+    margin-left: 70px;
+    margin-right: 80px;
+    transition: margin-right 0.3s ease;
+}
+
+
+
+/* 상단 종목 정보 */
+.stock-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stock-header__left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.stock-header__logo {
+    width: 65px;
+    height: 65px;
+    border-radius: 10px;
+    background-color: #d9d9d9;
+}
+
+.stock-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stock-header__name {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.stock-header__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.stock-header__price {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.stock-header__diff {
+    font-size: 17px;
+
+}
+
+.stock-header__diff-value {
+    color: #9000FF;
+}
+
+/* 상단 탭 */
+
+.stock-tabs {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.stock-tabs__item {
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background-color: #F9F9F9;
+    font-size: 17px;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+
+}
+
+.stock-tabs__item--active {
+    background-color: #D9D9D9;
+}
+
+/* 메인 레이아웃 */
+
+.stock-main {
+    display: flex;
+    gap: 24px;
+}
+
+/* 왼쪽 영역 */
+
+.stock-main__left {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.stock-range-tabs {
+    display: flex;
+    align-items: center;
+    margin-bottom: 11px;
+
+}
+
+.stock-range-tabs__select {
+    margin-right: 15px;
+    padding: 6px 12px;
+    font-size: 17px;
+    border-radius: 10px;
+    border: 1px solid #dcdcdc;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.stock-range-tabs__item {
+    width: 100%;
+    max-width: 40px;
+    height: 35px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: none;
+    background-color: #D9D9D9;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.stock-range-tabs__item--active {
+    background-color: #ffffff;
+}
+
+.stock-range-tabs__item--icon {
+    min-width: 60px;
+    margin-left: 15px;
+}
+
+.stock-chart-card,
+.stock-quote-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.stock-chart-card {
+    height: 450px;
+    width: 100%;
+    margin-bottom: 16px;
+    max-width: 930px;
+}
+
+.stock-chart-card__content {
+    max-width: 100%;
+    width: 100%;
+    height: 365px;
+    background-color: #dcdcdc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.stock-quote-card {
+    height: 308px;
+    width: 100%;
+    max-width: 930px;
+}
+
+.stock-quote-card__content {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+/* 내 주식 카드 */
+
+.my-stock-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px 24px 24px;
+    width: 380px;
+    max-width: calc(100% - 75px);
+    height: 778px;
+}
+
+
+.my-stock-card__title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.my-stock-card__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.my-stock-card__profit {
+    color: #9000FF;
+}
