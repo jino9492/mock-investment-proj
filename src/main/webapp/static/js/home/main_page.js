@@ -2,6 +2,7 @@
 import {loadIndexSparklineData, loadRankingData, loadRealtimeData} from "../common/api/fetch_utils.js";
 import {getPriceColorClass} from "../common/price_color_utils.js";
 import {registerToSocket} from "../common/api/socket.js";
+import {fetchAndUpdateStockDetail} from "./chart_card.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     const indexNames = document.querySelectorAll('.main__index-name');
@@ -111,6 +112,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (index === 0) {
                     activeHoverElement = targetRow;
                     targetRow.classList.add('is-active-hover');
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('code', stkCode);
+                    window.history.pushState({path: url.href}, '', url.href);
+
+                    fetchAndUpdateStockDetail(stkCode);
                 }
 
                 if (targetRow) {
@@ -155,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         url.searchParams.set('code', stkCode);
                         window.history.pushState({path: url.href}, '', url.href);
 
+                        fetchAndUpdateStockDetail(stkCode);
                     });
 
                     targetRow.addEventListener('click', () => {

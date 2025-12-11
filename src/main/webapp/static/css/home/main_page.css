@@ -370,8 +370,9 @@ ul {
 /* 인덱스 카드 */
 .main__index-section {
   position: sticky;
-  top: 70px;
+  top: 46px;
   padding-bottom: 24px;
+  padding-top: 24px;
   background: white;
   z-index: 100;
 }

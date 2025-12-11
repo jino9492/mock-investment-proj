@@ -133,6 +133,24 @@ public class StockDAO {
         return stock;
     }
 
+    public String getStockIdByCode(String stockCode, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id FROM stock WHERE stock_symbol = ?";
+        String stockId = null;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, stockCode);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    stockId = rs.getString("stock_id");
+                    return stockId;
+                }
+            }
+            catch (SQLException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
     private StockDTO mapResultSetToStockDTO(ResultSet rs) throws SQLException {
         StockDTO dto = new StockDTO();
         dto.setStockId(rs.getLong("stock_id"));

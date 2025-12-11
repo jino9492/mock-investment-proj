@@ -199,41 +199,7 @@
         </c:forEach>
       </section>
 
-      <!-- 오른쪽 차트 카드 -->
-      <section class="main__card chart-card">
-        <div class="main__chart-header">
-          <strong>주식회사이름A</strong>
-          <span>000원  +/-0.00%</span>
-        </div>
-
-        <div class="main__chart-box">차트</div>
-
-
-        <div class="main__chart-info">
-          <div>
-            <span class="main__chart-info-label">기업명</span>
-            <span>○○</span>
-          </div>
-          <div>
-            <span class="main__chart-info-label">시가총액</span>
-            <span>000,000,000,000원</span>
-          </div>
-          <div>
-            <span class="main__chart-info-label">상장일</span>
-            <span>0000.00.00</span>
-          </div>
-          <div>
-            <span class="main__chart-info-label">발행주식수</span>
-            <span>00,000주</span>
-          </div>
-        </div>
-
-        <div class="main__chip-area">
-          <div class="main__chip-title">주요 사업</div>
-          <div class="main__chip-box"></div>
-        </div>
-      </section>
-
+      <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/home/chart_card.jsp" />
     </div>
   </section>
 
