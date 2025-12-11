@@ -7,6 +7,7 @@ class WebSocketClient {
         this.websocket = null;
         this.connected = false;
         this.currentResponse = {};
+        this.recentRegisteredKeys = [];
     }
 
     // WebSocket 서버 연결
@@ -76,8 +77,15 @@ class WebSocketClient {
                 }
 
                 if (response.trnm !== 'PING') {
-                    this.currentResponse = response;
                     console.log('실시간 시세 서버 응답 수신:', response);
+                    if (response.trnm === 'SYSTEM' && response.code === 'R10001'){
+                        this.connect();
+                        this.register(this.recentRegisteredKeys);
+                        console.log("소켓 재연결 (keys:" + this.recentRegisteredKeys + ")");
+                    }
+                    else{
+                        this.currentResponse = response;
+                    }
                 }
             };
         });
@@ -102,27 +110,32 @@ class WebSocketClient {
         }
     }
 
+    register(items) {
+        this.recentRegisteredKeys = items;
+        setTimeout(() => {
+            this.sendMessage({
+                'trnm': 'REG', // 서비스명
+                'grp_no': '1', // 그룹번호
+                'refresh': '1', // 기존등록유지여부
+                'data': [{ // 실시간 등록 리스트
+                    'item': items, // 실시간 등록 요소
+                    'type': ['0B'], // 실시간 항목
+                }]
+            });
+        }, 1000);
+    }
+
     getRecentResponse(){
         return this.currentResponse;
     }
 }
 
 // 실시간 호출 함수
-export async function register(items) {
+export async function registerToSocket(items) {
     const websocketClient = new WebSocketClient(SOCKET_URL);
     await websocketClient.connect();
 
-    setTimeout(() => {
-        websocketClient.sendMessage({
-            'trnm': 'REG', // 서비스명
-            'grp_no': '1', // 그룹번호
-            'refresh': '1', // 기존등록유지여부
-            'data': [{ // 실시간 등록 리스트
-                'item': items, // 실시간 등록 요소
-                'type': ['0B'], // 실시간 항목
-            }]
-        });
-    }, 1000);
+    websocketClient.register(items);
 
     return websocketClient;
 }

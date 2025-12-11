@@ -1,7 +1,7 @@
 // main_page.js
 import {loadIndexSparklineData, loadRankingData, loadRealtimeData} from "../common/api/fetch_utils.js";
 import {getPriceColorClass} from "../common/price_color_utils.js";
-import {register} from "../common/api/socket.js";
+import {registerToSocket} from "../common/api/socket.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     const indexNames = document.querySelectorAll('.main__index-name');
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            const socket = await register(subscribedCodes);
+            const socket = await registerToSocket(subscribedCodes);
             startRealtimeUpdates(subscribedCodes, socket);
 
         })
