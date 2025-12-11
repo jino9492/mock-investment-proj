@@ -559,7 +559,7 @@ public class MemberDAO {
                 "h.quantity * spd.close_price as evaluation_amount, " +
                 "(spd.close_price - h.avg_buy_price) * h.quantity as profit_loss, " +
                 "CASE " +
-                "  WHEN h.avg_buy_price > 0 " +
+                "  WHEN h.avg_buy_price > 0 AND (spd.close_price - h.avg_buy_price) != 0 " +
                 "  THEN ((spd.close_price - h.avg_buy_price) / h.avg_buy_price) * 100 " +
                 "  ELSE 0 " +
                 "END as profit_rate " +
@@ -620,7 +620,7 @@ public class MemberDAO {
                 "h.quantity * spd.close_price as evaluation_amount, " +
                 "(spd.close_price - h.avg_buy_price) * h.quantity as profit_loss, " +
                 "CASE " +
-                "  WHEN h.avg_buy_price > 0 " +
+                "  WHEN h.avg_buy_price > 0 AND (spd.close_price - h.avg_buy_price) != 0 " +
                 "  THEN ((spd.close_price - h.avg_buy_price) / h.avg_buy_price) * 100 " +
                 "  ELSE 0 " +
                 "END as profit_rate " +

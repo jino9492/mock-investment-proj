@@ -9,43 +9,62 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
 
 
 @WebServlet("/stock_info")
 public class StockInfoController extends HttpServlet {
 
     private final String viewPage = "/WEB-INF/views/stock/info.jsp";
+    private final StockDetailService stockDetailService = new StockDetailService();
+    
+    /**
+     * 종목 코드 파라미터를 파싱합니다.
+     * @param req HTTP 요청
+     * @return 파싱된 종목 코드
+     * @throws ServletException 파라미터가 없거나 잘못된 형식인 경우
+     */
+    private Long parseStockCode(HttpServletRequest req) throws ServletException {
+        String codeParam = req.getParameter("code");
+        if (codeParam == null || codeParam.trim().isEmpty()) {
+            throw new ServletException("종목 코드가 필요합니다.");
+        }
+        
+        try {
+            return Long.parseLong(codeParam);
+        } catch (NumberFormatException e) {
+            throw new ServletException("올바른 종목 코드 형식이 아닙니다.");
+        }
+    }
+    
+    /**
+     * 종목 상세 정보를 조회하여 request에 설정합니다.
+     * @param stkCode 종목 코드
+     * @param req HTTP 요청
+     * @throws Exception 조회 실패 시
+     */
+    private void loadStockDetails(Long stkCode, HttpServletRequest req) throws Exception {
+        StockDTO stockDTO = stockDetailService.getStockByCode(stkCode);
+        Long stkId = stockDTO.getStockId();
+        
+        req.setAttribute("stock", stockDTO);
+        req.setAttribute("detail", stockDetailService.getStockDetailById(stkId));
+        req.setAttribute("indicator", stockDetailService.getFinancialIndicatorById(stkId));
+        req.setAttribute("summary", stockDetailService.getFinancialSummaryById(stkId));
+        req.setAttribute("daily", stockDetailService.getStockPriceDailyById(stkId));
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        Long stkCode = Long.parseLong(req.getParameter("code"));
-
-        StockDetailService stockDetailService = new StockDetailService();
-
-        StockDTO stockDTO;
-        StockDetailDTO stockDetailDTO;
-        StockFinancialIndicatorDTO stockFinancialIndicatorDTO;
-        StockFinancialSummaryDTO stockFinancialSummaryDTO;
-        StockPriceDailyDTO stockPriceDailyDTO;
-
-        try{
-            stockDTO = stockDetailService.getStockByCode(stkCode);
-            Long stkId = stockDTO.getStockId();
-            stockDetailDTO = stockDetailService.getStockDetailById(stkId);
-            stockFinancialIndicatorDTO = stockDetailService.getFinancialIndicatorById(stkId);
-            stockFinancialSummaryDTO = stockDetailService.getFinancialSummaryById(stkId);
-            stockPriceDailyDTO = stockDetailService.getStockPriceDailyById(stkId);
-
-            req.setAttribute("stock", stockDTO);
-            req.setAttribute("detail", stockDetailDTO);
-            req.setAttribute("indicator", stockFinancialIndicatorDTO);
-            req.setAttribute("summary", stockFinancialSummaryDTO);
-            req.setAttribute("daily", stockPriceDailyDTO);
-        } catch (Exception e){
+        try {
+            Long stkCode = parseStockCode(req);
+            loadStockDetails(stkCode, req);
+        } catch (Exception e) {
             e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+                "종목 정보를 조회하는 중 오류가 발생했습니다.");
+            return;
         }
 
         req.getRequestDispatcher(viewPage).forward(req, resp);
@@ -54,7 +73,6 @@ public class StockInfoController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         req.getRequestDispatcher(viewPage).forward(req, resp);
     }
 }

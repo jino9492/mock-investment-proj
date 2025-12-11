@@ -172,6 +172,16 @@ public class OrderService {
     }
 
     /**
+     * 주문 ID로 주문 조회
+     * @param orderId 주문 ID
+     * @return 주문 정보, 없으면 null
+     * @throws SQLException
+     */
+    public OrderDTO findOrderById(long orderId) throws SQLException {
+        return DBManager.withConnection(conn -> orderDAO.findOrderById(orderId, conn));
+    }
+
+    /**
      * 특정 종목에 대한 대기 중인 판매 주문 수량 조회
      * @param memId 회원 ID
      * @param stockId 종목 ID
@@ -424,6 +434,330 @@ public class OrderService {
             } else {
                 return DBManager.TransactionResult.rollback(false);
             }
+        });
+    }
+
+    /**
+     * 조건 주문 활성화/비활성화 토글
+     * @param orderId 조건 주문 ID
+     * @param memId 주문을 소유한 회원 ID (권한 확인용)
+     * @param isActive 활성화 여부
+     * @return 토글 성공 여부
+     * @throws SQLException
+     * @throws IllegalArgumentException 주문을 찾을 수 없거나 권한이 없을 때
+     */
+    public boolean toggleConditionalOrder(long orderId, int memId, boolean isActive) throws SQLException, IllegalArgumentException {
+        return DBManager.executeInTransaction(conn -> {
+            // 주문 조회 및 권한 확인
+            OrderDTO order = orderDAO.findOrderById(orderId, conn);
+            if (order == null) {
+                throw new RuntimeException(new IllegalArgumentException("주문을 찾을 수 없습니다."));
+            }
+            
+            // 주문 소유자 확인
+            if (order.getMemId() != memId) {
+                throw new RuntimeException(new IllegalArgumentException("주문을 수정할 권한이 없습니다."));
+            }
+            
+            // 조건 주문인지 확인
+            if (!order.isHasCondition()) {
+                throw new RuntimeException(new IllegalArgumentException("조건 주문이 아닙니다."));
+            }
+            
+            // 대기 중인 주문만 토글 가능
+            if (!"PENDING".equals(order.getStatus())) {
+                throw new RuntimeException(new IllegalArgumentException("대기 중인 주문만 활성화/비활성화할 수 있습니다."));
+            }
+            
+            // 조건 주문 활성화 상태 변경
+            orderConditionDAO.toggleCondition(orderId, isActive, conn);
+            
+            return DBManager.TransactionResult.commit(true);
+        });
+    }
+
+    /**
+     * 조건 주문 수정
+     * @param orderId 조건 주문 ID
+     * @param memId 주문을 소유한 회원 ID (권한 확인용)
+     * @param watchPrice 감시 가격 (null이면 업데이트하지 않음)
+     * @param price 주문 가격 (null이면 업데이트하지 않음)
+     * @param quantity 주문 수량 (null이면 업데이트하지 않음)
+     * @param isActive 활성화 여부 (null이면 업데이트하지 않음)
+     * @param orderDuration 주문 유지 기간 (null이면 업데이트하지 않음)
+     * @return 수정 성공 여부
+     * @throws SQLException
+     * @throws IllegalArgumentException 주문을 찾을 수 없거나 권한이 없을 때, 유효성 검증 실패 시
+     */
+    public boolean updateConditionalOrder(long orderId, int memId, BigDecimal watchPrice, BigDecimal price, 
+                                         Long quantity, Boolean isActive, String orderDuration) 
+                                         throws SQLException, IllegalArgumentException {
+        return DBManager.executeInTransaction(conn -> {
+            // 주문 조회 및 권한 확인
+            OrderDTO order = orderDAO.findOrderById(orderId, conn);
+            if (order == null) {
+                throw new RuntimeException(new IllegalArgumentException("주문을 찾을 수 없습니다."));
+            }
+            
+            // 주문 소유자 확인
+            if (order.getMemId() != memId) {
+                throw new RuntimeException(new IllegalArgumentException("주문을 수정할 권한이 없습니다."));
+            }
+            
+            // 조건 주문인지 확인
+            if (!order.isHasCondition()) {
+                throw new RuntimeException(new IllegalArgumentException("조건 주문이 아닙니다."));
+            }
+            
+            // 대기 중인 주문만 수정 가능
+            if (!"PENDING".equals(order.getStatus())) {
+                throw new RuntimeException(new IllegalArgumentException("대기 중인 주문만 수정할 수 있습니다."));
+            }
+            
+            // 주문 정보 업데이트 (가격, 수량)
+            if (price != null || quantity != null) {
+                // 수량 검증 (판매 주문인 경우 보유 수량 확인)
+                if (quantity != null && "SELL".equals(order.getSide())) {
+                    com.dongyang.mock.model.DTO.MemberHoldingDTO holding = 
+                        memberDAO.findHoldingByStock(memId, order.getStockId(), conn);
+                    
+                    if (holding == null) {
+                        throw new RuntimeException(new IllegalArgumentException("보유하지 않은 종목입니다."));
+                    }
+                    
+                    long pendingSellQuantity = orderDAO.getPendingSellOrderQuantity(memId, order.getStockId(), conn);
+                    long currentOrderQuantity = order.getQuantity();
+                    long availableQuantity = holding.getQuantity() - (pendingSellQuantity - currentOrderQuantity);
+                    
+                    if (quantity > availableQuantity) {
+                        throw new RuntimeException(new IllegalArgumentException(
+                            "거래 가능한 수량(" + availableQuantity + "주)을 초과할 수 없습니다."));
+                    }
+                }
+                
+                // 가격 검증
+                if (price != null && price.compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new RuntimeException(new IllegalArgumentException("가격은 0보다 커야 합니다."));
+                }
+                
+                // 수량 검증
+                if (quantity != null && quantity <= 0) {
+                    throw new RuntimeException(new IllegalArgumentException("수량은 1 이상이어야 합니다."));
+                }
+                
+                orderDAO.updateOrder(orderId, price, quantity, conn);
+            }
+            
+            // 조건 주문 정보 업데이트 (감시 가격, 유효 기간, 활성화 상태)
+            Timestamp validUntil = null;
+            if (orderDuration != null) {
+                validUntil = calculateValidUntil(orderDuration);
+            }
+            
+            if (watchPrice != null || validUntil != null || isActive != null) {
+                if (watchPrice != null && watchPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new RuntimeException(new IllegalArgumentException("감시 가격은 0보다 커야 합니다."));
+                }
+                
+                orderConditionDAO.updateCondition(orderId, watchPrice, validUntil, conn);
+                
+                // 활성화 상태 업데이트
+                if (isActive != null) {
+                    OrderConditionDTO condition = orderConditionDAO.findConditionByOrderId(orderId, conn);
+                    if (condition != null && condition.isActive() != isActive) {
+                        orderConditionDAO.toggleCondition(orderId, isActive, conn);
+                    }
+                }
+            }
+            
+            return DBManager.TransactionResult.commit(true);
+        });
+    }
+
+    /**
+     * 일반 주문 수정
+     * @param orderId 주문 ID
+     * @param memId 주문을 소유한 회원 ID (권한 확인용)
+     * @param orderType 주문 유형 (LIMIT/MARKET, null이면 업데이트하지 않음)
+     * @param price 주문 가격 (null이면 업데이트하지 않음, MARKET 주문인 경우 무시됨)
+     * @param quantity 주문 수량 (null이면 업데이트하지 않음)
+     * @return 수정 성공 여부
+     * @throws SQLException
+     * @throws IllegalArgumentException 주문을 찾을 수 없거나 권한이 없을 때, 유효성 검증 실패 시
+     */
+    public boolean updateGeneralOrder(long orderId, int memId, String orderType, BigDecimal price, Long quantity) 
+            throws SQLException, IllegalArgumentException {
+        return DBManager.executeInTransaction(conn -> {
+            // 주문 조회 및 권한 확인
+            OrderDTO order = orderDAO.findOrderById(orderId, conn);
+            if (order == null) {
+                throw new RuntimeException(new IllegalArgumentException("주문을 찾을 수 없습니다."));
+            }
+            
+            // 주문 소유자 확인
+            if (order.getMemId() != memId) {
+                throw new RuntimeException(new IllegalArgumentException("주문을 수정할 권한이 없습니다."));
+            }
+            
+            // 조건 주문이 아닌지 확인
+            if (order.isHasCondition()) {
+                throw new RuntimeException(new IllegalArgumentException("일반 주문만 수정할 수 있습니다."));
+            }
+            
+            // 대기 중인 주문만 수정 가능
+            if (!"PENDING".equals(order.getStatus())) {
+                throw new RuntimeException(new IllegalArgumentException("대기 중인 주문만 수정할 수 있습니다."));
+            }
+            
+            // 최종 주문 유형 결정
+            String finalOrderType = orderType != null ? orderType : order.getOrderType();
+            
+            // 최종 가격 결정
+            BigDecimal finalPrice = null;
+            if ("LIMIT".equals(finalOrderType)) {
+                // LIMIT 주문인 경우 가격 필요
+                if (price != null) {
+                    finalPrice = price;
+                } else if (order.getPrice() == null) {
+                    throw new RuntimeException(new IllegalArgumentException("지정가 주문은 가격이 필요합니다."));
+                } else {
+                    finalPrice = order.getPrice();
+                }
+            } else {
+                // MARKET 주문인 경우 가격은 null
+                finalPrice = null;
+            }
+            
+            // 최종 수량 결정
+            Long finalQuantity = quantity != null ? quantity : order.getQuantity();
+            
+            // 유효성 검증
+            if (finalPrice != null && finalPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException(new IllegalArgumentException("가격은 0보다 커야 합니다."));
+            }
+            
+            if (finalQuantity <= 0) {
+                throw new RuntimeException(new IllegalArgumentException("수량은 1 이상이어야 합니다."));
+            }
+            
+            // 구매 주문 검증
+            if ("BUY".equals(order.getSide())) {
+                int virtualCash = memberDAO.getVirtualCash(memId, conn);
+                
+                // 총 주문 금액 계산
+                long totalAmount;
+                if (finalPrice != null) {
+                    // 지정가 주문
+                    totalAmount = finalPrice.longValue() * finalQuantity;
+                } else {
+                    // 시장가 주문 - 현재가로 계산
+                    StockPriceDailyDTO priceDaily = stockPriceDailyDAO.selectLatestPriceDailyById(order.getStockId(), conn);
+                    if (priceDaily == null || priceDaily.getClosePrice() == null) {
+                        throw new RuntimeException(new IllegalArgumentException("시장가 주문을 위해 현재가를 조회할 수 없습니다."));
+                    }
+                    BigDecimal currentPrice = priceDaily.getClosePrice();
+                    if (currentPrice.compareTo(BigDecimal.ZERO) < 0) {
+                        currentPrice = currentPrice.abs();
+                    }
+                    totalAmount = currentPrice.longValue() * finalQuantity;
+                }
+                
+                if (virtualCash < totalAmount) {
+                    throw new RuntimeException(new IllegalArgumentException("예치금이 부족합니다. 필요: " + totalAmount + "원, 보유: " + virtualCash + "원"));
+                }
+            }
+            
+            // 판매 주문 검증
+            if ("SELL".equals(order.getSide())) {
+                // 보유 주식 수량 확인
+                com.dongyang.mock.model.DTO.MemberHoldingDTO holding = 
+                    memberDAO.findHoldingByStock(memId, order.getStockId(), conn);
+                
+                if (holding == null) {
+                    throw new RuntimeException(new IllegalArgumentException("보유하지 않은 종목입니다."));
+                }
+                
+                // 대기 중인 판매 주문 수량 조회
+                long pendingSellQuantity = orderDAO.getPendingSellOrderQuantity(memId, order.getStockId(), conn);
+                
+                // 현재 주문의 수량을 제외한 대기 중인 판매 주문 수량
+                long otherPendingSellQuantity = pendingSellQuantity - order.getQuantity();
+                
+                // 거래 가능한 수량 = 보유 수량 - (다른 대기 중인 판매 주문 수량)
+                long availableQuantity = holding.getQuantity() - otherPendingSellQuantity;
+                
+                // 수정된 수량이 거래 가능한 수량을 초과하는지 확인
+                if (finalQuantity > availableQuantity) {
+                    throw new RuntimeException(new IllegalArgumentException(
+                        "거래 가능한 수량(" + availableQuantity + "주)을 초과할 수 없습니다. " +
+                        "(보유: " + holding.getQuantity() + "주, 다른 대기 중인 판매 주문: " + otherPendingSellQuantity + "주)"));
+                }
+            }
+            
+            // 주문 정보 업데이트
+            int updated = orderDAO.updateGeneralOrder(orderId, orderType, finalPrice, finalQuantity, conn);
+            
+            if (updated > 0) {
+                return DBManager.TransactionResult.commit(true);
+            } else {
+                return DBManager.TransactionResult.rollback(false);
+            }
+        });
+    }
+
+    /**
+     * 만료된 조건 주문 자동 삭제
+     * 유효 기간이 지난 조건 주문을 찾아서 취소 처리
+     * @return 삭제된 조건 주문 수
+     * @throws SQLException
+     */
+    public int cleanupExpiredConditionalOrders() throws SQLException {
+        return DBManager.executeInTransaction(conn -> {
+            // 만료된 조건 주문 ID 목록 조회
+            List<Long> expiredOrderIds = orderConditionDAO.findExpiredConditionalOrderIds(conn);
+            
+            if (expiredOrderIds.isEmpty()) {
+                return DBManager.TransactionResult.commit(0);
+            }
+            
+            System.out.println("[OrderService] 만료된 조건 주문 " + expiredOrderIds.size() + "개 발견");
+            
+            int deletedCount = 0;
+            
+            for (Long orderId : expiredOrderIds) {
+                try {
+                    // 주문 조회
+                    OrderDTO order = orderDAO.findOrderById(orderId, conn);
+                    if (order == null) {
+                        System.out.println("[OrderService] 만료된 조건 주문 ID " + orderId + "를 찾을 수 없습니다.");
+                        continue;
+                    }
+                    
+                    // 대기 중인 주문만 취소 가능
+                    if (!"PENDING".equals(order.getStatus())) {
+                        System.out.println("[OrderService] 만료된 조건 주문 ID " + orderId + "는 이미 처리되었습니다. 상태: " + order.getStatus());
+                        // 상태와 관계없이 조건 주문은 비활성화
+                        orderConditionDAO.deactivateCondition(orderId, conn);
+                        continue;
+                    }
+                    
+                    // 주문 상태를 CANCELLED로 변경
+                    int updated = orderDAO.updateOrderStatus(orderId, "CANCELLED", conn);
+                    
+                    if (updated > 0) {
+                        // 조건 주문 비활성화
+                        orderConditionDAO.deactivateCondition(orderId, conn);
+                        deletedCount++;
+                        System.out.println("[OrderService] 만료된 조건 주문 ID " + orderId + " 삭제 완료");
+                    }
+                } catch (Exception e) {
+                    System.err.println("[OrderService] 만료된 조건 주문 ID " + orderId + " 삭제 중 오류: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            
+            System.out.println("[OrderService] 만료된 조건 주문 정리 완료. 삭제된 주문: " + deletedCount + "개");
+            return DBManager.TransactionResult.commit(deletedCount);
         });
     }
 }
