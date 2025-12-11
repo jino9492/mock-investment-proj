@@ -26,6 +26,7 @@
   request.setAttribute("currentPage", currentPage);
 %>
 
+<script type="module" src="${pageContext.request.contextPath}/static/js/common/sidebar/header.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/header.css"/>
 <header class="header__top-bar">
   <div class="header__top-inner">
@@ -46,9 +47,32 @@
       <c:if test="${!isLoggedIn}">
         <a class="header__btn-login" href="/login">로그인</a>
       </c:if>
-      <c:if test="${isLoggedIn}">
-        <a class="header__btn-login" href="/mypage">마이페이지</a>
-      </c:if>
+        <c:if test="${isLoggedIn}">
+            <div class="header__profile">
+                <button type="button" class="header__profile-btn">
+                    PROFILE
+                </button>
+
+                <!-- 프로필 드롭다운 -->
+                <div class="header__profile-dropdown" id="headerProfileDropdown">
+                    <div class="profile-menu__item profile-menu__user">
+                        <span class="profile-menu__icon">👤</span>
+                        <span class="profile-menu__name">
+                         ${member.memNickname}
+                         </span>
+                        <a href="/mypage" class="profile-menu__badge">내 정보</a>
+                    </div>
+
+                    <button type="button"
+                            class="profile-menu__item profile-menu__logout"
+                            onclick="location.href='/login'">
+                        <span class="profile-menu__icon">↩</span>
+                        <span class="profile-menu__text">로그아웃</span>
+                    </button>
+                </div>
+            </div>
+        </c:if>
+
     </div>
   </div>
 </header>

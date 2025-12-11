@@ -114,3 +114,95 @@
 .header__btn-logout:hover {
     background: #5a8de8;
 }
+
+/* 프로필 버튼 래퍼 */
+.header__profile {
+    position: relative;
+    margin-left: 12px;
+}
+
+/* 프로필 동그라미 버튼 */
+.header__profile-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: none;
+    background: #99BDFF;
+    color: white;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 53px;
+}
+
+/* 드롭다운 기본 상태 */
+.header__profile-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 180px;
+    padding: 8px 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    display: none;
+    z-index: 1000;
+}
+
+/* 열렸을 때 */
+.header__profile-dropdown--open {
+    display: block;
+}
+
+/* 메뉴 아이템 공통 */
+.profile-menu__item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #333;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+/* 유저 정보만 hover 안 되게 */
+.profile-menu__user {
+    cursor: default;
+}
+
+/* 아이콘 */
+.profile-menu__icon {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+/* 유저 이름 */
+.profile-menu__name {
+    flex: 1;
+}
+
+/* 내 정보 뱃지 */
+.profile-menu__badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: black;
+    background-color: #F0F0F0;
+    text-decoration: none;
+}
+
+/* 로그아웃 줄 hover 효과 */
+.profile-menu__logout:hover {
+    background: #f5f5f5;
+}
+
+.profile-menu__text {
+    flex: 1;
+    text-align: left;
+}
