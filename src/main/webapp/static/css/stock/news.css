@@ -1,0 +1,347 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.stock-news-page {
+    background-color: #F6F7F9;
+
+}
+
+
+.stock-news__container {
+    margin-left: 40px;
+    margin-top: 10px;
+    padding: 0 40px;
+    margin-right: 60px;
+}
+
+
+.stock-news__layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 32px;
+
+}
+
+.stock-news__main {
+    max-width: 1340px;
+    background-color: #FFFFFF;
+    width: 100%;
+    padding: 40px;
+    border-radius: 18px;
+}
+
+.stock-news__sidebar {
+    flex: 0 0 380px;
+}
+
+
+/* 상단 종목 정보 */
+.stock-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stock-header__left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.stock-header__logo {
+    width: 65px;
+    height: 65px;
+    border-radius: 10px;
+    background-color: #d9d9d9;
+}
+
+.stock-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stock-header__name {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.stock-header__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.stock-header__price {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.stock-header__diff {
+    font-size: 17px;
+
+}
+
+.stock-header__diff-value {
+    color: #9000FF;
+}
+
+/* 상단 탭 */
+
+.stock-tabs {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.stock-tabs__item {
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background-color: #F9F9F9;
+    font-size: 17px;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+
+}
+
+.stock-tabs__item--active {
+    background-color: #D9D9D9;
+}
+
+/* 뉴스, 공시 */
+
+.stock-news__main .stock-news {
+    display: flex;
+    align-items: flex-start;
+    gap: 32px;
+
+}
+
+/* Left Nav */
+.stock-news__main .stock-news__nav {
+    flex: 0 0 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stock-news__main .stock-news__nav-item {
+    width: 210px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: none;
+    background-color: #FFFFFF;
+    font-size: 17px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.stock-news__main .stock-news__nav-item--active {
+    background-color: #F9F9F9;
+    font-weight: 500;
+}
+
+
+.stock-news__main .stock-news__content {
+    flex: 1;
+}
+
+.stock-news__main .stock-news__panel {
+    display: none;
+}
+
+.stock-news__main .stock-news__panel--active {
+    display: block;
+}
+
+/* Header */
+.stock-news__main .stock-news__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.stock-news__main .stock-news__title {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+
+.stock-news__main .stock-news__sort-tabs {
+    display: inline-flex;
+    border-radius: 22px;
+    padding: 2px;
+    background-color: #F3F4F6;
+    gap: 4px;
+}
+
+.stock-news__main .stock-news__sort-btn {
+    min-width: 72px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.stock-news__main .stock-news__sort-btn--active {
+    background-color: #fff;
+    box-shadow: 0 0 0 1px #E1E3E8;
+}
+
+/* 뉴스 리스트 */
+.stock-news__main .stock-news__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stock-news__main .stock-news__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #F0F1F5;
+}
+
+.stock-news__main .stock-news__item-body {
+    flex: 1;
+}
+
+.stock-news__main .stock-news__item-title {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #111;
+    text-decoration: none;
+}
+
+.stock-news__main .stock-news__item-title:hover {
+    text-decoration: underline;
+}
+
+.stock-news__main .stock-news__item-summary {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.stock-news__main .stock-news__item-meta {
+    font-size: 12px;
+    color: #888;
+}
+
+.stock-news__main .stock-news__thumbnail {
+    flex: 0 0 150px;
+    height: 90px;
+    border-radius: 10px;
+    background-color: #464646;
+}
+
+/* 공시 */
+.stock-news__main .stock-news__header--disclosure {
+    margin-bottom: 16px;
+}
+
+.stock-news__main .stock-news__year {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #F0F1F5;
+    padding-bottom: 10px;
+}
+
+.stock-news__main .stock-disclosure__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.stock-news__main .stock-disclosure__item {
+    display: flex;
+    gap: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #F0F1F5;
+}
+
+.stock-news__main .stock-disclosure__date {
+    flex: 0 0 80px;
+    font-size: 16px;
+    font-weight: 500;
+
+}
+
+.stock-news__main .stock-disclosure__body {
+    flex: 1;
+}
+
+.stock-news__main .stock-disclosure__title {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #111;
+    text-decoration: none;
+}
+
+.stock-news__main .stock-disclosure__title:hover {
+    text-decoration: underline;
+}
+
+.stock-news__main .stock-disclosure__summary {
+    font-size: 13px;
+    color: #555;
+}
+
+/* 페이지네이션 */
+.stock-news__main .stock-news__pagination,
+.stock-news__main .stock-disclosure__pagination {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+}
+
+.stock-news__main .stock-news__page-btn {
+    min-width: 72px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    border: 1px solid #E1E3E8;
+    background-color: #FFFFFF;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.stock-news__main .stock-news__page-btn--active {
+    background-color: #F6F6F6;
+    font-weight: 500;
+}
+
+
+/* 반응형 */
+@media (max-width: 1100px) {
+    .stock-news__main .stock-news {
+        flex-direction: column;
+    }
+
+    .stock-news__main .stock-news__nav {
+        flex-direction: row;
+    }
+
+    .stock-news__main .stock-news__thumbnail {
+        width: 100%;
+        max-width: 240px;
+    }
+}
+

@@ -1,0 +1,484 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.stock-info-page {
+    background-color: #F6F7F9;
+
+}
+
+
+.stock-info__container {
+    margin-left: 40px;
+    margin-top: 10px;
+    padding: 0 40px;
+    margin-right: 60px;
+}
+
+
+.stock-info__layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 32px;
+
+}
+
+.stock-info__main {
+    max-width: 1340px;
+    background-color: #FFFFFF;
+    width: 100%;
+    padding: 40px;
+}
+
+.stock-info__sidebar {
+    flex: 0 0 380px;
+}
+
+
+/* 상단 종목 정보 */
+.stock-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stock-header__left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.stock-header__logo {
+    width: 65px;
+    height: 65px;
+    border-radius: 10px;
+    background-color: #d9d9d9;
+}
+
+.stock-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stock-header__name {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.stock-header__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.stock-header__price {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.stock-header__diff {
+    font-size: 17px;
+
+}
+
+.stock-header__diff-value {
+    color: #9000FF;
+}
+
+/* 상단 탭 */
+
+.stock-tabs {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.stock-tabs__item {
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background-color: #F9F9F9;
+    font-size: 17px;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+
+}
+
+.stock-tabs__item--active {
+    background-color: #D9D9D9;
+}
+
+/* 상단 헤더 */
+.stock-info__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.stock-info__header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.stock-info__header-title {
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.stock-info__header-meta {
+    font-size: 14px;
+    color: #838383;
+}
+
+.stock-info__header-update {
+    font-size: 11px;
+    color: #838383;
+}
+
+/* 기본 기업 정보 영역 */
+.stock-info__basic {
+    border-top: none;
+    margin-bottom: 40px;
+}
+
+.stock-info__basic-row {
+    display: flex;
+    gap: 40px;
+    padding: 10px 0;
+}
+
+
+
+
+.stock-info__basic-group {
+    flex: 1;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+.stock-info__basic-cell {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+
+.stock-info__basic-row--last .stock-info__basic-cell {
+    border-bottom: none;
+}
+
+
+.stock-info__basic-cell--align-right {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.stock-info__basic-subtext {
+    margin-top: 2px;
+    font-size: 11px;
+
+}
+
+.stock-info__basic-subtext--align-right {
+    text-align: right;
+}
+
+/* 섹션 공통 */
+.stock-info-section {
+    margin-bottom: 38px;
+}
+
+.stock-info-section__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+/* 주요 사업 카드 */
+.stock-info__business-card {
+    width: 215px;
+    height: 88px;
+    border-radius: 15px;
+    background-color: #F9F9F9;
+}
+
+/* 투자 지표 카드들 */
+.stock-info__metrics {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.stock-info__metrics-card {
+    background-color: #F9F9F9;
+    border-radius: 16px;
+    flex: 1;
+    padding: 16px 20px;
+    font-size: 14px;
+}
+
+.stock-info__metrics-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.stock-info__metrics-row--last {
+    border-bottom: none;
+
+}
+
+
+
+/* 하단 재무 상태 카드 */
+.stock-info__finance-card {
+    background-color: #F9F9F9;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 14px;
+}
+
+.stock-info__finance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.stock-info__finance-row--last {
+    border-bottom: none;
+}
+
+/* -------- 주문 카드 -------- */
+
+.order-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px 24px 24px;
+    width: 380px;
+    height: 820px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+
+}
+
+.order-card__title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.order-card__trade-type {
+    display: flex;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #f0f0f2;
+}
+
+.order-card__trade-tab {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    background-color: transparent;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.order-card__trade-tab--active {
+    background-color: #ffffff;
+    color: #F04452;
+    border-bottom: 2px solid #F04452;
+}
+
+/* 폼 공통 */
+.order-card__row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.order-card__label {
+    width: 70px;
+    font-size: 17px;
+}
+
+.order-card__field {
+    flex: 1;
+}
+
+.order-card__select_box {
+    width: 250px;
+    padding: 6px 12px;
+    font-size: 17px;
+    border-radius: 10px;
+    border: 1px solid #dcdcdc;
+    background-color: #ffffff;
+    cursor: pointer;
+    text-align: center;
+    text-align-last: center;
+}
+
+/* pill 버튼 */
+.order-card__field--split {
+    display: flex;
+    gap: 4px;
+}
+
+.order-card__pill {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 10px;
+    border: none;
+    background-color: #f0f0f2;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.order-card__pill--active {
+    background-color: #ffffff;
+    border: 1px solid #e1e2e6;
+}
+
+/* 가격 / 수량 입력 */
+
+.order-card__field--price,
+.order-card__field--qty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.order-card__input::placeholder {
+    color: #787878;
+}
+
+.order-card__unit {
+    font-size: 17px;
+}
+
+.input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.unit-text {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 17px;
+    pointer-events: none;
+}
+
+.order-card__input {
+    width: 100%;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #e1e2e6;
+    padding: 0 12px;
+    padding-right: 40px;
+}
+
+.order-card__step-btn {
+    width: 50px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: #f0f0f2;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* 구분선 & 요약 */
+
+.order-card__divider {
+    border: none;
+    border-top: 1px solid #D9D9D9;
+    margin: 16px 0 12px;
+}
+
+.order-card__summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.order-card__summary-label {
+    color: #555;
+}
+
+.order-card__input--readonly {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* 주문 버튼 */
+
+.order-card__submit-btn {
+    margin-top: 16px;
+    width: 100%;
+    border: none;
+    border-radius: 999px;
+    background-color: #F04452;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 0;
+    cursor: pointer;
+}
+
+/* 반응형 */
+@media (max-width: 1340px) {
+    .stock-info__container {
+        padding: 0 20px;
+    }
+
+    .stock-info__layout {
+        flex-direction: column;
+    }
+
+    .stock-info__sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .order-card {
+        width: 100%;
+        height: auto;
+    }
+
+    .stock-info__basic-row {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 4px;
+    }
+
+    .stock-info__basic-value {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+
+    .stock-info__metrics {
+        flex-direction: column;
+    }
+
+    .stock-info__business-card {
+        width: 100%;
+    }
+}

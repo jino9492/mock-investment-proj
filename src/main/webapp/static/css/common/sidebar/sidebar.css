@@ -56,6 +56,10 @@
     width: 320px;
 }
 
+ul {
+    padding-left: 1em;
+}
+
 .sidebar__work-area {
     position: sticky;
     top: 0;
