@@ -1,0 +1,70 @@
+
+/* 내 주식 카드 */
+
+.my-stock-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px 24px 24px;
+    width: 380px;
+    max-width: calc(100% - 75px);
+    height: 778px;
+}
+
+
+.my-stock-card__title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.my-stock-card__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.my-stock-card__profit {
+    color: #9000FF;
+}
+
+
+/* 공통 컨텐츠 래퍼 */
+.my-stock-card__content {
+    width: 100%;
+    height: 100%;
+}
+
+
+.my-stock-card__content--logged-out {
+    height: calc(100% - 24px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+
+.my-stock-card__empty-text {
+    font-size: 15px;
+    line-height: 1.4;
+    color: #333333;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.my-stock-card__login-btn {
+    padding: 8px 24px;
+    border-radius: 999px;
+    border: none;
+    background-color: #D9D9D9;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.my-stock-card__login-btn:hover {
+    background-color: #d5d5d5;
+}

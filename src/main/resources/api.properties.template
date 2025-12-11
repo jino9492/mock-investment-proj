@@ -1,0 +1,3 @@
+koreainvest.app.key=YOUR_APP_KEY
+koreainvest.app.secret=YOUR_APP_SECRET
+koreainvest.api.token.url=https://openapivts.koreainvestment.com:29443
