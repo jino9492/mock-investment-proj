@@ -6,13 +6,13 @@
 .sidebar__right-rail {
     position: fixed;
     right: 0;
-    width: 75px;
+    width: 60px;
     height: 1080px;
     text-align: center;
     font-size: 14px;
     top: 0;
-    border-left: #D9D9D9 1px solid;
-    background: white;
+    border-left: #dde1e6 1px solid;
+    background: #f6f7f9;
     z-index: 100;
 }
 
@@ -23,10 +23,15 @@
     display: block;
     user-select: none;
     margin: 30px auto;
+    color: #aab3bd;
+}
+
+.sidebar__rail-icon {
+    color: inherit;
 }
 
 .sidebar__right-rail-toggle{
-    margin: 28px 0;
+    margin: 15px 0;
     border: none;
     outline: none;
     background: transparent;
@@ -41,27 +46,37 @@
     align-items: center;
     justify-content: center;
     font-size: 18px;
+    color: initial;
 }
 
 .sidebar__arrow-icon.activated img {
     transform: rotate(180deg);
     transition: transform .5s;
+    filter: brightness(0) saturate(100%) invert(70%) sepia(5%) saturate(500%) hue-rotate(180deg);
 }
 
 .sidebar__arrow-icon img{
     transition: transform .5s;
+    filter: brightness(0) saturate(100%) invert(70%) sepia(5%) saturate(500%) hue-rotate(180deg);
 }
 
 .sidebar__work-area.activated {
     width: 320px;
+    margin-right: 60px;
+    background: #f6f7f9;
+}
+
+ul {
+    padding-left: 1em;
 }
 
 .sidebar__work-area {
+    background: #f6f7f9;
     position: sticky;
     top: 0;
     height: 100vh;
     min-width: 0;
-    border-left: #D9D9D9 1px solid;
+    border-left: #dde1e6 1px solid;
     width: 0;
     overflow: hidden;
     text-wrap: nowrap;
@@ -71,16 +86,27 @@
 
 .sidebar__title {
     text-indent: 10px;
-    margin-top: 1em;
-    padding: 1em;
+    margin: 10px;
+}
+
+.sidebar__title--account {
+    margin-top: 14px;
+    margin-bottom: 14px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.sidebar__title--investment {
+    margin-top: 13px;
+    font-size: 15px;
 }
 
 .sidebar__account-box {
-    width: calc(100% - 75px - 30px);
-    margin-left: 15px;
+    margin: 10px;
     border-radius: 10px;
     padding: .75em;
-    background: #D9D9D9;
+    background: #e9ecf0;
+    font-weight: 500;
 }
 
 .sidebar__my-investment {
@@ -97,4 +123,35 @@
 
 .sidebar__favorite.selected {
     display: block;
+}
+
+.sidebar__login-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+    text-align: center;
+}
+
+.sidebar__login-prompt-text {
+    margin-bottom: 20px;
+    color: #17171B;
+    font-size: 16px;
+}
+
+.sidebar__login-prompt-button {
+    display: inline-block;
+    padding: 6px 22px;
+    background: #689DFF;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.sidebar__login-prompt-button:hover {
+    background: #5a8de8;
 }

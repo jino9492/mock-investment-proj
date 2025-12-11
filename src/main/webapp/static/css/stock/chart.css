@@ -1,0 +1,671 @@
+@import url('stock_common.css');
+
+body.stock-page {
+    background-color: #F6F7F9;
+    display: flex;
+    min-height: 100vh;
+    max-width: calc(100% - 20px);
+    width: 100%;
+}
+
+
+.stock-page__container {
+    display: flex;
+    flex-direction: column;
+    margin: 24px auto;
+    width: 90%;
+    transition: margin-right 0.3s ease;
+}
+
+/* 메인 레이아웃 */
+
+.stock-main {
+    display: flex;
+    gap: 10px;
+}
+
+/* 왼쪽 영역 */
+
+.stock-main__left {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.stock-range-tabs {
+    display: flex;
+    align-items: center;
+    margin-bottom: 11px;
+
+}
+
+.stock-range-tabs__select {
+    margin-right: 15px;
+    padding: 6px 12px;
+    font-size: 17px;
+    border-radius: 10px;
+    border: 1px solid #dcdcdc;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.stock-range-tabs__item {
+    width: 100%;
+    max-width: 40px;
+    height: 35px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: none;
+    background-color: #D9D9D9;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.stock-range-tabs__item--active {
+    background-color: #ffffff;
+}
+
+.stock-range-tabs__item--icon {
+    min-width: 60px;
+    margin-left: 15px;
+}
+
+.stock-chart-card,
+.stock-quote-card {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.stock-chart-card {
+    height: 450px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.stock-chart-card__content {
+    width: 100%;
+    height: 365px;
+    background-color: #dcdcdc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.stock-quote-card {
+    height: 308px;
+    width: 100%;
+}
+
+.stock-quote-card__content {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* 주문 카드 */
+
+.order-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    width: 380px;
+    height: 778px;
+}
+
+.order-card__title {
+    font-size: 17px;
+    font-weight: 650;
+    margin-bottom: 16px;
+}
+
+.order-card__trade-type {
+    display: flex;
+    margin-bottom: 16px;
+    height: 35px;
+    padding: 3px;
+    border-radius: 8px;
+    background-color: #f2f4f6;
+    position: relative;
+}
+
+/* 활성 탭 이동 배경 애니메이션 */
+.order-card__trade-type::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc((100% - 6px) / 3);
+    height: calc(100% - 6px);
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: rgba(0, 27, 55, 0.08) 0px 1px 2px 0px;
+    transition: transform 0.2s ease;
+    z-index: 0;
+}
+
+.order-card__trade-type:has(.order-card__trade-tab:nth-child(1)[aria-checked="true"])::before {
+    transform: translateX(0%);
+}
+
+.order-card__trade-type:has(.order-card__trade-tab:nth-child(2)[aria-checked="true"])::before {
+    transform: translateX(100%);
+}
+
+.order-card__trade-type:has(.order-card__trade-tab:nth-child(3)[aria-checked="true"])::before {
+    transform: translateX(200%);
+}
+
+.order-card__trade-tab {
+    flex: 1;
+    min-width: 28px;
+    height: 100%;
+    padding: 0 6px;
+    border: none;
+    background-color: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    color: #6b7280;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* 구매 탭 활성화 */
+.order-card__trade-tab--buy.order-card__trade-tab--active,
+.order-card__trade-tab--buy[aria-checked="true"] {
+    background-color: #ffffff;
+    color: #F04452;
+    box-shadow: rgba(0, 27, 55, 0.08) 0px 1px 2px 0px;
+}
+
+/* 판매 탭 활성화 */
+.order-card__trade-tab--sell.order-card__trade-tab--active,
+.order-card__trade-tab--sell[aria-checked="true"] {
+    background-color: #ffffff;
+    color: #3E8AF6;
+    box-shadow: rgba(0, 27, 55, 0.08) 0px 1px 2px 0px;
+}
+
+/* 대기 탭 활성화 */
+.order-card__trade-tab--wait.order-card__trade-tab--active,
+.order-card__trade-tab--wait[aria-checked="true"] {
+    background-color: #ffffff;
+    color: #1bb77a;
+    box-shadow: rgba(0, 27, 55, 0.08) 0px 1px 2px 0px;
+}
+
+/* 폼 공통 */
+.order-card__row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.order-card__label {
+    width: 70px;
+    font-size: 14px;
+}
+
+.order-card__field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+}
+
+.order-card__select_box {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 14px;
+    font-weight: 550;
+    border-radius: 8px;
+    border: 1px solid #e5e8eb;
+    background-color: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    text-align-last: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-card__dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.order-card__dropdown-toggle {
+    width: 100%;
+    height: 35px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e8eb;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 550;
+    text-align: left;
+    color: #111827;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.order-card__dropdown-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(64, 120, 255, 0.2);
+    border-color: #a5b4fc;
+}
+
+.order-card__dropdown-icon {
+    font-size: 12px;
+    color: #6b7280;
+    transform: rotate(0deg);
+    transition: transform 0.15s ease;
+}
+
+.order-card__dropdown[aria-expanded=\"true\"] .order-card__dropdown-icon,
+.order-card__dropdown.is-open .order-card__dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.order-card__dropdown-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e5e8eb;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(17, 24, 39, 0.12);
+    padding: 6px;
+    display: none;
+    z-index: 10;
+}
+
+.order-card__dropdown.is-open .order-card__dropdown-list,
+.order-card__dropdown[aria-expanded=\"true\"] .order-card__dropdown-list {
+    display: block;
+}
+
+.order-card__dropdown-option {
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: #111827;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-radius: 8px;
+}
+
+.order-card__dropdown-option:hover {
+    background-color: #f2f4f6;
+}
+
+.order-card__dropdown-option[aria-selected=\"true\"] {
+    background-color: #f8fafc;
+    color: #2563eb;
+}
+
+.order-card__dropdown-option-desc {
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.3;
+}
+
+
+
+/* pill 버튼 */
+
+.order-card__field--split {
+    display: flex;
+    height: 35px;
+    padding: 1px 3px;
+    border-radius: 8px;
+    background-color: #f2f4f6;
+    position: relative;
+    align-self: center;
+    min-height: auto;
+}
+
+.order-card__field.order-card__field--split {
+    min-height: auto;
+}
+
+.order-card__pill {
+    flex: 1;
+    min-width: 28px;
+    height: calc(100% - 4px);
+    padding: 0 6px;
+    border: none;
+    background-color: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    color: #6b7280;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-card__pill--active,
+.order-card__pill[aria-checked="true"] {
+    background-color: #ffffff;
+    color: #333;
+    box-shadow: rgba(0, 27, 55, 0.08) 0px 1px 2px 0px;
+}
+
+/* 가격 / 수량 입력 */
+
+.order-card__field--price,
+.order-card__field--qty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+}
+
+
+.order-card__input::placeholder {
+    color: #787878;
+    font-weight: 500;
+}
+
+.order-card__unit {
+    font-size: 17px;
+}
+
+.order-card__input--readonly {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.unit-text {
+    position: absolute;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    pointer-events: none;
+}
+
+.order-card__input {
+    width: 100%;
+    height: 35px;
+    border-radius: 8px;
+    border: 1px solid #e5e8eb;
+    padding: 0 12px;
+    padding-right: 40px;
+}
+
+.order-card__step-btn-group {
+    display: flex;
+    align-items: center;
+    width: 70px;
+    min-width: 70px;
+    height: 35px;
+    border-radius: 8px;
+    background-color: #f2f4f6;
+    overflow: hidden;
+    border: none;
+    flex-shrink: 0;
+}
+
+.order-card__order-type-hidden, .order-card__conditional-order--hidden, .order-card__wait-orders--hidden {
+    display: none;
+}
+
+.order-card__step-btn {
+    flex: 1;
+    height: 100%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 650;
+    color: #a5adb6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease;
+    padding: 0;
+    margin: 0;
+}
+
+.order-card__step-btn-divider {
+    width: 1px;
+    height: 20px;
+    background-color: #e1e2e6;
+    flex-shrink: 0;
+}
+
+.order-card__step-btn:hover {
+    background-color: #e8eaed;
+}
+
+.order-card__step-btn:active {
+    background-color: #d1d3d6;
+}
+
+.order-card__step-btn:focus {
+    outline: none;
+}
+
+/* 구분선 & 요약 */
+
+.order-card__divider {
+    border: none;
+    border-top: 1px solid #D9D9D9;
+    margin: 16px 0 12px;
+}
+
+.order-card__summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.order-card__summary-label {
+    color: #555;
+}
+
+/* 일반 주문 / 조건 주문 표시/숨김 */
+
+/* 조건 주문 필드 스타일 */
+.order-card__watch-price {
+    margin-bottom: 4px;
+}
+
+.order-card__watch-price-info {
+    font-size: 12px;
+    color: #F04452;
+    margin-left: 70px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    text-align: right;
+}
+
+.order-card__order-duration {
+    margin-bottom: 10px;
+}
+
+/* 대기 주문 목록 */
+.order-card__wait-orders {
+    margin-top: 16px;
+}
+
+.order-card__wait-order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-card__wait-order-item:last-child {
+    border-bottom: none;
+}
+
+.order-card__wait-order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.order-card__wait-order-type {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.order-card__wait-order-type--buy {
+    color: #F24452;
+}
+
+.order-card__wait-order-type--sell {
+    color: #4A91F6;
+}
+
+.order-card__wait-order-price {
+    font-size: 13px;
+    color: #666;
+}
+
+.order-card__wait-order-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.order-card__wait-order-btn {
+    padding: 6px 12px;
+    border: 1px solid #e5e8eb;
+    border-radius: 6px;
+    background-color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.order-card__wait-order-btn:hover {
+    background-color: #f2f4f6;
+    border-color: #d1d3d6;
+}
+
+.order-card__wait-order-btn--edit {
+    color: #4A91F6;
+}
+
+.order-card__wait-order-btn--cancel {
+    color: #666;
+}
+
+/* 대기 주문 없음 */
+.order-card__wait-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.order-card__wait-empty-text {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+}
+
+/* 주문 버튼 */
+
+.order-card__submit-btn {
+    margin-top: 16px;
+    width: 100%;
+    border: none;
+    height: 40px;
+    border-radius: 8px;
+    background-color: #F04452;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 0 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 구매 탭 버튼 색상 */
+.order-card--buy .order-card__submit-btn {
+    background-color: #F04452;
+}
+
+/* 판매 탭 버튼 색상 */
+.order-card--sell .order-card__submit-btn {
+    background-color: #3E8AF6;
+}
+
+/* 대기 탭 버튼 색상 */
+.order-card--wait .order-card__submit-btn {
+    background-color: #1bb77a;
+}
+
+/* 내 주식 카드 */
+
+.my-stock-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px 24px 24px;
+    width: 380px;
+    max-width: calc(100% - 75px);
+    height: 778px;
+}
+
+.my-stock-card__title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.my-stock-card__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.my-stock-card__profit {
+    color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
+}

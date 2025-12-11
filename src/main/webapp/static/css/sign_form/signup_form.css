@@ -1,0 +1,210 @@
+:root {
+  background: linear-gradient(
+    to top,
+    #ffffff 0%,
+    #e5eeff 50%,
+    #99bdff 100%
+  );
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* 배경 */
+
+.signup__page-wrap {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+}
+
+/* 헤더 */
+
+.signup__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  padding-left: 25px;
+  
+}
+
+.signup__brand {
+  display: inline;
+  letter-spacing: -8px;
+  font-weight: 1000;
+  font-size: 32px;
+  color: white;
+}
+
+.signup__close-button {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 36px;
+  color: #17171B;
+  text-decoration: none;
+}
+
+/* 메인 컨텐츠 정렬 */
+
+.signup__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 카드 */
+
+.signup__card {
+  margin-top: 50px;
+  background-color: #ffffff;
+  width: 500px;
+  height: 830px;
+  border-radius: 24px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.signup__card-title {
+  margin-top: 50px;
+  margin-bottom: 64px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+/* 폼 */
+
+.signup__card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-left: 40px;
+}
+
+.signup__card-field {
+  width: 100%;
+}
+
+.signup__card-input {
+  width: 420px;
+  height: 60px;
+  border-radius: 10px;
+  border: 0.5px solid #ABABAB;
+  padding-left: 20px;
+  font-size: 20px;
+  outline: none;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+}
+
+.signup__card-input::placeholder {
+  color: #ABABAB;
+}
+
+.signup__card-input:focus {
+  border-color: #4b8aff;;
+  box-shadow: 0 0 0 1px #689dff;
+}
+
+
+/* 약관 영역 */
+
+.signup__agreements {
+  margin-top: 60px;
+  color: #17171b;
+}
+
+.signup__agreement-all {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.signup__agreement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.signup__agreement-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.signup__agreement-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  
+}
+
+.signup__agreement-all-label {
+  font-size: 18px;
+}
+
+.signup__agreement-label {
+  font-size: 16px;
+}
+
+.signup__agreement-divider {
+  height: 1px;
+  background-color: #ABABAB;
+  margin-top: 2px;
+  margin-right: 40px;
+  
+}
+
+/* 버튼 */
+
+.signup__card-button {
+  margin-top: 17px;
+  width: 420px;
+  height: 65px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #689dff;
+}
+
+/* 푸터 텍스트 */
+
+.signup__card-footer {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 16px;
+  color: #17171b;
+}
+
+.signup__card-footer-text {
+  margin-right: 4px;
+}
+
+.signup__card-footer-link {
+  color: #4b8aff;;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup__card-footer-link:hover {
+  text-decoration: underline;
+}
+
+.error-msg {
+  color: red;
+}

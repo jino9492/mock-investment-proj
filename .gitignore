@@ -44,3 +44,12 @@ wtpwebapps/
 .DS_Store
 Thumbs.db
 *.log
+
+src/main/resources/db.properties
+src/main/resources/api.properties
+out/
+build/
+classes/
+
+src/main/java/com/dongyang/mock/controller/TestController.java
+src/main/webapp/WEB-INF/views/test.jsp

@@ -19,20 +19,6 @@ ul {
 }
 
 
-/* 전체 레이아웃 */
-.main__page-wrap {
-  display: flex;
-  flex: 1;
-}
-
-.main__inner {
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-}
-
-
 
 /* 메인 콘텐츠 영역 */
 .main__content {
@@ -67,7 +53,8 @@ ul {
   display: grid;
   grid-template-columns: 1.1fr 1.2fr;
   gap: 32px;
-  margin: 72px 0;
+  margin-top: 30px;
+  margin-bottom: 72px;
 }
 
 .main__news_card {
@@ -80,26 +67,16 @@ ul {
 }
 
 /* 블러 처리 */
-body.logged-out .main__card-account {
+.main__card-account {
   filter: blur(8px);
   pointer-events: none;
 }
 
-body.logged-out .login__modal {
-  opacity: 1;
-  visibility: visible;
-}
 
-body.logged-in .main__card-account {
+.main__card-account.logged-in {
   filter: none;
   pointer-events: auto;
 }
-
-body.logged-in .login__modal {
-  opacity: 0;
-  visibility: hidden;
-}
-
 
 .main__card-login-wrap {
   user-select: none;
@@ -128,7 +105,6 @@ body.logged-in .login__modal {
   width: 100%;
   height: 100%;
   z-index: 2;
-  opacity: 0;
 }
 
 .login__modal-content-wrapper{
@@ -196,7 +172,7 @@ body.logged-in .login__modal {
 
 .main__summary-value span {
   font-size: 14px;
-  color: #a65af7;
+  color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
 }
 
 .main__divider {
@@ -207,7 +183,7 @@ body.logged-in .login__modal {
 .main__table-simple {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .main__table-simple th,
@@ -229,26 +205,35 @@ body.logged-in .login__modal {
   text-align: center;
 }
 
-.main__text-purple {
-  color: #a65af7;
+/* 호환성을 위한 기존 클래스 - 공통 클래스 사용 권장 */
+.main__text-red {
+  color: #F04452; /* 공통 색상으로 통일 */
+}
+
+.main__text-blue {
+  color: #3182F6; /* 공통 색상으로 통일 */
+}
+
+.main__text-zero {
+  color: #666666; /* 공통 색상으로 통일 */
 }
 
 /* 인덱스 카드 */
 .main__index-section {
-  margin-bottom: 24px;
+  position: sticky;
+  top: 70px;
+  padding-bottom: 24px;
+  background: white;
+  z-index: 100;
 }
 
 .main__index-row {
   display: flex;
   align-items: center;
-  /* overflow: hidden; */
-  gap: 16px;
+  justify-content: space-between;
 }
 
 .main__index-thumb {
-  width: 120px;
-  height: 50px;
-  background: #D9D9D9;
   flex-shrink: 0;
 }
 
@@ -379,25 +364,26 @@ section{
 .main__section-title {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 12px;
   border-bottom: 1px solid #E8E8E8;
   padding-bottom: 12px;
+  padding-top: 12px;
 }
 
 .main__bottom-section {
-  margin-top: 10px;
+  margin-top: 18px;
   display: grid;
   grid-template-columns: 1.4fr 0.9fr; 
   gap: 32px;
+  margin-bottom: 48px;
 }
 
 .main__table-header-row {
   color: #797979;
-  padding: 10px 16px;
+  padding: 12px 16px;
+  background: white;
   font-size: 14px;
   display: grid;
   grid-template-columns: 30% 30% 20% 20%;
-  margin-bottom: 4px;
 }
 
 .main__table-header-row span:nth-child(3),
@@ -435,7 +421,7 @@ section{
   justify-content: center;
 }
 
-.main__list-row:hover {
+.main__list-row:hover, .is-active-hover {
   background-color: #F8F8F8;  
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -460,7 +446,7 @@ section{
   gap: 8px 16px;
   font-size: 10px;
   margin-bottom: 14px;
-  border: 1px solid #BABABA;
+  border: 1px solid #E2E2E2;
   border-radius: 10px;
   padding: 14px;
 }
@@ -474,12 +460,14 @@ section{
 
 .main__chart-info-label {
   color: #17171B;
+  font-size: 16px;
 }
 
 
 .main__chart-info div span:last-child {
   text-align: right;
-  flex-shrink: 0; 
+  flex-shrink: 0;
+  font-size: 16px;
 }
 
 
@@ -487,12 +475,12 @@ section{
   display: flex;
   flex-direction: column;  
   gap: 4px;
-  font-size: 12px;
+  font-size: 16px;
   margin-bottom: 12px;
 }
 
 .main__chart-header strong {
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 600;
 }
 
@@ -512,4 +500,47 @@ section{
   border-radius: 7px;
   height: 48px;
   width: 137px;
+}
+
+.main__table-header-row{
+  position: sticky;
+  top: 190px;
+}
+
+.main__card{
+  position: sticky;
+  top: 224px;
+  display: inline-block;
+  height: 800px;
+  margin-top: 24px;
+}
+
+.main__section-title{
+  z-index: 100;
+  background: white;
+}
+
+.main__stock-section > *{
+  position: sticky;
+  top: 140px;
+}
+
+@keyframes flash-red {
+  0% { background-color: #ffcccc; } /* 밝은 빨강 */
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-blue {
+  0% { background-color: #cceeff; } /* 밝은 파랑 */
+  100% { background-color: transparent; }
+}
+
+/* 텍스트가 반짝이는 클래스 (양수인 경우) */
+.text-highlight-up {
+  animation: flash-red 0.5s ease-out;
+}
+
+/* 텍스트가 반짝이는 클래스 (음수인 경우) */
+.text-highlight-down {
+  animation: flash-blue 0.5s ease-out;
 }
