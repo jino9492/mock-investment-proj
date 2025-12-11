@@ -77,4 +77,18 @@ public class StockCodeDAO {
         }
         return codeIdMap;
     }
+
+    public int getCount(Connection conn) throws  SQLException {
+        final String sql = "SELECT count(*) FROM stock_code";
+        int count = 0;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()) {
+            count = rs.getInt(1);
+
+            return count;
+        } catch (SQLException e) {
+            return 0;
+        }
+    }
 }

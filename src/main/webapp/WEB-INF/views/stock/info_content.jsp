@@ -4,37 +4,15 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/stock/info.css"/>
-<script src="${pageContext.request.contextPath}/static/js/stock/info.js"></script>
+<script type="module" src="${pageContext.request.contextPath}/static/js/stock/info.js"></script>
 
 <body class="stock-info-page">
 <main class="stock-info__container">
 
-    <!-- 상단 종목 정보 -->
-    <header class="stock-header">
-        <div class="stock-header__left">
-            <div class="stock-header__logo"></div>
-            <div class="stock-header__info">
-                <div class="stock-header__name">${stock.getStockName()} ${stock.getStockSymbol()}</div>
-                <div class="stock-header__price-row">
-                    <span class="stock-header__price"><fmt:formatNumber value="${daily.getClosePrice().abs()}" pattern="#,###" />원</span>
-                    <span class="stock-header__diff">
-                        <c:set var="isUp" value="${daily.getChangePrice() > 0}" />
-                        어제보다&nbsp;<span class="stock-header__diff-value" style="color:${isUp ? "#F04452" : "#3182F6"}">
-                        ${isUp ? "+" : ""}<fmt:formatNumber value="${daily.getChangePrice()}" pattern="#,###" />원 (${daily.getChangeRate().abs()}%)
-                    </span>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- 상단 탭 -->
-    <nav class="stock-tabs">
-        <a href="${pageContext.request.contextPath}/stock?stockID=${param.stockID}" class="stock-tabs__item">차트 · 호가</a>
-        <button class="stock-tabs__item stock-tabs__item--active">종목정보</button>
-        <button class="stock-tabs__item">뉴스 · 공시</button>
-        <button class="stock-tabs__item">커뮤니티</button>
-    </nav>
+    <!-- 상단 종목 정보 및 탭 -->
+    <jsp:include page="/WEB-INF/fragments/stock/stock_header.jsp">
+        <jsp:param name="activeTab" value="info"/>
+    </jsp:include>
 
     <div class="stock-info__layout">
         <!-- 왼쪽 메인 영역 -->
@@ -127,7 +105,7 @@
 
             <!-- 투자 지표 및 재무 상태 -->
             <section class="stock-info-section">
-                <h2 class="stock-info-section__title">투자 지표 및 재무 상태</h2>
+                <h2 class="stock-info-section__title">투자지표 및 재무상태</h2>
 
                 <div class="stock-info__metrics">
                     <!-- 왼쪽 카드 -->

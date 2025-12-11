@@ -65,7 +65,7 @@
                     <div class="league__summary-value" id="account-stock-value">
                         <c:if test="${not empty accountSummary}">
                             <fmt:formatNumber value="${accountSummary.stockValue}" pattern="#,###"/>원 
-                            <span class="<c:choose><c:when test="${accountSummary.totalReturn == 0}">league__text-gray</c:when><c:when test="${accountSummary.totalReturn > 0}">league__text-red</c:when><c:otherwise>league__text-blue</c:otherwise></c:choose>">
+                            <span class="<c:choose><c:when test="${accountSummary.totalReturn == 0}">price-color--neutral</c:when><c:when test="${accountSummary.totalReturn > 0}">price-color--up</c:when><c:otherwise>price-color--down</c:otherwise></c:choose>">
                                 (<c:if test="${accountSummary.totalReturn > 0}">+</c:if><fmt:formatNumber value="${accountSummary.totalReturn}" pattern="0.00"/>%)
                             </span>
                         </c:if>

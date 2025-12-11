@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.function.Supplier;
 
 /**
  * 관리자 컨트롤러들의 공통 기능을 제공하는 베이스 클래스
@@ -16,6 +18,11 @@ import java.net.URLEncoder;
  * - 공통 유틸리티 메서드
  */
 public abstract class BaseAdminController extends HttpServlet {
+
+    /**
+     * 기본 예치금 상수
+     */
+    protected static final int DEFAULT_VIRTUAL_CASH = 1_000_000;
 
     /**
      * 관리자 세션 확인
@@ -48,7 +55,11 @@ public abstract class BaseAdminController extends HttpServlet {
      * URL 인코딩 유틸리티
      */
     protected String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (Exception e) {
+            return value;
+        }
     }
 
     /**
@@ -56,6 +67,76 @@ public abstract class BaseAdminController extends HttpServlet {
      */
     protected void setCurrentPath(HttpServletRequest req, String path) {
         req.setAttribute("currentPath", path);
+    }
+
+    /**
+     * null 체크 후 기본값 반환 (DTO null 체크 패턴 통합)
+     * @param value 체크할 값
+     * @param defaultValue null일 경우 반환할 기본값
+     * @param <T> 타입
+     * @return value가 null이 아니면 value, null이면 defaultValue
+     */
+    protected <T> T orDefault(T value, Supplier<T> defaultValue) {
+        return value != null ? value : defaultValue.get();
+    }
+
+    /**
+     * SQLException을 ServletException으로 변환하여 throw
+     * @param e SQLException
+     * @param message 에러 메시지
+     * @throws ServletException 변환된 예외
+     */
+    protected void handleSQLException(SQLException e, String message) throws ServletException {
+        e.printStackTrace();
+        throw new ServletException(message, e);
+    }
+
+    /**
+     * 상태 파라미터와 함께 리다이렉트
+     * @param req HttpServletRequest
+     * @param resp HttpServletResponse
+     * @param basePath 기본 경로
+     * @param status 상태 값 (null이면 파라미터 추가 안 함)
+     * @throws IOException 리다이렉트 실패 시
+     */
+    protected void redirectWithStatus(HttpServletRequest req, HttpServletResponse resp, String basePath, String status) throws IOException {
+        StringBuilder target = new StringBuilder(req.getContextPath()).append(basePath);
+        if (status != null && !status.isEmpty()) {
+            target.append("?status=").append(encode(status));
+        }
+        resp.sendRedirect(target.toString());
+    }
+
+    /**
+     * 쿼리 파라미터와 함께 리다이렉트
+     * @param req HttpServletRequest
+     * @param resp HttpServletResponse
+     * @param basePath 기본 경로
+     * @param queryParams 쿼리 파라미터 (예: "memberId=123&status=success")
+     * @throws IOException 리다이렉트 실패 시
+     */
+    protected void redirectWithQuery(HttpServletRequest req, HttpServletResponse resp, String basePath, String queryParams) throws IOException {
+        StringBuilder target = new StringBuilder(req.getContextPath()).append(basePath);
+        if (queryParams != null && !queryParams.isEmpty()) {
+            target.append("?").append(queryParams);
+        }
+        resp.sendRedirect(target.toString());
+    }
+
+    /**
+     * 정수 파라미터 파싱 (안전한 파싱)
+     * @param param 파싱할 파라미터 값
+     * @return 파싱된 정수, 실패 시 null
+     */
+    protected Integer parseIntSafely(String param) {
+        if (isBlank(param)) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(param);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     /**

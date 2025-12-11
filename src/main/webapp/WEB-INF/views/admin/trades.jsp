@@ -31,13 +31,27 @@
                 <c:choose>
                     <c:when test="${not empty stats}">
                         <c:set var="tradeCountChangeRate" value="${stats.tradeCountChangeRate}" />
-                        <div class="stat-card__change ${tradeCountChangeRate >= 0 ? 'stat-card__change--up' : 'stat-card__change--down'}">
-                            전일 대비 <fmt:formatNumber value="${tradeCountChangeRate}" pattern="#,##0.0"/>%
-                        </div>
+                        <c:choose>
+                            <c:when test="${tradeCountChangeRate > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${tradeCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:when test="${tradeCountChangeRate < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${tradeCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0.0%
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         <div class="stat-card__change stat-card__change--down">
-                            전일 대비 0.0%
+                            전일 대비 -%
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -51,13 +65,27 @@
                 <c:choose>
                     <c:when test="${not empty stats}">
                         <c:set var="tradeAmountChangeRate" value="${stats.tradeAmountChangeRate}" />
-                        <div class="stat-card__change ${tradeAmountChangeRate >= 0 ? 'stat-card__change--up' : 'stat-card__change--down'}">
-                            전일 대비 <fmt:formatNumber value="${tradeAmountChangeRate}" pattern="#,##0.0"/>%
-                        </div>
+                        <c:choose>
+                            <c:when test="${tradeAmountChangeRate > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${tradeAmountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:when test="${tradeAmountChangeRate < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${tradeAmountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0.0%
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         <div class="stat-card__change stat-card__change--down">
-                            전일 대비 0.0%
+                            전일 대비 -%
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -74,13 +102,27 @@
                 <c:choose>
                     <c:when test="${not empty stats}">
                         <c:set var="buyCountChangeRate" value="${stats.buyCountChangeRate}" />
-                        <div class="stat-card__change ${buyCountChangeRate >= 0 ? 'stat-card__change--up' : 'stat-card__change--down'}">
-                            전일 대비 <fmt:formatNumber value="${buyCountChangeRate}" pattern="#,##0.0"/>%
-                        </div>
+                        <c:choose>
+                            <c:when test="${buyCountChangeRate > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${buyCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:when test="${buyCountChangeRate < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${buyCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0.0%
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         <div class="stat-card__change stat-card__change--down">
-                            전일 대비 0.0%
+                            전일 대비 -%
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -94,13 +136,27 @@
                 <c:choose>
                     <c:when test="${not empty stats}">
                         <c:set var="sellCountChangeRate" value="${stats.sellCountChangeRate}" />
-                        <div class="stat-card__change ${sellCountChangeRate >= 0 ? 'stat-card__change--up' : 'stat-card__change--down'}">
-                            전일 대비 <fmt:formatNumber value="${sellCountChangeRate}" pattern="#,##0.0"/>%
-                        </div>
+                        <c:choose>
+                            <c:when test="${sellCountChangeRate > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${sellCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:when test="${sellCountChangeRate < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${sellCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0.0%
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         <div class="stat-card__change stat-card__change--down">
-                            전일 대비 0.0%
+                            전일 대비 -%
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -114,13 +170,27 @@
                 <c:choose>
                     <c:when test="${not empty stats}">
                         <c:set var="cancelledCountChangeRate" value="${stats.cancelledCountChangeRate}" />
-                        <div class="stat-card__change ${cancelledCountChangeRate >= 0 ? 'stat-card__change--up' : 'stat-card__change--down'}">
-                            전일 대비 <fmt:formatNumber value="${cancelledCountChangeRate}" pattern="#,##0.0"/>%
-                        </div>
+                        <c:choose>
+                            <c:when test="${cancelledCountChangeRate > 0}">
+                                <div class="stat-card__change stat-card__change--up">
+                                    전일 대비 +<fmt:formatNumber value="${cancelledCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:when test="${cancelledCountChangeRate < 0}">
+                                <div class="stat-card__change stat-card__change--down">
+                                    전일 대비 <fmt:formatNumber value="${cancelledCountChangeRate}" pattern="#,##0.0"/>%
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="stat-card__change stat-card__change--neutral">
+                                    전일 대비 0.0%
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         <div class="stat-card__change stat-card__change--down">
-                            전일 대비 0.0%
+                            전일 대비 -%
                         </div>
                     </c:otherwise>
                 </c:choose>

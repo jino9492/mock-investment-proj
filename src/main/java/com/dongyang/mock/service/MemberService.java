@@ -3,6 +3,8 @@ package com.dongyang.mock.service;
 import com.dongyang.mock.model.DAO.MemberDAO;
 import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.model.DTO.MemberStatsDTO;
+import com.dongyang.mock.model.DTO.MemberAssetDTO;
+import com.dongyang.mock.model.DTO.MemberHoldingDTO;
 import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.util.*;
 import com.dongyang.mock.util.db.DBManager;
@@ -145,5 +147,23 @@ public class MemberService {
      */
     public MemberStatsDTO getMemberStats() throws SQLException {
         return DBManager.withConnection(memberDAO::fetchMemberStats);
+    }
+
+    /**
+     * 회원 자산 정보 조회
+     * @param memberId 회원 ID
+     * @return 회원 자산 정보
+     */
+    public MemberAssetDTO getMemberAsset(int memberId) throws SQLException {
+        return DBManager.withConnection(conn -> memberDAO.fetchMemberAsset(memberId, conn));
+    }
+
+    /**
+     * 회원 보유 종목 목록 조회
+     * @param memberId 회원 ID
+     * @return 보유 종목 목록
+     */
+    public List<MemberHoldingDTO> getMemberHoldings(int memberId) throws SQLException {
+        return DBManager.withConnection(conn -> memberDAO.fetchMemberHoldings(memberId, conn));
     }
 }

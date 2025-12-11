@@ -2,7 +2,7 @@ package com.dongyang.mock.service.scheduler;
 
 import com.dongyang.mock.service.api.fetch.IndexFetchService;
 
-public class SparklineFetchTask implements  Runnable {
+public class SparklineFetchWorker implements  Runnable {
     @Override
     public synchronized void run() {
         IndexFetchService indexFetchService = new IndexFetchService();

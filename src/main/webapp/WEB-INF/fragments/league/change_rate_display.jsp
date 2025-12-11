@@ -21,9 +21,9 @@
 %>
 
 <span class="<c:choose>
-    <c:when test="${changeRate == 0}">league__text-gray</c:when>
-    <c:when test="${changeRate > 0}">league__text-red</c:when>
-    <c:otherwise>league__text-blue</c:otherwise>
+    <c:when test="${changeRate == 0}">price-color--neutral</c:when>
+    <c:when test="${changeRate > 0}">price-color--up</c:when>
+    <c:otherwise>price-color--down</c:otherwise>
 </c:choose>">
     <c:if test="${changeRate > 0}">+</c:if><fmt:formatNumber value="${changeRate}" pattern="0.00"/>%
 </span>

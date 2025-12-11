@@ -32,6 +32,12 @@ public class IndexFetchService extends FetchService {
             runFetch(token, 5, "101", "KOSDAQ");
             Thread.sleep(DELAY_TIME);
             runFetch(token, 5, "701", "KRX100");
+            Thread.sleep(DELAY_TIME);
+            runFetch(token, 5, "002", "대형주");
+            Thread.sleep(DELAY_TIME);
+            runFetch(token, 5, "003", "중형주");
+            Thread.sleep(DELAY_TIME);
+            runFetch(token, 5, "004", "소형주");
 
         } catch (Exception e) {
             System.err.println("배치 업데이트 중 오류 발생: " + e.getMessage());

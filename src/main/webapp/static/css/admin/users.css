@@ -109,6 +109,10 @@ body {
     color: #4A90E2;
 }
 
+.stat-card__change--neutral {
+    color: #999;
+}
+
 /* ==================== 필터 바 ==================== */
 .filter-bar {
     padding: 20px 0;

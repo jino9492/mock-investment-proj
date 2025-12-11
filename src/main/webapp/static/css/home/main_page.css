@@ -369,14 +369,17 @@ ul {
 
 /* 인덱스 카드 */
 .main__index-section {
-  margin-bottom: 24px;
+  position: sticky;
+  top: 70px;
+  padding-bottom: 24px;
+  background: white;
+  z-index: 100;
 }
 
 .main__index-row {
   display: flex;
   align-items: center;
-  /* overflow: hidden; */
-  gap: 16px;
+  justify-content: space-between;
 }
 
 .main__index-thumb {
@@ -510,25 +513,26 @@ section{
 .main__section-title {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 12px;
   border-bottom: 1px solid #E8E8E8;
   padding-bottom: 12px;
+  padding-top: 12px;
 }
 
 .main__bottom-section {
-  margin-top: 10px;
+  margin-top: 18px;
   display: grid;
   grid-template-columns: 1.4fr 0.9fr; 
   gap: 32px;
+  margin-bottom: 48px;
 }
 
 .main__table-header-row {
   color: #797979;
-  padding: 10px 16px;
+  padding: 12px 16px;
+  background: white;
   font-size: 14px;
   display: grid;
   grid-template-columns: 30% 30% 20% 20%;
-  margin-bottom: 4px;
 }
 
 .main__table-header-row span:nth-child(3),
@@ -566,7 +570,7 @@ section{
   justify-content: center;
 }
 
-.main__list-row:hover {
+.main__list-row:hover, .is-active-hover {
   background-color: #F8F8F8;  
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -591,7 +595,7 @@ section{
   gap: 8px 16px;
   font-size: 10px;
   margin-bottom: 14px;
-  border: 1px solid #BABABA;
+  border: 1px solid #E2E2E2;
   border-radius: 10px;
   padding: 14px;
 }
@@ -605,12 +609,14 @@ section{
 
 .main__chart-info-label {
   color: #17171B;
+  font-size: 16px;
 }
 
 
 .main__chart-info div span:last-child {
   text-align: right;
-  flex-shrink: 0; 
+  flex-shrink: 0;
+  font-size: 16px;
 }
 
 
@@ -618,12 +624,12 @@ section{
   display: flex;
   flex-direction: column;  
   gap: 4px;
-  font-size: 12px;
+  font-size: 16px;
   margin-bottom: 12px;
 }
 
 .main__chart-header strong {
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 600;
 }
 
@@ -643,4 +649,47 @@ section{
   border-radius: 7px;
   height: 48px;
   width: 137px;
+}
+
+.main__table-header-row{
+  position: sticky;
+  top: 190px;
+}
+
+.main__card{
+  position: sticky;
+  top: 224px;
+  display: inline-block;
+  height: 800px;
+  margin-top: 24px;
+}
+
+.main__section-title{
+  z-index: 100;
+  background: white;
+}
+
+.main__stock-section > *{
+  position: sticky;
+  top: 140px;
+}
+
+@keyframes flash-red {
+  0% { background-color: #ffcccc; } /* 밝은 빨강 */
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-blue {
+  0% { background-color: #cceeff; } /* 밝은 파랑 */
+  100% { background-color: transparent; }
+}
+
+/* 텍스트가 반짝이는 클래스 (양수인 경우) */
+.text-highlight-up {
+  animation: flash-red 0.5s ease-out;
+}
+
+/* 텍스트가 반짝이는 클래스 (음수인 경우) */
+.text-highlight-down {
+  animation: flash-blue 0.5s ease-out;
 }

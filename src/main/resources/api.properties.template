@@ -13,3 +13,8 @@ kw.stock.endpoint=/api/dostk/stkinfo
 
 kw.stockdetail.tr=ka10001
 kw.stockdetail.endpoint=/api/dostk/stkinfo
+
+kw.ranking.tr=ka10032
+kw.ranking.endpoint=/api/dostk/rkinfo
+
+kw.socket.url=wss://mockapi.kiwoom.com:10000/api/dostk/websocket

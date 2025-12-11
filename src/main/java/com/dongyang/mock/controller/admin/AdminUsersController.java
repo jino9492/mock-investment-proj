@@ -2,8 +2,12 @@ package com.dongyang.mock.controller.admin;
 
 import com.dongyang.mock.model.DTO.MemberDTO;
 import com.dongyang.mock.model.DTO.MemberStatsDTO;
+import com.dongyang.mock.model.DTO.MemberAssetDTO;
+import com.dongyang.mock.model.DTO.MemberHoldingDTO;
+import com.dongyang.mock.model.DTO.TradeDTO;
 import com.dongyang.mock.model.status.MemberStatus;
 import com.dongyang.mock.service.MemberService;
+import com.dongyang.mock.service.TradeService;
 import com.dongyang.mock.util.DateUtility;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,6 +31,7 @@ import java.util.List;
 public class AdminUsersController extends BaseAdminController {
 
     private final MemberService memberService = new MemberService();
+    private final TradeService tradeService = new TradeService();
 
     /**
      * GET 요청 처리
@@ -76,19 +81,16 @@ public class AdminUsersController extends BaseAdminController {
 
         try {
             List<MemberDTO> members = memberService.getMembers(keyword, statusFilter, profitFilter, joinFilter);
-            MemberStatsDTO stats = memberService.getMemberStats();
-            
-            // null 체크: stats가 null이면 기본값으로 초기화
-            if (stats == null) {
-                stats = new MemberStatsDTO();
-            }
+            MemberStatsDTO stats = orDefault(
+                memberService.getMemberStats(),
+                MemberStatsDTO::new
+            );
 
             req.setAttribute("memberList", members);
             req.setAttribute("filteredCount", members != null ? members.size() : 0);
             req.setAttribute("memberStats", stats);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException("Failed to load member list", e);
+            handleSQLException(e, "Failed to load member list");
         }
 
         req.setAttribute("keyword", keyword);
@@ -126,7 +128,7 @@ public class AdminUsersController extends BaseAdminController {
         newMember.setAgreePrivacyAt(DateUtility.getCheckTime(req.getParameter("agreePrivacy"), now));
         newMember.setAgreeThirdAt(DateUtility.getCheckTime(req.getParameter("agreeThird"), now));
         newMember.setAgreeNotificationAt(DateUtility.getCheckTime(req.getParameter("agreeNotification"), now));
-        newMember.setVirtualCash(1000000); // 기본 예치금 1,000,000원
+        newMember.setVirtualCash(DEFAULT_VIRTUAL_CASH);
 
         MemberStatus.JoinResult status = MemberStatus.JoinResult.FAIL_INSERT;
         try {
@@ -143,11 +145,7 @@ public class AdminUsersController extends BaseAdminController {
      * @param status 리다이렉트 URL에 포함할 상태 값
      */
     private void redirectWithStatus(HttpServletRequest req, HttpServletResponse resp, String status) throws IOException {
-        StringBuilder target = new StringBuilder(req.getContextPath()).append("/admin/users");
-        if (status != null && !status.isEmpty()) {
-            target.append("?status=").append(encode(status));
-        }
-        resp.sendRedirect(target.toString());
+        redirectWithStatus(req, resp, "/admin/users", status);
     }
 
     /**
@@ -157,25 +155,36 @@ public class AdminUsersController extends BaseAdminController {
      * - 상세 정보 페이지로 포워딩
      */
     private void handleUserDetail(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String memberIdParam = req.getParameter("memberId");
-        MemberDTO member = null;
-        if (!isBlank(memberIdParam)) {
-            try {
-                int memberId = Integer.parseInt(memberIdParam);
-                member = memberService.getMemberById(memberId);
-            } catch (NumberFormatException ignored) {
-            } catch (SQLException e) {
-                throw new ServletException("Failed to load member detail", e);
-            }
-        }
-
-        if (member == null) {
-            resp.sendRedirect(req.getContextPath() + "/admin/users?status=not_found");
+        Integer memberId = parseIntSafely(req.getParameter("memberId"));
+        if (memberId == null) {
+            redirectWithStatus(req, resp, "/admin/users", "not_found");
             return;
         }
 
-        req.setAttribute("member", member);
-        req.getRequestDispatcher("/WEB-INF/views/admin/user_detail.jsp").forward(req, resp);
+        try {
+            MemberDTO member = memberService.getMemberById(memberId);
+            if (member == null) {
+                redirectWithStatus(req, resp, "/admin/users", "not_found");
+                return;
+            }
+
+            // 회원 자산 정보 조회
+            MemberAssetDTO asset = memberService.getMemberAsset(memberId);
+            
+            // 보유 종목 목록 조회
+            List<MemberHoldingDTO> holdings = memberService.getMemberHoldings(memberId);
+            
+            // 최근 거래 내역 조회 (최대 10건)
+            List<TradeDTO> recentTrades = tradeService.getMemberRecentTrades(memberId, 10);
+
+            req.setAttribute("member", member);
+            req.setAttribute("asset", asset);
+            req.setAttribute("holdings", holdings);
+            req.setAttribute("recentTrades", recentTrades);
+            req.getRequestDispatcher("/WEB-INF/views/admin/user_detail.jsp").forward(req, resp);
+        } catch (SQLException e) {
+            handleSQLException(e, "Failed to load member detail");
+        }
     }
 
     /**
@@ -185,17 +194,10 @@ public class AdminUsersController extends BaseAdminController {
      */
     private void handleDetailAction(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String action = req.getParameter("action");
-        String memberIdParam = req.getParameter("memberId");
-        if (isBlank(memberIdParam)) {
-            resp.sendRedirect(req.getContextPath() + "/admin/users?status=invalid");
-            return;
-        }
-
-        int memberId;
-        try {
-            memberId = Integer.parseInt(memberIdParam);
-        } catch (NumberFormatException e) {
-            resp.sendRedirect(req.getContextPath() + "/admin/users?status=invalid");
+        Integer memberId = parseIntSafely(req.getParameter("memberId"));
+        
+        if (memberId == null) {
+            redirectWithStatus(req, resp, "/admin/users", "invalid");
             return;
         }
 
@@ -220,31 +222,25 @@ public class AdminUsersController extends BaseAdminController {
         String nickname = trim(req.getParameter("memberNickname"));
         String virtualCashStr = trim(req.getParameter("virtualCash"));
 
-        String baseRedirect = req.getContextPath() + "/admin/users/detail?memberId=" + memberId + "&status=";
+        String basePath = "/admin/users/detail";
+        String baseQuery = "memberId=" + memberId + "&status=";
+        
         if (isBlank(nickname)) {
-            resp.sendRedirect(baseRedirect + encode("update_fail"));
+            redirectWithQuery(req, resp, basePath, baseQuery + encode("update_fail"));
             return;
         }
 
-        Integer virtualCash = null;
-        if (virtualCashStr != null && !virtualCashStr.isEmpty()) {
-            try {
-                virtualCash = Integer.parseInt(virtualCashStr);
-                if (virtualCash < 0) {
-                    resp.sendRedirect(baseRedirect + encode("update_fail"));
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                resp.sendRedirect(baseRedirect + encode("update_fail"));
-                return;
-            }
+        Integer virtualCash = parseIntSafely(virtualCashStr);
+        if (virtualCash != null && virtualCash < 0) {
+            redirectWithQuery(req, resp, basePath, baseQuery + encode("update_fail"));
+            return;
         }
 
         try {
             // 이메일은 수정하지 않고, 비밀번호도 수정하지 않음 (null 전달)
             MemberDTO existingMember = memberService.getMemberById(memberId);
             if (existingMember == null) {
-                resp.sendRedirect(baseRedirect + encode("update_fail"));
+                redirectWithQuery(req, resp, basePath, baseQuery + encode("update_fail"));
                 return;
             }
 
@@ -262,10 +258,10 @@ public class AdminUsersController extends BaseAdminController {
                 case DUPLICATE_NICKNAME -> status = "update_duplicate_nickname";
                 default -> status = "update_fail";
             }
-            resp.sendRedirect(baseRedirect + encode(status));
+            redirectWithQuery(req, resp, basePath, baseQuery + encode(status));
         } catch (SQLException e) {
             e.printStackTrace();
-            resp.sendRedirect(baseRedirect + encode("update_fail"));
+            redirectWithQuery(req, resp, basePath, baseQuery + encode("update_fail"));
         }
     }
 
@@ -279,13 +275,15 @@ public class AdminUsersController extends BaseAdminController {
         try {
             boolean deleted = memberService.deleteMember(memberId);
             if (deleted) {
-                resp.sendRedirect(req.getContextPath() + "/admin/users?status=delete_success");
+                redirectWithStatus(req, resp, "/admin/users", "delete_success");
             } else {
-                resp.sendRedirect(req.getContextPath() + "/admin/users/detail?memberId=" + memberId + "&status=" + encode("delete_fail"));
+                redirectWithQuery(req, resp, "/admin/users/detail", 
+                    "memberId=" + memberId + "&status=" + encode("delete_fail"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/admin/users/detail?memberId=" + memberId + "&status=" + encode("delete_fail"));
+            redirectWithQuery(req, resp, "/admin/users/detail", 
+                "memberId=" + memberId + "&status=" + encode("delete_fail"));
         }
     }
 }

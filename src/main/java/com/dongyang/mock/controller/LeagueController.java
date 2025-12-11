@@ -54,6 +54,9 @@ public class LeagueController extends HttpServlet {
 
         request.setAttribute("member", member);
         request.setAttribute("isLoggedIn", isLoggedIn);
+        
+        // 헤더 메뉴 활성화를 위한 현재 경로 설정
+        request.setAttribute("currentPage", "/league");
 
         String modifyRequest = request.getParameter("modify");
         request.setAttribute("modify", modifyRequest);

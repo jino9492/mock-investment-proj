@@ -185,5 +185,89 @@ public class TradeDAO {
         trade.setTradeDate(rs.getTimestamp("trade_date"));
         return trade;
     }
+
+    /**
+     * 특정 회원의 최근 거래 내역 조회
+     * @param memberId 회원 ID
+     * @param limit 조회할 최대 건수
+     * @return 최근 거래 내역 목록
+     */
+    public List<TradeDTO> findMemberRecentTrades(int memberId, int limit, Connection conn) throws SQLException {
+        String sql = "SELECT t.trade_id, t.mem_id, m.mem_nickname, s.stock_name, " +
+                "CASE WHEN o.side = 'BUY' THEN 'buy' ELSE 'sell' END AS trade_type, " +
+                "t.trade_quantity AS quantity, " +
+                "t.trade_price AS price, " +
+                "t.trade_price * t.trade_quantity AS total_amount, " +
+                "CASE WHEN o.status = 'FILLED' THEN 'settled' WHEN o.status = 'CANCELLED' THEN 'cancelled' ELSE o.status END AS status, " +
+                "t.traded_at AS trade_date " +
+                "FROM trade t " +
+                "INNER JOIN trade_order o ON t.order_id = o.order_id " +
+                "INNER JOIN stock s ON t.stock_id = s.stock_id " +
+                "LEFT JOIN member m ON t.mem_id = m.mem_id " +
+                "WHERE t.mem_id = ? " +
+                "ORDER BY t.traded_at DESC, t.trade_id DESC " +
+                "LIMIT ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<TradeDTO> trades = new ArrayList<>();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memberId);
+            pstmt.setInt(2, limit);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                trades.add(mapToTrade(rs));
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        return trades;
+    }
+
+    /**
+     * 체결 내역 저장
+     * @param memId 회원 ID
+     * @param stockId 종목 ID
+     * @param orderId 주문 ID
+     * @param tradePrice 체결 가격
+     * @param tradeQuantity 체결 수량
+     * @param conn DB 연결
+     * @return 생성된 trade ID
+     * @throws SQLException
+     */
+    public long insertTrade(int memId, long stockId, long orderId, 
+                           java.math.BigDecimal tradePrice, long tradeQuantity, 
+                           Connection conn) throws SQLException {
+        String sql = "INSERT INTO trade (mem_id, stock_id, order_id, trade_price, trade_quantity, traded_at) " +
+                     "VALUES (?, ?, ?, ?, ?, NOW())";
+        
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setInt(1, memId);
+            pstmt.setLong(2, stockId);
+            pstmt.setLong(3, orderId);
+            pstmt.setBigDecimal(4, tradePrice);
+            pstmt.setLong(5, tradeQuantity);
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows == 0) {
+                throw new SQLException("체결 내역 저장에 실패했습니다.");
+            }
+            
+            rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getLong(1);
+            } else {
+                throw new SQLException("체결 ID를 가져올 수 없습니다.");
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+    }
 }
 

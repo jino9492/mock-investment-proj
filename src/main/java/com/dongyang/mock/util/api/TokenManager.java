@@ -1,6 +1,11 @@
 package com.dongyang.mock.util.api;
 
+import com.dongyang.mock.model.DTO.ServerStatsDTO;
+import com.dongyang.mock.util.DateUtility;
+
 import java.io.InputStream;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Properties;
 
 public class TokenManager {
@@ -50,11 +55,11 @@ public class TokenManager {
      * @param token 새로 발급받은 Access Token
      * @param expiresIn API가 알려준 유효 기간 (초 단위)
      */
-    public void setToken(String token, String type, long expiresIn) {
+    public void setToken(String token, String type, String expiresIn) {
         this.tokenType = type;
         this.accessToken = token;
-        // API가 알려준 만료 시간(초)에서 약 60초를 미리 빼서 갱신하도록 설정
-        this.tokenExpiryTime = System.currentTimeMillis() + (expiresIn * 1000) - 60000;
-        System.out.println("Access Token is successfully saved. Expiry Time : " + new java.util.Date(tokenExpiryTime));
+        // API가 알려준 만료 시간(초)에서 약 1분 미리 빼서 갱신하도록 설정
+        this.tokenExpiryTime = DateUtility.convertToMillis(expiresIn.substring(0, 12), "yyyyMMddHHmm") - 60000;
+        System.out.println("Access Token is successfully saved. Expiry Time : " + new Timestamp(this.tokenExpiryTime));
     }
 }

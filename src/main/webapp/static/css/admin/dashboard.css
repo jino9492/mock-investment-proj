@@ -81,6 +81,19 @@ body {
     gap: 4px;
 }
 
+.stat-change--up {
+    color: #E74C3C;
+}
+
+.stat-change--down {
+    color: #4A90E2;
+}
+
+.stat-change--neutral {
+    color: #999;
+}
+
+/* 기존 클래스명 호환성 유지 */
 .stat-change.positive {
     color: #E74C3C;
 }
