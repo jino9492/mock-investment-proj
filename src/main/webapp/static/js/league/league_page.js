@@ -2,6 +2,8 @@
  * 리그 페이지 메인 클래스
  * API 연동 및 데이터 렌더링 관리
  */
+import {getPriceColorClass, formatPriceChange} from "../common/price_color_utils.js";
+
 class LeaguePage {
     constructor() {
         this.updateIntervalId = null;
@@ -327,39 +329,22 @@ class LeaguePageUtils {
      * 수익률을 퍼센트 형식으로 포맷팅 (색상 클래스 포함)
      */
     static formatReturnRate(rate) {
-        if (rate === 0 || rate === 0.0) {
-            return { text: '0.00%', className: 'league__text-gray' };
-        } else if (rate > 0) {
-            return { text: '+' + rate.toFixed(2) + '%', className: 'league__text-red' };
-        } else {
-            return { text: rate.toFixed(2) + '%', className: 'league__text-blue' };
-        }
+        const text = formatPriceChange(rate) + '%';
+        return { text: text, className: getPriceColorClass(rate) };
     }
 
     /**
      * 등락률을 퍼센트 형식으로 포맷팅
      */
     static formatChangeRate(rate) {
-        if (rate === 0 || rate === 0.0) {
-            return '0.00%';
-        } else if (rate > 0) {
-            return '+' + rate.toFixed(2) + '%';
-        } else {
-            return rate.toFixed(2) + '%';
-        }
+        return formatPriceChange(rate) + '%';
     }
 
     /**
      * 등락률에 따른 색상 클래스 반환
      */
     static getChangeRateClass(rate) {
-        if (rate === 0 || rate === 0.0) {
-            return 'league__text-gray';
-        } else if (rate > 0) {
-            return 'league__text-red';
-        } else {
-            return 'league__text-blue';
-        }
+        return getPriceColorClass(rate);
     }
 }
 

@@ -105,7 +105,7 @@
 
             <!-- 투자 지표 및 재무 상태 -->
             <section class="stock-info-section">
-                <h2 class="stock-info-section__title">투자 지표 및 재무 상태</h2>
+                <h2 class="stock-info-section__title">투자지표 및 재무상태</h2>
 
                 <div class="stock-info__metrics">
                     <!-- 왼쪽 카드 -->

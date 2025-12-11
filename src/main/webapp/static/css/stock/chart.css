@@ -662,10 +662,10 @@ body.stock-page {
 .my-stock-card__row {
     display: flex;
     justify-content: space-between;
-    font-size: 17px;
+    font-size: 16px;
     margin-bottom: 10px;
 }
 
 .my-stock-card__profit {
-    color: #9000FF;
+    color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
 }

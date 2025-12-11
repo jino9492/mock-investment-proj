@@ -35,7 +35,6 @@
 .stock-header__info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
 }
 
 .stock-header__name {
@@ -58,9 +57,7 @@
     font-size: 17px;
 }
 
-.stock-header__diff-value {
-    color: #9000FF;
-}
+/* .stock-header__diff-value의 색상은 price-color--* 클래스가 제어합니다 */
 
 /* 상단 탭 */
 .stock-tabs {
@@ -70,17 +67,18 @@
 
 .stock-tabs__item {
     border: none;
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 20px;
     background-color: #F9F9F9;
     font-size: 15px;
     cursor: pointer;
     text-decoration: none;
-    color: black;
+    color: #17171B;
 }
 
 .stock-tabs__item--active {
-    background-color: #D9D9D9;
+    background-color: #e9ecf0;
+    font-weight: 550;
 }
 
 .order-card__order-type-hidden, .order-card__conditional-order--hidden, .order-card__wait-orders--hidden {
