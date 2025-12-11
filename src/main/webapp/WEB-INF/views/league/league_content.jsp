@@ -16,7 +16,6 @@
  * - 빈 상태 메시지: /WEB-INF/fragments/league/empty_state_message.jsp
  * - 테이블 행: /WEB-INF/fragments/league/table_row_*.jsp
 --%>
-<%@ page import="com.dongyang.mock.model.DTO.MemberDTO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -24,21 +23,8 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/league/league_page.css"/>
 <script src="${pageContext.request.contextPath}/static/js/league/league_page.js"></script>
 
-<%-- 
- * 서버 사이드 데이터를 JavaScript 변수로 전달하여 중복 API 호출 방지
- * 초기 렌더링은 서버 사이드 데이터 사용, 실시간 업데이트만 API 호출
- --%>
-<script>
-    // 서버 사이드에서 렌더링된 초기 데이터를 JavaScript 변수로 전달
-    // 초기 로드 시 API 호출하지 않고 서버 사이드 데이터 사용
-    window.leagueInitialData = {
-        hasInitialData: true,
-        lastUpdateTime: new Date().getTime()
-    };
-</script>
-
 <main class="league__content">
-    <%-- 페이지 제목 영역 --%>
+
     <div class="main__sub-title">
         <span class="main__dot-green"></span>
         <strong>국내 장 열림/닫힘</strong>

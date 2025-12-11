@@ -1,9 +1,10 @@
-<%@ page import="com.dongyang.mock.model.DTO.MemberDTO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/home/main_page.css"/>
 <script type="module" src="${pageContext.request.contextPath}/static/js/home/main_page.js"></script>
+
 <main class="main__content">
   <div class="main__sub-title">
     <span class="main__dot-green"></span>
@@ -15,23 +16,37 @@
     <!-- 계좌 카드 + 로그인 팝업 -->
     <div class="main__card-login-wrap">
       <section class="main__card-account ${isLoggedIn ? "logged-in" : ""}">
-        <h1 class="main__page-title">○○○님의 가상 주식 계좌</h1>
+        <h1 class="league__page-title">
+          ${not empty member.memNickname ? member.memNickname : '○○○'}님의 가상 주식 계좌
+        </h1>
         <div class="main__summary-grid">
           <div class="main__summary-box">
 
             <div class="main__summary-label">계좌 총 잔액</div>
-            <div class="main__summary-value">0,000,000원</div>
+            <div class="league__summary-value" id="account-total-asset">
+              <fmt:formatNumber value="${not empty accountSummary ? accountSummary.totalAsset : 0}" pattern="#,###"/>원
+            </div>
           </div>
           <div class="main__summary-box">
             <div class="main__summary-label">상위</div>
-            <div class="main__summary-value">0%</div>
+            <div class="league__summary-value" id="account-percentile">
+              <fmt:formatNumber value="${not empty accountSummary ? accountSummary.percentile : 0}" pattern="0.0"/>%
+            </div>
           </div>
         </div>
 
-        <div class="main__summary-box" style="margin-bottom: 10px;">
-          <div class="main__summary-label">투자중인 금액</div>
-          <div class="main__summary-value">
-            0,000,000원 <span>(00.00%)</span>
+        <div class="league__summary-box" style="margin-bottom: 10px;">
+          <div class="league__summary-label">투자중인 금액</div>
+          <div class="league__summary-value" id="account-stock-value">
+            <c:if test="${not empty accountSummary}">
+              <fmt:formatNumber value="${accountSummary.stockValue}" pattern="#,###"/>원
+              <span class="<c:choose><c:when test="${accountSummary.totalReturn == 0}">league__text-gray</c:when><c:when test="${accountSummary.totalReturn > 0}">league__text-red</c:when><c:otherwise>league__text-blue</c:otherwise></c:choose>">
+                                (<c:if test="${accountSummary.totalReturn > 0}">+</c:if><fmt:formatNumber value="${accountSummary.totalReturn}" pattern="0.00"/>%)
+                            </span>
+            </c:if>
+            <c:if test="${empty accountSummary}">
+              0원 <span>(0.00%)</span>
+            </c:if>
           </div>
         </div>
 
@@ -46,25 +61,26 @@
             <th>총 수익</th>
           </tr>
           </thead>
-          <tbody>
-          <tr>
-            <td>1</td>
-            <td>주식회사이름</td>
-            <td>000원</td>
-            <td><span class="price-color--neutral">000원  +/-0.00%</span></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>주식회사이름</td>
-            <td>000원</td>
-            <td><span class="price-color--neutral">000원   +/-0.00%</span></td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>주식회사이름</td>
-            <td>000원</td>
-            <td><span class="price-color--neutral">000원   +/-0.00%</span></td>
-          </tr>
+          <tbody id="top-return-stocks-tbody">
+          <c:choose>
+            <c:when test="${not empty topReturnStocks}">
+              <c:forEach items="${topReturnStocks}" var="stock" varStatus="status">
+                <jsp:include page="/WEB-INF/fragments/league/table_row_top_return_stock.jsp">
+                  <jsp:param name="rank" value="${status.count}"/>
+                  <jsp:param name="stockName" value="${stock.stockName}"/>
+                  <jsp:param name="currentPrice" value="${stock.currentPrice}"/>
+                  <jsp:param name="avgPurchasePrice" value="${stock.avgPurchasePrice}"/>
+                  <jsp:param name="changeRate" value="${stock.changeRate}"/>
+                </jsp:include>
+              </c:forEach>
+            </c:when>
+            <c:otherwise>
+              <jsp:include page="/WEB-INF/fragments/league/empty_state_message.jsp">
+                <jsp:param name="colspan" value="5"/>
+                <jsp:param name="message" value="보유하고 있는 주식이 없습니다."/>
+              </jsp:include>
+            </c:otherwise>
+          </c:choose>
           </tbody>
         </table>
       </section>

@@ -139,7 +139,6 @@ public class StockDetailFetchService extends FetchService implements ServletCont
         }
 
         try {
-            Long code = getLongValue(response, "stk_cd");
             Date indicatorDate = Date.valueOf(LocalDate.now());
             BigDecimal per = getBigDecimalValue(response, "per");
             BigDecimal pbr = getBigDecimalValue(response, "pbr");
@@ -153,7 +152,6 @@ public class StockDetailFetchService extends FetchService implements ServletCont
         }
 
         try {
-            Long code = getLongValue(response, "stk_cd");
             Long revenue = getLongValue(response, "sale_amt");
             Long operatingProfit = getLongValue(response, "bus_pro");
             BigDecimal creditRatio = getBigDecimalValue(response, "crd_rt");
