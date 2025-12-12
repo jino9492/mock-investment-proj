@@ -324,7 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
 
       <div class="condition-filter" style="display:flex; align-items:center; gap:8px;">
-        <label style="font-size:13px; color:#111827;">모든 주식</label>
         <select id="condition-stock-select" style="height:32px; border:1px solid #e5e7eb; border-radius:8px; padding:0 10px;">
           <option value="ALL">모든 주식</option>
         </select>
