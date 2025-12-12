@@ -21,7 +21,7 @@ public class StockInfoController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        Long stkCode = Long.parseLong(req.getParameter("code"));
+        String stkCode = req.getParameter("code");
 
         StockDetailService stockDetailService = new StockDetailService();
 

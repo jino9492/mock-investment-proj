@@ -2,7 +2,8 @@
 import {loadIndexSparklineData, loadRankingData, loadRealtimeData} from "../common/api/fetch_utils.js";
 import {getPriceColorClass} from "../common/price_color_utils.js";
 import {registerToSocket} from "../common/api/socket.js";
-import {fetchAndUpdateStockDetail} from "./chart_card.js";
+import {fetchAndUpdateStockDetail, rerenderPrice} from "./chart_card.js";
+import {saveRealtimeData, STORAGE_KEY} from "../common/utils.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     const indexNames = document.querySelectorAll('.main__index-name');
@@ -10,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadSparklinePromises = [];
     const loadRankingPromises = [];
     let activeHoverElement = null;
+
+    let storedRealtimeData = sessionStorage.getItem(STORAGE_KEY);
+    storedRealtimeData = storedRealtimeData ? JSON.parse(storedRealtimeData) : {};
 
     // 전역 변수로 관리할 맵 (종목 코드 -> DOM 요소)
     const realtimeDOMMap = {};
@@ -91,23 +95,48 @@ document.addEventListener('DOMContentLoaded', function () {
             timeSpan.textContent = "순위 · 오늘 " + formattedDate + " 기준"
 
             const subscribedCodes = [];
+            rankingList.forEach(item => {
+                subscribedCodes.push(item.stkCode.replace('_AL', ''));
+            });
+
+            const realtimePromises = subscribedCodes.map(code => loadRealtimeData(code));
+            const res = await Promise.allSettled(realtimePromises);
+
+            const realtimeDataMap = new Map();
+            res.forEach(result => {
+                if (result.status === 'fulfilled') {
+                    const realtimeItem = result.value[0];
+                    if (realtimeItem && realtimeItem.stkCode) {
+                        realtimeDataMap.set(realtimeItem.stkCode, realtimeItem);
+                    }
+                } else {
+                    console.error(result.reason);
+                }
+            });
 
             rankingList.forEach((item, index) => {
                 const rank = index + 1;
                 const stkCode = item.stkCode.replace('_AL', '');
+                const storedItem = storedRealtimeData[stkCode];
                 const actualPrice = Math.abs(item.curPrice);
 
-                const isPositive = item.fluRt > 0;
-                const isNegative = item.fluRt < 0;
+                const realtimeItem = realtimeDataMap.get(stkCode) || null;
 
-                const priceClass = getPriceColorClass(item.fluRt);
+                const priceToDisplay = storedItem
+                    ? Math.abs(storedItem.price)
+                    : (realtimeItem ? Math.abs(realtimeItem.curPrice) : actualPrice);
 
+                const rateToDisplay = storedItem
+                    ? storedItem.rate
+                    : (realtimeItem ? realtimeItem.fluRt : item.fluRt);
+
+                const priceClass = getPriceColorClass(rateToDisplay);
+                const isPositive = rateToDisplay > 0;
+                const isNegative = rateToDisplay < 0;
                 const rateSign = isPositive ? '+' : (isNegative ? '-' : '');
 
                 const selector = `.main__list-row--${rank}`;
                 const targetRow = document.querySelector(selector);
-
-                subscribedCodes.push(stkCode);
 
                 if (index === 0) {
                     activeHoverElement = targetRow;
@@ -121,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 if (targetRow) {
-
                     const rankSpan = targetRow.querySelector('span:nth-child(1)');
                     if (rankSpan) rankSpan.textContent = item.nowRank;
 
@@ -132,16 +160,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const priceSpan = targetRow.querySelector('span:nth-child(3)');
                     if (priceSpan) {
-                        priceSpan.textContent = actualPrice.toLocaleString() + "원";
+                        priceSpan.textContent = priceToDisplay.toLocaleString() + "원";
                     }
 
                     const rateSpan = targetRow.querySelector('span:nth-child(4)');
                     if (rateSpan) {
-                        rateSpan.textContent = `${rateSign}${Math.abs(item.fluRt).toFixed(2)}%`;
+                        rateSpan.textContent = `${rateSign}${Math.abs(rateToDisplay).toFixed(2)}%`;
                         rateSpan.className = 'main__text-rate ' + priceClass;
                     }
 
-                    // DOM 맵에 priceSpan과 rateSpan을 저장
                     realtimeDOMMap[stkCode] = {
                         priceSpan: priceSpan,
                         rateSpan: rateSpan
@@ -196,55 +223,45 @@ document.addEventListener('DOMContentLoaded', function () {
     function startRealtimeUpdates(codes, socket) {
         if (codes.length === 0) return;
 
-        // const ITEM_DELAY_MS = 40; // 개별 종목 요청 사이의 지연 시간 (ms)
         let lastResponse = {};
         const fetchAndUpdate = async () => {
-            // for (const code of codes) {
-            //     try {
-            //         const dataArray = await loadRealtimeData(code);
-            //         const realtimeItem = dataArray && dataArray.length > 0 ? dataArray[0] : null;
-            //
-            //         if (!realtimeItem.realtime) {
-            //             continue;
-            //         }
-            //
-            //         const mappedElements = realtimeDOMMap[code];
-            //         const priceString = realtimeItem.realtime.curPrice;
-            //         const rateString = realtimeItem.realtime.fluRt;
-            //
-            //         if (mappedElements && priceString && rateString) {
-            //             const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
-            //             const changeRate = parseFloat(rateString);
-            //
-            //             if (!isNaN(currentPrice) && !isNaN(changeRate)) {
-            //                 const oldRateTextRaw = mappedElements.rateSpan.textContent.replace(/[%]/g, '');
-            //
-            //                 const newRateText = `${rateString}%`;
-            //
-            //                 const isPositive = changeRate > 0;
-            //                 const priceClass = getPriceColorClass(changeRate);
-            //
-            //                 const oldRateFormatted = parseFloat(oldRateTextRaw).toFixed(2);
-            //                 const newRateFormatted = parseFloat(rateString).toFixed(2);
-            //                 if (newRateFormatted !== oldRateFormatted) {
-            //                     mappedElements.rateSpan.textContent = newRateText;
-            //                     mappedElements.rateSpan.className = 'main__text-rate ' + priceClass;
-            //                     applyFlashEffect(mappedElements.rateSpan, isPositive);
-            //                 }
-            //             }
-            //         }
-            //
-            //         await new Promise(resolve => setTimeout(resolve, ITEM_DELAY_MS));
-            //
-            //     } catch (error) {
-            //         console.error(`[${code}] 데이터 업데이트 중 오류 발생:`, error.message);
-            //     }
-            // }
-
             let currentResponse = socket.getRecentResponse();
 
             if ((JSON.stringify(currentResponse) !== JSON.stringify(lastResponse)) && lastResponse.data != null){
                 console.log("changed!");
+                currentResponse.data.forEach(res => {
+                    console.log(realtimeDOMMap[res.item]);
+                    const mappedElements = realtimeDOMMap[res.item];
+                    const priceString = res.values["10"];
+                    const changePriceString = res.values["11"];
+                    const rateString = res.values["12"];
+
+                    if (mappedElements && priceString && rateString) {
+                        const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
+                        const changeRate = parseFloat(rateString);
+                        const changePrice = parseFloat(changePriceString);
+
+                        if (!isNaN(currentPrice) && !isNaN(changeRate)) {
+                            const oldRateTextRaw = mappedElements.rateSpan.textContent.replace(/[%]/g, '');
+
+                            const newRateText = `${rateString}%`;
+
+                            const isPositive = changeRate > 0;
+                            const priceClass = getPriceColorClass(changeRate);
+
+                            const oldRateFormatted = parseFloat(oldRateTextRaw).toFixed(2);
+                            const newRateFormatted = parseFloat(rateString).toFixed(2);
+                            if (newRateFormatted !== oldRateFormatted) {
+                                mappedElements.rateSpan.textContent = newRateText;
+                                mappedElements.rateSpan.className = 'main__text-rate ' + priceClass;
+                                applyFlashEffect(mappedElements.rateSpan, isPositive);
+                                rerenderPrice();
+                            }
+
+                            saveRealtimeData(res.item, currentPrice, changeRate, changePrice);
+                        }
+                    }
+                })
             }
 
             lastResponse = currentResponse;

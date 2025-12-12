@@ -109,7 +109,7 @@ public class StockDAO {
         return stock;
     }
 
-    public StockDTO selectStockByCode(Long stockCode, Connection conn) throws SQLException {
+    public StockDTO selectStockByCode(String stockCode, Connection conn) throws SQLException {
         final String sql = "SELECT stock_id, stock_symbol, stock_name, market_type, stock_code_id, " +
                 "listing_date, status, created_at, updated_at " +
                 "FROM stock WHERE stock_symbol = ?";
@@ -118,7 +118,7 @@ public class StockDAO {
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setLong(1, stockCode);
+            pstmt.setString(1, stockCode);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {

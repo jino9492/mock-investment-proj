@@ -3,8 +3,8 @@
 <script type="module" src="${pageContext.request.contextPath}/static/js/home/chart_card.js"></script>
 <section class="main__card chart-card">
       <div class="main__chart-header">
-        <strong>주식회사이름A</strong>
-        <span>000원 +/-0.00%</span>
+        <strong></strong>
+        <span></span>
       </div>
       <div class="main__chart-box">차트</div>
       <div class="main__chart-info">

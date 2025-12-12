@@ -71,7 +71,7 @@ class WebSocketClient {
                         console.log('로그인 성공하였습니다.');
                     }
                 }
-                // 메시지 유형이 PING일 경우 수신값 그대로 송신{
+                // 메시지 유형이 PING일 경우 수신값 그대로 송신
                 else if (response.trnm === 'PING') {
                     this.sendMessage(response);
                 }
@@ -81,7 +81,7 @@ class WebSocketClient {
                     if (response.trnm === 'SYSTEM' && response.code === 'R10001'){
                         this.connect();
                         this.register(this.recentRegisteredKeys);
-                        console.log("소켓 재연결 (keys:" + this.recentRegisteredKeys + ")");
+                        console.log("소켓 재연결");
                     }
                     else{
                         this.currentResponse = response;
