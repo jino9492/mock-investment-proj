@@ -15,6 +15,8 @@ import jakarta.servlet.annotation.WebListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,9 @@ public class StockDetailFetchService extends FetchService implements ServletCont
         try {
             Thread initThread = new Thread(() -> {
                 try {
+                    // DB에 저장된 음수 close_price 확인
+                    checkNegativeClosePrices();
+                    
                     stockMap = DBManager.withConnection(conn->stockDAO.selectAllStockSymbolMap(conn));
                     runUpdate();
                     System.out.println("Stock Detail 데이터가 서버 메모리에 로드되었습니다. (비동기 완료)");
@@ -52,6 +57,48 @@ public class StockDetailFetchService extends FetchService implements ServletCont
             initThread.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+    
+    /**
+     * DB에 저장된 음수 close_price 확인 및 수정
+     */
+    private void checkNegativeClosePrices() {
+        try {
+            DBManager.executeInTransaction(conn -> {
+                // 1. 음수 값 확인
+                String selectSql = "SELECT stock_id, price_date, close_price, open_price, high_price, low_price " +
+                                 "FROM stock_price_daily WHERE close_price < 0 OR open_price < 0 OR high_price < 0 OR low_price < 0 " +
+                                 "ORDER BY stock_id, price_date DESC LIMIT 20";
+                
+                int count = 0;
+                try (PreparedStatement pstmt = conn.prepareStatement(selectSql);
+                     ResultSet rs = pstmt.executeQuery()) {
+                    
+                    while (rs.next()) {
+                        count++;
+                    }
+                }
+                
+                // 2. 음수 값들을 절댓값으로 수정
+                if (count > 0) {
+                    String updateSql = "UPDATE stock_price_daily SET " +
+                                     "open_price = ABS(open_price), " +
+                                     "high_price = ABS(high_price), " +
+                                     "low_price = ABS(low_price), " +
+                                     "close_price = ABS(close_price) " +
+                                     "WHERE close_price < 0 OR open_price < 0 OR high_price < 0 OR low_price < 0";
+                    
+                    try (PreparedStatement updatePstmt = conn.prepareStatement(updateSql)) {
+                        updatePstmt.executeUpdate();
+                    }
+                }
+                
+                return DBManager.TransactionResult.commit(null);
+            });
+        } catch (Exception e) {
+            System.err.println("[StockDetailFetchService] 음수 close_price 확인/수정 중 오류: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -75,6 +122,7 @@ public class StockDetailFetchService extends FetchService implements ServletCont
                 // boolean exists = DBManager.withConnection(conn->stockPriceDailyDAO.existsByStockId(stkId, conn));
 
                 if (!exists) {
+                    System.out.println("[StockDetailFetchService] 종목 코드 " + stkCd + " (ID: " + stkId + ") fetch 시작");
                     runFetch(token, stkCd, stkId);
                     counter++;
                     Thread.sleep(DELAY_TIME);
@@ -169,9 +217,24 @@ public class StockDetailFetchService extends FetchService implements ServletCont
             BigDecimal highPrice = getBigDecimalValue(response, "high_pric");
             BigDecimal lowPrice = getBigDecimalValue(response, "low_pric");
             BigDecimal closePrice = getBigDecimalValue(response, "cur_prc");
+            
+            // 가격 필드가 음수인 경우 절댓값으로 변환
+            if (openPrice != null && openPrice.compareTo(BigDecimal.ZERO) < 0) {
+                openPrice = openPrice.abs();
+            }
+            if (highPrice != null && highPrice.compareTo(BigDecimal.ZERO) < 0) {
+                highPrice = highPrice.abs();
+            }
+            if (lowPrice != null && lowPrice.compareTo(BigDecimal.ZERO) < 0) {
+                lowPrice = lowPrice.abs();
+            }
+            if (closePrice != null && closePrice.compareTo(BigDecimal.ZERO) < 0) {
+                closePrice = closePrice.abs();
+            }
+            
             Long volume = getLongValue(response, "trde_qty");
 
-            Long amount = closePrice.multiply(new BigDecimal(volume)).setScale(0, RoundingMode.HALF_UP).longValue();
+            Long amount = closePrice != null ? closePrice.multiply(new BigDecimal(volume)).setScale(0, RoundingMode.HALF_UP).longValue() : 0L;
 
             BigDecimal prevClose = DBManager.withConnection(conn -> stockPriceDailyDAO.getPreviousClosePrice(stockId, conn));
 
@@ -209,7 +272,9 @@ public class StockDetailFetchService extends FetchService implements ServletCont
             return null;
         }
         try {
-            return new BigDecimal(strValue.replaceAll("[^0-9\\.\\-]", ""));
+            String cleanedValue = strValue.replaceAll("[^0-9\\.\\-]", "");
+            BigDecimal result = new BigDecimal(cleanedValue);
+            return result;
         } catch (NumberFormatException e) {
             System.err.println(key + " 필드의 BigDecimal 변환 실패: " + strValue);
             return null;

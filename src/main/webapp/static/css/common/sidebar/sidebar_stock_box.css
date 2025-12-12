@@ -11,7 +11,7 @@
 .stock-box__container {
     display: flex;
     padding-right: 10px;
-    width: calc(100% - 75px - 30px);
+    width: calc(100% - 20px);
     border-radius: 10px;
 }
 
@@ -47,4 +47,17 @@
 .stock-box__comparison {
     font-size: 12px;
     color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
+}
+
+/* 가격 변동 색상 유틸리티 연결 */
+.stock-box__comparison--positive {
+    color: #F04452; /* 상승: 빨간색 */
+}
+
+.stock-box__comparison--negative {
+    color: #3182F6; /* 하락: 파란색 */
+}
+
+.stock-box__comparison--neutral {
+    color: #666666; /* 변동 없음: 회색 */
 }

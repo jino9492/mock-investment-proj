@@ -553,6 +553,7 @@ public class MemberDAO {
     public List<MemberHoldingDTO> fetchMemberHoldings(int memberId, Connection conn) throws SQLException {
         String sql = "SELECT " +
                 "s.stock_name, " +
+                "s.stock_symbol, " +
                 "h.quantity, " +
                 "h.avg_buy_price as average_price, " +
                 "spd.close_price as current_price, " +
@@ -580,6 +581,7 @@ public class MemberDAO {
             while (rs.next()) {
                 MemberHoldingDTO holding = new MemberHoldingDTO();
                 holding.setStockName(rs.getString("stock_name"));
+                holding.setStockSymbol(rs.getString("stock_symbol"));
                 holding.setQuantity(rs.getInt("quantity"));
                 
                 BigDecimal avgPrice = rs.getBigDecimal("average_price");
@@ -614,6 +616,7 @@ public class MemberDAO {
     public MemberHoldingDTO findHoldingByStock(int memberId, long stockId, Connection conn) throws SQLException {
         String sql = "SELECT " +
                 "s.stock_name, " +
+                "s.stock_symbol, " +
                 "h.quantity, " +
                 "h.avg_buy_price as average_price, " +
                 "spd.close_price as current_price, " +
@@ -641,6 +644,7 @@ public class MemberDAO {
             if (rs.next()) {
                 MemberHoldingDTO holding = new MemberHoldingDTO();
                 holding.setStockName(rs.getString("stock_name"));
+                holding.setStockSymbol(rs.getString("stock_symbol"));
                 holding.setQuantity(rs.getInt("quantity"));
                 holding.setAveragePrice(rs.getInt("average_price"));
                 holding.setCurrentPrice(rs.getInt("current_price"));

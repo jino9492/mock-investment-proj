@@ -1,11 +1,10 @@
 # Order Card JSP 피드백 문서
 
 **파일 경로**: `src/main/webapp/WEB-INF/fragments/stock/order_card.jsp`  
-**생성 일자**: 2024년
 
 ## 개요
 
-이 문서는 `order_card.jsp` 파일에 대한 코드 리뷰 피드백을 제공합니다. 주문 카드 컴포넌트의 구조, 접근성, 보안, 유지보수성 측면에서 분석한 결과를 포함합니다.
+이 문서는 `order_card.jsp` 파일에 대한 미해결 개선 사항을 기록합니다.
 
 ---
 
@@ -13,48 +12,7 @@
 
 ### 🔴 심각 (Critical)
 
-#### 1.1 코드 중복 (DRY 위반) ✅ **수정 완료**
-**문제점**: 조건 주문 필드(`order-card__conditional-order`)와 판매 조건 주문 필드(`order-card__conditional-order--sell`)가 거의 동일한 구조를 가지고 있었습니다.
-
-**수정 내용**:
-- ✅ **감시 가격 필드 fragment 생성**: `order_conditional_watch_price_fields.jsp`
-  - 구매용과 판매용 감시 가격 필드를 하나의 fragment로 통합
-  - ID를 파라미터로 받아 재사용 가능하도록 구현
-- ✅ **총 주문 금액 표시 fragment 생성**: `order_conditional_total_amount.jsp`
-  - 중복되던 총 주문 금액 표시를 공통 fragment로 분리
-- ✅ **기존 fragment 활용**: 이미 분리되어 있던 필드들
-  - `order_conditional_price_fields.jsp` (가격 입력 필드)
-  - `order_conditional_quantity_fields.jsp` (수량 입력 필드)
-  - `order_conditional_duration_fields.jsp` (주문 유지 기간 드롭다운)
-
-**수정 전**:
-- 감시 가격 필드가 구매용(167-197줄)과 판매용(226-256줄)에 중복
-- 총 주문 금액 표시가 구매용(215-221줄)과 판매용(274-280줄)에 중복
-
-**수정 후**:
-```jsp
-<%-- 구매 조건 주문 --%>
-<c:set var="watchPriceInputId" value="watch-price-input" scope="request" />
-<c:set var="watchPriceInfoId" value="watch-price-info" scope="request" />
-<c:set var="watchPriceMinusBtnId" value="watch-price-minus" scope="request" />
-<c:set var="watchPricePlusBtnId" value="watch-price-plus" scope="request" />
-<%@ include file="order_conditional_watch_price_fields.jsp" %>
-
-<%-- 판매 조건 주문 --%>
-<c:set var="watchPriceInputId" value="conditional-sell-watch-price-input" scope="request" />
-<c:set var="watchPriceInfoId" value="conditional-sell-watch-price-info" scope="request" />
-<c:set var="watchPriceMinusBtnId" value="conditional-sell-watch-price-minus" scope="request" />
-<c:set var="watchPricePlusBtnId" value="conditional-sell-watch-price-plus" scope="request" />
-<%@ include file="order_conditional_watch_price_fields.jsp" %>
-
-<%-- 총 주문 금액 (구매/판매 공통) --%>
-<%@ include file="order_conditional_total_amount.jsp" %>
-```
-
-**수정 일자**: 2024년 (최근)
-**상태**: ✅ 완료 - 모든 중복 코드가 fragment로 분리되어 유지보수성과 일관성이 향상되었습니다.
-
-#### 1.2 인라인 스타일 사용
+#### 1.1 인라인 스타일 사용
 **문제점**: `style="display: block;"` 및 `style="display: none;"` 사용 (70, 140, 282, 408번 줄)
 
 **영향**:
@@ -78,27 +36,7 @@
 
 ### 🟡 중요 (Important)
 
-#### 1.3 ID 불일치 문제 ✅ **수정 완료**
-**문제점**: JSP 파일의 버튼 ID가 `id="order-submit-button"`이었지만, JavaScript 파일들(`info.js`, `chart.js`)은 `getElementById("order-submit-btn")`을 사용하여 버튼을 찾고 있었습니다.
-
-**영향**:
-- JavaScript 이벤트 핸들러가 연결되지 않음
-- 주문 제출 기능이 작동하지 않음
-- 사용자가 주문을 생성할 수 없음
-
-**수정 내용**:
-```jsp
-<!-- 수정 전 -->
-<button class="order-card__submit-btn" id="order-submit-button">${submitButtonText}</button>
-
-<!-- 수정 후 -->
-<button class="order-card__submit-btn" id="order-submit-btn">${submitButtonText}</button>
-```
-
-**수정 일자**: 2024년 (최근)
-**상태**: ✅ 해결됨 - 버튼 ID를 `order-submit-btn`으로 통일하여 JavaScript 이벤트 핸들러가 정상적으로 연결되도록 수정했습니다.
-
-#### 1.4 하드코딩된 텍스트
+#### 1.2 하드코딩된 텍스트
 **문제점**: 
 - "최대 0주 가능" (114, 217, 343번 줄)
 - "0원" (131, 144, 175번 줄)
@@ -113,7 +51,7 @@
 <input ... placeholder="${maxQuantityText}" />
 ```
 
-#### 1.5 일관성 없는 ID 부여
+#### 1.3 일관성 없는 ID 부여
 **문제점**: 
 - 일반 주문 필드에는 ID가 있음 (`order-price-input`, `order-quantity-input`)
 - 조건 주문 필드의 가격/수량 입력에는 ID가 없음 (200, 217, 326, 343번 줄)
@@ -320,74 +258,23 @@
 ## 8. 우선순위별 개선 사항 요약
 
 ### 우선순위 1 (즉시 수정 권장)
-1. ✅ **ID 불일치 문제 해결** (`order-submit-button` → `order-submit-btn`) - **완료**
-2. ⏳ 인라인 스타일 제거
-3. ⏳ Label 접근성 개선 (`for` 속성 연결)
+1. 인라인 스타일 제거
+2. Label 접근성 개선 (`for` 속성 연결)
 
 ### 우선순위 2 (단기 개선)
-4. ✅ **코드 중복 제거 (조건 주문 필드)** - **완료** (감시 가격 필드와 총 주문 금액 표시를 fragment로 분리)
-5. ⏳ XSS 방지 강화 (`fn:escapeXml` 사용)
-6. ⏳ 모든 입력 필드에 ID 부여
+3. XSS 방지 강화 (`fn:escapeXml` 사용)
+4. 모든 입력 필드에 ID 부여
 
 ### 우선순위 3 (중기 개선)
-7. ✅ 하드코딩된 텍스트 리소스 번들로 이전
-8. ✅ 에러 메시지 UX 개선
-9. ✅ 로딩 상태 표시 추가
+5. 하드코딩된 텍스트 리소스 번들로 이전
+6. 에러 메시지 UX 개선
+7. 로딩 상태 표시 추가
 
 ### 우선순위 4 (장기 개선)
-10. ✅ 다국어 지원 준비
-11. ✅ 조건부 렌더링 최적화
-
----
-
-## 9. 긍정적인 측면
-
-### 잘 구현된 부분
-1. ✅ BEM 네이밍 컨벤션 대체로 잘 준수
-2. ✅ ARIA 속성 기본적으로 사용 (`role`, `aria-checked`, `aria-expanded` 등)
-3. ✅ JSTL 태그를 적절히 활용하여 서버 측 로직 처리
-4. ✅ 데이터 속성(`data-*`)을 활용한 JavaScript 연동 구조
-5. ✅ 의미 있는 HTML 요소 사용 (`<section>`, `<label>` 등)
-
----
-
-## 10. 참고 자료
-
-- [W3C WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
-- [JSP Best Practices](https://www.oracle.com/java/technologies/jsp-best-practices.html)
-- [OWASP XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
-
----
-
----
-
-## 11. 최근 수정 이력
-
-### 2024년 (최근)
-- ✅ **버튼 ID 불일치 문제 해결**: `order-submit-button` → `order-submit-btn`으로 변경하여 JavaScript 이벤트 핸들러가 정상적으로 연결되도록 수정했습니다.
-  - **영향**: 주문 제출 기능이 정상적으로 작동합니다.
-  - **관련 파일**: `src/main/webapp/WEB-INF/fragments/stock/order_card.jsp`
-
-- ✅ **코드 중복 제거 (DRY 원칙 적용)**: 조건 주문 필드의 중복 코드를 fragment로 분리했습니다.
-  - **생성된 fragment**:
-    - `order_conditional_watch_price_fields.jsp` - 감시 가격 필드 (구매/판매 공통)
-    - `order_conditional_total_amount.jsp` - 총 주문 금액 표시 (구매/판매 공통)
-  - **영향**: 유지보수 비용 감소, 버그 수정 시 한 곳만 수정하면 됨, 일관성 향상
-  - **관련 파일**: 
-    - `src/main/webapp/WEB-INF/fragments/stock/order_card.jsp`
-    - `src/main/webapp/WEB-INF/fragments/stock/order_conditional_watch_price_fields.jsp` (신규)
-    - `src/main/webapp/WEB-INF/fragments/stock/order_conditional_total_amount.jsp` (신규)
-
-- ✅ **종목 ID 자동 수집**: URL 파라미터 대신 페이지의 `stock` 객체에서 종목 ID를 자동으로 가져오도록 수정했습니다.
-  - **영향**: "종목 ID가 필요합니다" 오류 해결, URL 파라미터에 의존하지 않음
-  - **관련 파일**: 
-    - `src/main/webapp/WEB-INF/fragments/stock/order_card.jsp`
-    - `src/main/webapp/static/js/common/stock/stock_order_card.js`
+8. 다국어 지원 준비
+9. 조건부 렌더링 최적화
 
 ---
 
 **작성자**: AI 코드 리뷰어  
-**리뷰 날짜**: 2024년  
-**최종 업데이트**: 2024년 (버튼 ID 불일치 문제 수정)  
-**다음 리뷰 권장 시기**: 주요 수정 사항 적용 후
-
+**최종 업데이트**: 2024년

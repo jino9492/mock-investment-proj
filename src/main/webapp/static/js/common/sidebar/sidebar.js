@@ -71,17 +71,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const profitClass = profitLoss > 0 ? "stock-box__comparison--positive" : 
                                       profitLoss < 0 ? "stock-box__comparison--negative" : 
                                       "stock-box__comparison--neutral";
-                    const profitSign = profitLoss > 0 ? "+" : profitLoss < 0 ? "-" : "";
-                    const rateSign = profitRate > 0 ? "+" : profitRate < 0 ? "-" : "";
+                    const profitSign = profitLoss > 0 ? "+" : "";
+                    const rateSign = profitRate > 0 ? "+" : "";
                     
                     holdingsHTML += `
-                        <li class="stock-box__container" data-stock-name="${holding.stockName}">
+                        <li class="stock-box__container" data-stock-name="${holding.stockName}" data-stock-code="${holding.stockSymbol || ''}">
                             <div class="stock-box__company-profile"></div>
                             <div class="stock-box__company-wrapper">
                                 <div class="stock-box__detail-wrapper">
                                     <div class="stock-box__company-name">${holding.stockName}</div>
                                     <div class="stock-box__stock-price">
-                                        ${(holding.currentPrice || 0).toLocaleString('ko-KR')}원
+                                        ${Math.abs(Number(holding.evaluationAmount) || 0).toLocaleString('ko-KR')}원
                                     </div>
                                 </div>
                                 <div class="stock-box__detail-wrapper">
@@ -156,6 +156,24 @@ document.addEventListener('DOMContentLoaded', () => {
             startSidebarPolling();
         } else {
             stopSidebarPolling();
+        }
+    });
+
+    // stock-box__container 클릭 이벤트 처리 (이벤트 위임 사용)
+    document.addEventListener('click', function(e) {
+        const stockContainer = e.target.closest('.stock-box__container');
+        if (stockContainer) {
+            const stockCode = stockContainer.getAttribute('data-stock-code');
+            if (stockCode) {
+                // 종목 코드로 주식 페이지로 이동
+                window.location.href = `/stock?code=${stockCode}`;
+            } else {
+                // 종목 코드가 없으면 종목명으로 시도
+                const stockName = stockContainer.getAttribute('data-stock-name');
+                if (stockName) {
+                    window.location.href = `/stock?name=${encodeURIComponent(stockName)}`;
+                }
+            }
         }
     });
 

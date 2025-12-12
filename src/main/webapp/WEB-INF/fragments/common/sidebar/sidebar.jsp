@@ -27,13 +27,14 @@
             <c:choose>
               <c:when test="${not empty holdings && fn:length(holdings) > 0}">
                 <c:forEach var="holding" items="${holdings}" varStatus="status">
-                  <li class="stock-box__container" data-stock-name="${holding.stockName}">
+                  <li class="stock-box__container" data-stock-name="${holding.stockName}" data-stock-code="${holding.stockSymbol}">
                     <div class="stock-box__company-profile"></div>
                     <div class="stock-box__company-wrapper">
                       <div class="stock-box__detail-wrapper">
                         <div class="stock-box__company-name">${holding.stockName}</div>
                         <div class="stock-box__stock-price">
-                          <fmt:formatNumber value="${holding.currentPrice}" pattern="#,###"/>원
+                          <c:set var="absEvaluationAmount" value="${holding.evaluationAmount >= 0 ? holding.evaluationAmount : -holding.evaluationAmount}" />
+                          <fmt:formatNumber value="${absEvaluationAmount}" pattern="#,###"/>원
                         </div>
                       </div>
                       <div class="stock-box__detail-wrapper">
@@ -46,16 +47,10 @@
                             <c:when test="${holding.profitLoss < 0}">stock-box__comparison--negative</c:when>
                             <c:otherwise>stock-box__comparison--neutral</c:otherwise>
                           </c:choose>">
-                          <c:choose>
-                            <c:when test="${holding.profitLoss > 0}">+</c:when>
-                            <c:when test="${holding.profitLoss < 0}">-</c:when>
-                          </c:choose>
+                          <c:if test="${holding.profitLoss > 0}">+</c:if>
                           <c:set var="absProfitLoss" value="${holding.profitLoss >= 0 ? holding.profitLoss : -holding.profitLoss}" />
                           <fmt:formatNumber value="${absProfitLoss}" pattern="#,###"/>원
-                          (<c:choose>
-                            <c:when test="${holding.profitRate > 0}">+</c:when>
-                            <c:when test="${holding.profitRate < 0}">-</c:when>
-                          </c:choose>
+                          (<c:if test="${holding.profitRate > 0}">+</c:if>
                           <c:set var="absProfitRate" value="${holding.profitRate >= 0 ? holding.profitRate : -holding.profitRate}" />
                           <fmt:formatNumber value="${absProfitRate}" pattern="#,##0.00"/>%)
                         </div>
