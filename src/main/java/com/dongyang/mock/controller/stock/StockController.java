@@ -4,6 +4,7 @@ import com.dongyang.mock.model.DTO.*;
 import com.dongyang.mock.model.DAO.MemberDAO;
 import com.dongyang.mock.service.OrderService;
 import com.dongyang.mock.service.api.StockDetailService;
+import com.dongyang.mock.util.StockCodeResolver;
 import com.dongyang.mock.util.db.DBManager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,9 +26,17 @@ public class StockController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        Long stkCode = Long.parseLong(req.getParameter("code"));
+        String codeParam = req.getParameter("code");
+        if (codeParam == null || codeParam.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "종목 코드가 필요합니다.");
+            return;
+        }
+
+        codeParam = codeParam.trim();
+        System.out.println("[StockController] 요청된 종목 코드: '" + codeParam + "'");
 
         StockDetailService stockDetailService = new StockDetailService();
+        StockCodeResolver codeResolver = new StockCodeResolver(stockDetailService);
         OrderService orderService = new OrderService();
         MemberDAO memberDAO = new MemberDAO();
 
@@ -38,7 +47,18 @@ public class StockController extends HttpServlet {
         StockPriceDailyDTO stockPriceDailyDTO;
 
         try{
-            stockDTO = stockDetailService.getStockByCode(stkCode);
+            // 종목 코드로 조회 (stock_symbol 우선, 실패 시 stock_code_id)
+            stockDTO = codeResolver.resolveStock(codeParam);
+            
+            if (stockDTO == null) {
+                System.err.println("[StockController] 종목을 찾을 수 없습니다. code: '" + codeParam + "'");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "종목을 찾을 수 없습니다: " + codeParam);
+                return;
+            }
+            
+            Long stkCode = stockDTO.getStockCodeId();
+            System.out.println("[StockController] 종목 조회 성공: stock_id=" + stockDTO.getStockId() + ", stock_symbol=" + stockDTO.getStockSymbol() + ", stock_code_id=" + stkCode);
+            
             Long stkId = stockDTO.getStockId();
             stockDetailDTO = stockDetailService.getStockDetailById(stkId);
             stockFinancialIndicatorDTO = stockDetailService.getFinancialIndicatorById(stkId);

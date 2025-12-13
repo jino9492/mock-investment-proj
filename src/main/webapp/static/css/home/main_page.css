@@ -374,7 +374,7 @@ ul {
   padding-bottom: 24px;
   padding-top: 24px;
   background: white;
-  z-index: 100;
+  z-index: 10;
 }
 
 .main__index-row {
@@ -666,7 +666,7 @@ section{
 }
 
 .main__section-title{
-  z-index: 100;
+  z-index: 10;
   background: white;
 }
 

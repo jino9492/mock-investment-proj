@@ -78,10 +78,11 @@ class WebSocketClient {
 
                 if (response.trnm !== 'PING') {
                     console.log('실시간 시세 서버 응답 수신:', response);
+                    // SYSTEM 메시지 R10001: 동일한 App key로 접속 알림 (재연결 불필요)
                     if (response.trnm === 'SYSTEM' && response.code === 'R10001'){
-                        this.connect();
-                        this.register(this.recentRegisteredKeys);
-                        console.log("소켓 재연결 (keys:" + this.recentRegisteredKeys + ")");
+                        console.log('시스템 알림:', response.message);
+                        // 재연결하지 않음 - 이 메시지는 단순 알림이며, 실제 연결은 유지됨
+                        // 서버가 기존 세션을 종료하더라도 현재 연결이 유효하면 계속 사용
                     }
                     else{
                         this.currentResponse = response;

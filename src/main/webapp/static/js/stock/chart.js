@@ -635,6 +635,12 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
             const response = await fetch(`/api/holding?stockId=${stockId}`);
             
             if (!response.ok) {
+                if (response.status === 401) {
+                    // 401 Unauthorized: 로그인이 필요함 - 폴링 중지
+                    console.warn("[보유 정보 업데이트] 로그인이 필요합니다. 폴링을 중지합니다.");
+                    stopHoldingPolling();
+                    return;
+                }
                 console.warn("[보유 정보 업데이트] 서버 응답 오류:", response.status);
                 return;
             }
@@ -723,15 +729,20 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     
     document.addEventListener("visibilitychange", function() {
         isPageVisible = !document.hidden;
-        if (isPageVisible) {
+        const myStockCard = document.querySelector(".my-stock-card");
+        if (isPageVisible && myStockCard) {
             startHoldingPolling();
         } else {
             stopHoldingPolling();
         }
     });
 
-    // 초기 폴링 시작
-    startHoldingPolling();
+    // 로그인 상태 확인 후 폴링 시작
+    // my-stock-card가 존재하면 로그인한 것으로 간주
+    const myStockCard = document.querySelector(".my-stock-card");
+    if (myStockCard) {
+        startHoldingPolling();
+    }
     
     // 페이지 언로드 시 폴링 중지
     window.addEventListener("beforeunload", function() {
@@ -757,6 +768,12 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
             const response = await fetch(url);
             
             if (!response.ok) {
+                if (response.status === 401) {
+                    // 401 Unauthorized: 로그인이 필요함 - 폴링 중지
+                    console.warn("[구매 가능 금액 업데이트] 로그인이 필요합니다. 폴링을 중지합니다.");
+                    stopAvailableCashPolling();
+                    return;
+                }
                 return;
             }
             
@@ -817,18 +834,21 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     // 페이지가 보일 때만 폴링 시작
     document.addEventListener("visibilitychange", function() {
         const isPageVisible = !document.hidden;
-        if (isPageVisible) {
+        if (isPageVisible && orderCard) {
             startAvailableCashPolling();
         } else {
             stopAvailableCashPolling();
         }
     });
 
-    // 초기 로드 시 즉시 업데이트
-    updateAvailableCash();
-    
-    // 초기 폴링 시작
-    startAvailableCashPolling();
+    // 로그인 상태 확인 후 폴링 시작
+    // order-card가 존재하면 로그인한 것으로 간주
+    if (orderCard) {
+        // 초기 로드 시 즉시 업데이트
+        updateAvailableCash();
+        // 초기 폴링 시작
+        startAvailableCashPolling();
+    }
     
     // 페이지 언로드 시 폴링 중지
     window.addEventListener("beforeunload", function() {
