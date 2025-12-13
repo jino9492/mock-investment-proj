@@ -3,6 +3,7 @@ package com.dongyang.mock.controller.stock;
 import com.dongyang.mock.model.DTO.*;
 import com.dongyang.mock.model.DAO.MemberDAO;
 import com.dongyang.mock.service.OrderService;
+import com.dongyang.mock.service.WatchlistService;
 import com.dongyang.mock.service.api.StockDetailService;
 import com.dongyang.mock.util.db.DBManager;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ public class StockController extends HttpServlet {
     private final StockDetailService stockDetailService = new StockDetailService();
     private final OrderService orderService = new OrderService();
     private final MemberDAO memberDAO = new MemberDAO();
+    private final WatchlistService watchlistService = new WatchlistService();
     
     /**
      * 종목 코드 파라미터를 파싱합니다.
@@ -87,6 +89,10 @@ public class StockController extends HttpServlet {
             // 대기 중인 판매 주문 수량 조회
             long pendingSellQuantity = orderService.getPendingSellOrderQuantity(memId, stkId);
             req.setAttribute("pendingSellQuantity", pendingSellQuantity);
+            
+            // 관심종목 여부 확인
+            boolean isWatchlist = watchlistService.isWatchlist(memId, stkId);
+            req.setAttribute("isWatchlist", isWatchlist);
         } catch (SQLException e) {
             e.printStackTrace();
         }

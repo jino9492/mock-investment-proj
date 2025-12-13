@@ -1,14 +1,17 @@
 package com.dongyang.mock.controller.stock;
 
 import com.dongyang.mock.model.DTO.*;
+import com.dongyang.mock.service.WatchlistService;
 import com.dongyang.mock.service.api.StockDetailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 
 @WebServlet("/stock_info")
@@ -16,6 +19,7 @@ public class StockInfoController extends HttpServlet {
 
     private final String viewPage = "/WEB-INF/views/stock/info.jsp";
     private final StockDetailService stockDetailService = new StockDetailService();
+    private final WatchlistService watchlistService = new WatchlistService();
     
     /**
      * 종목 코드 파라미터를 파싱합니다.
@@ -60,6 +64,22 @@ public class StockInfoController extends HttpServlet {
         try {
             Long stkCode = parseStockCode(req);
             loadStockDetails(stkCode, req);
+            
+            // 로그인한 사용자의 관심종목 여부 확인
+            StockDTO stock = (StockDTO) req.getAttribute("stock");
+            if (stock != null) {
+                HttpSession session = req.getSession(false);
+                if (session != null && session.getAttribute("member") != null) {
+                    MemberDTO member = (MemberDTO) session.getAttribute("member");
+                    int memId = member.getMemId();
+                    try {
+                        boolean isWatchlist = watchlistService.isWatchlist(memId, stock.getStockId());
+                        req.setAttribute("isWatchlist", isWatchlist);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 

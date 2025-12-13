@@ -71,11 +71,50 @@
         </div>
         <div class="sidebar__favorite">
           <div class="sidebar__title">관심</div>
-          <ul>
-            <%@ include file="sidebar_stock_box.jsp" %>
-            <%@ include file="sidebar_stock_box.jsp" %>
-            <%@ include file="sidebar_stock_box.jsp" %>
-            <%@ include file="sidebar_stock_box.jsp" %>
+          <ul id="sidebar-watchlist-list">
+            <c:choose>
+              <c:when test="${not empty watchlistStocks && fn:length(watchlistStocks) > 0}">
+                <c:forEach var="watchlistStock" items="${watchlistStocks}" varStatus="status">
+                  <li class="stock-box__container" data-stock-name="${watchlistStock.stockName}" data-stock-code="${watchlistStock.stockSymbol}" data-stock-id="${watchlistStock.stockId}">
+                    <div class="stock-box__company-profile"></div>
+                    <div class="stock-box__company-wrapper">
+                      <div class="stock-box__detail-wrapper">
+                        <div class="stock-box__company-name">${watchlistStock.stockName}</div>
+                        <div class="stock-box__stock-price">
+                          <c:if test="${not empty watchlistStock.currentPrice}">
+                            <fmt:formatNumber value="${watchlistStock.currentPrice}" pattern="#,###"/>원
+                          </c:if>
+                        </div>
+                      </div>
+                      <div class="stock-box__detail-wrapper">
+                        <div class="stock-box__comparison 
+                          <c:choose>
+                            <c:when test="${not empty watchlistStock.changePrice && watchlistStock.changePrice > 0}">stock-box__comparison--positive</c:when>
+                            <c:when test="${not empty watchlistStock.changePrice && watchlistStock.changePrice < 0}">stock-box__comparison--negative</c:when>
+                            <c:otherwise>stock-box__comparison--neutral</c:otherwise>
+                          </c:choose>">
+                          <c:if test="${not empty watchlistStock.changePrice}">
+                            <c:if test="${watchlistStock.changePrice > 0}">+</c:if>
+                            <fmt:formatNumber value="${watchlistStock.changePrice >= 0 ? watchlistStock.changePrice : -watchlistStock.changePrice}" pattern="#,###"/>원
+                            <c:if test="${not empty watchlistStock.changeRate}">
+                              (<c:if test="${watchlistStock.changeRate > 0}">+</c:if>
+                              <fmt:formatNumber value="${watchlistStock.changeRate >= 0 ? watchlistStock.changeRate : -watchlistStock.changeRate}" pattern="#,##0.00"/>%)
+                            </c:if>
+                          </c:if>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <li class="stock-box__empty">
+                  <div style="text-align: center; padding: 20px; color: #999; font-size: 14px;">
+                    관심종목이 없습니다.
+                  </div>
+                </li>
+              </c:otherwise>
+            </c:choose>
           </ul>
         </div>
       </c:when>
