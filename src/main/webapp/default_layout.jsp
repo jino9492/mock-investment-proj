@@ -5,7 +5,7 @@
 <head>
     <base href="${pageContext.request.contextPath}">
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="static/css/common/default_layout.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/default_layout.css">
     <title>MOCK</title>
 </head>
 <body>
