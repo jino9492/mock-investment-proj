@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const rateClass = (profit.profitRate || 0) >= 0 ? "analysis__profit--positive" : "analysis__profit--negative";
             
             return `
-                <div class="analysis__row">
+                <div class="analysis__row" data-stock-symbol="${profit.stockSymbol || ""}">
                     <div>${profit.soldAt || ""}</div>
                     <div class="analysis__stock">
                         <span class="analysis__dot"></span>
@@ -110,6 +110,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
         }).join("");
+        
+        // 각 행에 클릭 이벤트 추가
+        const rows = tbody.querySelectorAll(".analysis__row");
+        rows.forEach(row => {
+            row.addEventListener("click", function() {
+                const stockSymbol = this.getAttribute("data-stock-symbol");
+                if (stockSymbol) {
+                    window.location.href = `/stock?code=${encodeURIComponent(stockSymbol)}`;
+                }
+            });
+        });
     }
 
     // 요약 정보 업데이트

@@ -41,6 +41,7 @@ public class SignupController extends HttpServlet {
         newMember.setAgreePrivacyAt(agreePrivacy);
         newMember.setAgreeThirdAt(agreeThird);
         newMember.setAgreeNotificationAt(agreeNotification);
+        newMember.setVirtualCash(1_000_000); // 초기 자금 100만원 설정
 
         MemberStatus.JoinResult status = MemberStatus.JoinResult.FAIL_INSERT;
         try {

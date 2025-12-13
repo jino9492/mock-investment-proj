@@ -112,13 +112,32 @@ public class MemberService {
 
     /**
      * 회원 삭제 처리
-     * - 트랜잭션 내에서 회원 삭제
+     * - 트랜잭션 내에서 회원 및 관련 데이터 삭제
      * @return 삭제 성공 시 true, 실패 시 false
      */
     public boolean deleteMember(int memberId) throws SQLException {
         return DBManager.executeInTransaction(conn -> {
-            int deleted = memberDAO.deleteMember(memberId, conn);
-            if (deleted > 0) {
+            boolean deleted = memberDAO.deleteMemberWithAllData(memberId, conn);
+            if (deleted) {
+                return DBManager.TransactionResult.commit(Boolean.TRUE);
+            }
+            return DBManager.TransactionResult.rollback(Boolean.FALSE);
+        });
+    }
+
+    /**
+     * 파산 신청 처리
+     * - member 정보와 관심 테이블은 유지
+     * - trade_order, order_condition, trade, holding, cash_history 데이터 삭제
+     * - virtual_cash를 초기 자금(100만원)으로 리셋
+     * @param memberId 회원 ID
+     * @return 성공 시 true, 실패 시 false
+     * @throws SQLException
+     */
+    public boolean declareBankruptcy(int memberId) throws SQLException {
+        return DBManager.executeInTransaction(conn -> {
+            boolean success = memberDAO.declareBankruptcy(memberId, conn);
+            if (success) {
                 return DBManager.TransactionResult.commit(Boolean.TRUE);
             }
             return DBManager.TransactionResult.rollback(Boolean.FALSE);

@@ -239,6 +239,7 @@ public class TradeDAO {
         String sql = "SELECT " +
                 "DATE_FORMAT(t.traded_at, '%Y.%m.%d') AS sold_at, " +
                 "s.stock_name, " +
+                "s.stock_symbol, " +
                 "t.trade_price * t.trade_quantity AS total_sales_amount, " +
                 "COALESCE((" +
                 "    SELECT AVG(t2.trade_price) " +
@@ -341,6 +342,7 @@ public class TradeDAO {
                 RealizedProfitDTO profit = new RealizedProfitDTO();
                 profit.setSoldAt(rs.getString("sold_at"));
                 profit.setStockName(rs.getString("stock_name"));
+                profit.setStockSymbol(rs.getString("stock_symbol"));
                 
                 java.math.BigDecimal totalSalesAmount = rs.getBigDecimal("total_sales_amount");
                 profit.setTotalSalesAmount(totalSalesAmount != null ? totalSalesAmount.intValue() : 0);

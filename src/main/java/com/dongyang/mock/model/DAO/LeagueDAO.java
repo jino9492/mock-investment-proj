@@ -94,7 +94,7 @@ public class LeagueDAO {
         // 현금 잔고와 초기 자본금을 하나의 쿼리로 조회 (LEFT JOIN으로 최적화)
         String sql = "SELECT " +
                 "COALESCE(m.virtual_cash, 0) as cash_balance, " +
-                "COALESCE(initial_cap.amount, 10000000) as initial_capital " +
+                "COALESCE(initial_cap.amount, 1000000) as initial_capital " +
                 "FROM member m " +
                 "LEFT JOIN ( " +
                 "  SELECT ch1.mem_id, ch1.amount " +
@@ -113,7 +113,7 @@ public class LeagueDAO {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         long cashBalance = 0L;
-        long initialCapital = 10000000L;
+        long initialCapital = 1000000L;
         
         try {
             pstmt = conn.prepareStatement(sql);
@@ -282,7 +282,7 @@ public class LeagueDAO {
                 "m.mem_id, " +
                 "m.mem_nickname, " +
                 "COALESCE(m.virtual_cash, 0) + COALESCE(SUM(h.quantity * spd.close_price), 0) as total_asset, " +
-                "COALESCE(initial_cap.initial_capital, 10000000) as initial_capital " +
+                "COALESCE(initial_cap.initial_capital, 1000000) as initial_capital " +
                 "FROM member m " +
                 "LEFT JOIN holding h ON m.mem_id = h.mem_id " +
                 "LEFT JOIN stock_price_daily spd ON h.stock_id = spd.stock_id " +
@@ -312,7 +312,7 @@ public class LeagueDAO {
                 BigDecimal totalAssetBD = rs.getBigDecimal("total_asset");
                 BigDecimal initialCapitalBD = rs.getBigDecimal("initial_capital");
                 long totalAsset = totalAssetBD != null ? totalAssetBD.longValue() : 0L;
-                long initialCapital = initialCapitalBD != null ? initialCapitalBD.longValue() : 10000000L;
+                long initialCapital = initialCapitalBD != null ? initialCapitalBD.longValue() : 1000000L;
                 double returnRate = initialCapital > 0 ? ((double) (totalAsset - initialCapital) / initialCapital) * 100.0 : 0.0;
                 returnRate = Math.round(returnRate * 100.0) / 100.0;
 

@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 public class RealizedProfitDTO {
     private String soldAt; // 판매일 (YYYY.MM.DD 형식)
     private String stockName; // 종목명
+    private String stockSymbol; // 종목 코드
     private int totalProfit; // 총 판매수익 (판매 금액 - 구매 금액)
     private double profitRate; // 수익률 (%)
     private int totalSalesAmount; // 총 판매금액 (판매 가격 * 수량)
@@ -28,6 +29,14 @@ public class RealizedProfitDTO {
 
     public void setStockName(String stockName) {
         this.stockName = stockName;
+    }
+
+    public String getStockSymbol() {
+        return stockSymbol;
+    }
+
+    public void setStockSymbol(String stockSymbol) {
+        this.stockSymbol = stockSymbol;
     }
 
     public int getTotalProfit() {

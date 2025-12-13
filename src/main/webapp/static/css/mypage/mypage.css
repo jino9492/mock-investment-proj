@@ -1,3 +1,6 @@
+/* 공통 가격 색상 스타일 */
+@import url('../common/price_color.css');
+
 /* 공통 */
 *,
 *::before,
