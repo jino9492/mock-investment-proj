@@ -3,7 +3,6 @@ import {loadIndexSparklineData, loadRankingData, loadRealtimeData} from "../comm
 import {getPriceColorClass} from "../common/price_color_utils.js";
 import {registerToSocket} from "../common/api/socket.js";
 import {fetchAndUpdateStockDetail, rerenderPrice} from "./chart_card.js";
-import {saveRealtimeData, STORAGE_KEY} from "../common/utils.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     const indexNames = document.querySelectorAll('.main__index-name');
@@ -12,12 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadRankingPromises = [];
     let activeHoverElement = null;
 
-    let storedRealtimeData = sessionStorage.getItem(STORAGE_KEY);
-    storedRealtimeData = storedRealtimeData ? JSON.parse(storedRealtimeData) : {};
-
     // 전역 변수로 관리할 맵 (종목 코드 -> DOM 요소)
     const realtimeDOMMap = {};
-    const updateInterval = 2000; // 2초마다 폴링 간격
 
     // =========================================================================
     // ⭐ 반짝임 효과 적용 함수
@@ -105,9 +100,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const realtimeDataMap = new Map();
             res.forEach(result => {
                 if (result.status === 'fulfilled') {
-                    const realtimeItem = result.value[0];
-                    if (realtimeItem && realtimeItem.stkCode) {
-                        realtimeDataMap.set(realtimeItem.stkCode, realtimeItem);
+                    const realtimeItem = result.value;
+                    if (realtimeItem && realtimeItem.code) {
+                        realtimeDataMap.set(realtimeItem.code, realtimeItem);
                     }
                 } else {
                     console.error(result.reason);
@@ -117,18 +112,13 @@ document.addEventListener('DOMContentLoaded', function () {
             rankingList.forEach((item, index) => {
                 const rank = index + 1;
                 const stkCode = item.stkCode.replace('_AL', '');
-                const storedItem = storedRealtimeData[stkCode];
                 const actualPrice = Math.abs(item.curPrice);
 
                 const realtimeItem = realtimeDataMap.get(stkCode) || null;
 
-                const priceToDisplay = storedItem
-                    ? Math.abs(storedItem.price)
-                    : (realtimeItem ? Math.abs(realtimeItem.curPrice) : actualPrice);
+                const priceToDisplay = (realtimeItem ? Math.abs(realtimeItem.price) : actualPrice)
 
-                const rateToDisplay = storedItem
-                    ? storedItem.rate
-                    : (realtimeItem ? realtimeItem.fluRt : item.fluRt);
+                const rateToDisplay = (realtimeItem ? realtimeItem.fluRt : item.fluRt);
 
                 const priceClass = getPriceColorClass(rateToDisplay);
                 const isPositive = rateToDisplay > 0;
@@ -206,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            const socket = await registerToSocket(subscribedCodes);
+            const socket = await registerToSocket();
             startRealtimeUpdates(subscribedCodes, socket);
 
         })
@@ -223,54 +213,53 @@ document.addEventListener('DOMContentLoaded', function () {
     function startRealtimeUpdates(codes, socket) {
         if (codes.length === 0) return;
 
-        let lastResponse = {};
-        const fetchAndUpdate = async () => {
-            let currentResponse = socket.getRecentResponse();
+        socket.registerDataUpdateCallback((currentResponse) => {
 
-            if ((JSON.stringify(currentResponse) !== JSON.stringify(lastResponse)) && lastResponse.data != null){
-                console.log("changed!");
+            console.log("WebSocket 메시지 수신 - 업데이트 시작.");
+
+            if (currentResponse.data && Array.isArray(currentResponse.data)) {
+
                 currentResponse.data.forEach(res => {
-                    console.log(realtimeDOMMap[res.item]);
-                    const mappedElements = realtimeDOMMap[res.item];
-                    const priceString = res.values["10"];
-                    const changePriceString = res.values["11"];
-                    const rateString = res.values["12"];
+                    const itemCode = res.item;
+                    const mappedElements = realtimeDOMMap[itemCode];
 
-                    if (mappedElements && priceString && rateString) {
-                        const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
-                        const changeRate = parseFloat(rateString);
-                        const changePrice = parseFloat(changePriceString);
+                    // 해당 종목의 DOM 요소와 필요한 데이터가 있는지 확인
+                    if (mappedElements && res.values) {
+                        const priceString = res.values["10"]; // 현재가
+                        const changePriceString = res.values["11"]; // 변동액
+                        const rateString = res.values["12"]; // 변동률
 
-                        if (!isNaN(currentPrice) && !isNaN(changeRate)) {
-                            const oldRateTextRaw = mappedElements.rateSpan.textContent.replace(/[%]/g, '');
+                        if (priceString && rateString && changePriceString) {
+                            const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
+                            const changeRate = parseFloat(rateString);
+                            const changePrice = parseFloat(changePriceString);
 
-                            const newRateText = `${rateString}%`;
+                            if (!isNaN(currentPrice) && !isNaN(changeRate) && !isNaN(changePrice)) {
+                                const oldRateTextRaw = mappedElements.rateSpan.textContent.replace(/[%]/g, '');
+                                const newRateText = `${changeRate > 0 ? '+' : ''}${changeRate.toFixed(2)}%`; // 부호 처리 추가
 
-                            const isPositive = changeRate > 0;
-                            const priceClass = getPriceColorClass(changeRate);
+                                const priceClass = getPriceColorClass(changeRate);
+                                const isPositive = changeRate > 0;
 
-                            const oldRateFormatted = parseFloat(oldRateTextRaw).toFixed(2);
-                            const newRateFormatted = parseFloat(rateString).toFixed(2);
-                            if (newRateFormatted !== oldRateFormatted) {
-                                mappedElements.rateSpan.textContent = newRateText;
-                                mappedElements.rateSpan.className = 'main__text-rate ' + priceClass;
-                                applyFlashEffect(mappedElements.rateSpan, isPositive);
-                                rerenderPrice();
+                                const oldRateFormatted = parseFloat(oldRateTextRaw).toFixed(2);
+                                const newRateFormatted = changeRate.toFixed(2);
+
+                                mappedElements.priceSpan.textContent = currentPrice.toLocaleString('ko-KR');
+
+                                if (newRateFormatted !== oldRateFormatted) {
+
+                                    mappedElements.rateSpan.textContent = newRateText;
+                                    mappedElements.rateSpan.className = 'main__text-rate ' + priceClass;
+
+                                    applyFlashEffect(mappedElements.rateSpan, isPositive);
+                                }
                             }
-
-                            saveRealtimeData(res.item, currentPrice, changeRate, changePrice);
                         }
+                    } else {
+                        console.warn(`[${itemCode}]에 대한 DOM 매핑 또는 데이터가 누락되었습니다.`);
                     }
-                })
+                });
             }
-
-            lastResponse = currentResponse;
-
-            console.log("순차 업데이트 주기 완료.");
-        };
-
-        setInterval(fetchAndUpdate, updateInterval);
-
-        fetchAndUpdate();
+        });
     }
 });

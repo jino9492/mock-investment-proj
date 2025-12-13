@@ -1,9 +1,9 @@
 package com.dongyang.mock.service.api;
 
-import com.dongyang.mock.model.DTO.RankingItemDTO;
 import com.dongyang.mock.model.DTO.RealtimeDTO;
 import com.dongyang.mock.service.auth.AuthService;
 import com.dongyang.mock.util.api.InmemoryCacheManager;
+import com.dongyang.mock.websocket.RealtimeWebSocket;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,11 +11,7 @@ import com.google.gson.JsonObject;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-import java.math.BigDecimal;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class WebSocketService extends WebSocketClient {
     private final AuthService authService = new AuthService();
@@ -61,6 +57,8 @@ public class WebSocketService extends WebSocketClient {
                     cacheManager.put(REALTIME_CACHE_KEY + extractItemCode(response), parseResponse(response));
                 System.out.println("실시간 시세 서버 응답: " + response.toString());
             }
+
+            RealtimeWebSocket.broadcast(message);
         } catch (Exception e) {
             e.printStackTrace();
         }

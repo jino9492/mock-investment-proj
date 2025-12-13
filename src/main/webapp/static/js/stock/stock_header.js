@@ -1,6 +1,6 @@
 import {registerToSocket} from "../common/api/socket.js";
 import {getPriceColorClass} from "../common/price_color_utils.js";
-import {saveRealtimeData, STORAGE_KEY} from "../common/utils.js";
+import {loadRealtimeData} from "../common/api/fetch_utils.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     const stockHeader = document.querySelector('.stock-header');
@@ -42,101 +42,75 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // =========================================================================
 
+    const initializeStockData = async (code) => {
+        try {
+            const data = await loadRealtimeData(code);
+
+            if (data && data.price) {
+                const initialPrice = parseFloat(data.price);
+                const initialRate = parseFloat(data.fluRt);
+                const initialChangePrice = parseFloat(data.changePrice);
+
+                if (priceElement && !isNaN(initialPrice)) {
+                    priceElement.textContent = initialPrice.toLocaleString('ko-KR') + '원';
+                }
+
+                if (diffValueElement && !isNaN(initialRate) && !isNaN(initialChangePrice)) {
+                    const isPositive = initialRate > 0;
+                    const sign = isPositive ? '+' : (initialRate < 0 ? '' : '');
+                    const priceClass = getPriceColorClass(initialRate);
+
+                    diffValueElement.textContent =
+                        `${sign}${initialChangePrice.toLocaleString('ko-KR')}원 (${Math.abs(initialRate).toFixed(2)}%)`;
+
+                    diffValueElement.className = 'stock-header__diff-value ' + priceClass;
+                }
+            }
+        } catch (error) {
+            console.error(`초기 가격 로드 실패 (${code}):`, error.message);
+        }
+    };
+
     const startRealtimeUpdates = async (code) => {
-        const socket = await registerToSocket([code]);
-
-        let lastResponse = {};
-        const updateInterval = 2000;
-
-        const fetchAndUpdate = () => {
-            let currentResponse = socket.getRecentResponse();
-
-            if ((JSON.stringify(currentResponse) !== JSON.stringify(lastResponse)) && currentResponse.data && currentResponse.data.length > 0){
-
+        const socket = await registerToSocket();
+        socket.registerDataUpdateCallback((currentResponse)=>{
+            if (currentResponse.data && currentResponse.data.length > 0) {
                 const res = currentResponse.data.find(item => item.item === code);
 
-                if (res) {
+                if (res && res.values) {
                     const priceString = res.values["10"];
                     const changePriceString = res.values["11"];
                     const changeRateString = res.values["12"];
 
-                    if (priceString && changePriceString && changeRateString) {
-                        const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
-                        const changePrice = parseFloat(changePriceString);
-                        const changeRate = parseFloat(changeRateString);
+                    const currentPrice = parseFloat(priceString.replace(/^[+-]/, ''));
+                    const changePrice = parseFloat(changePriceString);
+                    const changeRate = parseFloat(changeRateString);
 
-                        if (!isNaN(currentPrice) && !isNaN(changePrice) && !isNaN(changeRate)) {
+                    if (!isNaN(currentPrice) && !isNaN(changePrice) && !isNaN(changeRate)) {
+                        if (priceElement) {
+                            priceElement.textContent = currentPrice.toLocaleString('ko-KR') + '원';
+                        }
 
-                            if (priceElement) {
-                                priceElement.textContent = currentPrice.toLocaleString('ko-KR') + '원';
-                            }
+                        if (diffValueElement) {
+                            const isPositive = changeRate > 0;
+                            const isNegative = changeRate < 0;
+                            const sign = isPositive ? '+' : (isNegative ? '' : '');
 
-                            if (diffValueElement) {
-                                const isPositive = changeRate > 0;
-                                const isNegative = changeRate < 0;
-                                const sign = isPositive ? '+' : (isNegative ? '' : '');
+                            const priceClass = getPriceColorClass(changeRate);
 
-                                const priceClass = getPriceColorClass(changeRate);
+                            diffValueElement.textContent =
+                                `${sign}${changePrice.toLocaleString('ko-KR')}원 (${Math.abs(changeRate).toFixed(2)}%)`;
 
-                                diffValueElement.textContent =
-                                    `${sign}${changePrice.toLocaleString('ko-KR')}원 (${Math.abs(changeRate).toFixed(2)}%)`;
+                            diffValueElement.className = 'stock-header__diff-value ' + priceClass;
 
-                                diffValueElement.className = 'stock-header__diff-value ' + priceClass;
-
-                                applyFlashEffect(diffValueElement, isPositive);
-                            }
-
-                            saveRealtimeData(code, currentPrice, changeRate, changePrice);
+                            applyFlashEffect(diffValueElement, isPositive);
                         }
                     }
                 }
             }
-
-            lastResponse = currentResponse;
-        };
-
-        setInterval(fetchAndUpdate, updateInterval);
-
-        fetchAndUpdate();
+        });
     };
 
-    let storedRealtimeData = sessionStorage.getItem(STORAGE_KEY);
-    storedRealtimeData = storedRealtimeData ? JSON.parse(storedRealtimeData) : {};
-    const storedItem = storedRealtimeData[stockCode];
-    console.log(storedItem)
-
-    let initialChangePrice = 0;
-    if (diffValueElement) {
-        const jspChangeText = diffValueElement.textContent; // 예: '+1,000원 (1.50%)'
-        const changePriceMatch = jspChangeText.match(/[+-]?[0-9,]+원/);
-
-        if (changePriceMatch) {
-            initialChangePrice = parseFloat(changePriceMatch[0].replace(/[원,]/g, ''));
-        }
-    }
-
-
-    if (storedItem) {
-        const storedPrice = parseFloat(storedItem.price);
-        const storedRate = parseFloat(storedItem.rate);
-        const storedChangePrice = parseFloat(storedItem.changePrice);
-
-        if (priceElement && !isNaN(storedPrice)) {
-            priceElement.textContent = storedPrice.toLocaleString('ko-KR') + '원';
-        }
-
-        if (diffValueElement && !isNaN(storedRate) && !isNaN(storedChangePrice)) {
-            const isPositive = storedRate > 0;
-            const sign = isPositive ? '+' : (storedRate < 0 ? '' : '');
-
-            const priceClass = getPriceColorClass(storedRate);
-
-            diffValueElement.textContent =
-                `${sign}${Math.abs(storedChangePrice).toLocaleString('ko-KR')}원 (${Math.abs(storedRate).toFixed(2)}%)`;
-
-            diffValueElement.className = 'stock-header__diff-value ' + priceClass;
-        }
-    }
-
+    initializeStockData(stockCode);
     startRealtimeUpdates(stockCode);
 });
