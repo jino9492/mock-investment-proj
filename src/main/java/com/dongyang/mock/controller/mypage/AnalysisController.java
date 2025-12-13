@@ -8,9 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/mypage/assets")
-public class AssetsController extends HttpServlet {
-    private final String viewPage = "/WEB-INF/views/mypage/assets.jsp";
+@WebServlet("/mypage/analysis")
+public class AnalysisController extends HttpServlet {
+    private final String viewPage = "/WEB-INF/views/mypage/analysis.jsp";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -19,3 +19,4 @@ public class AssetsController extends HttpServlet {
         req.getRequestDispatcher(viewPage).forward(req, resp);
     }
 }
+

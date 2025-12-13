@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const profileBtn = document.querySelector(".header__profile-btn");
     const dropdown = document.getElementById("headerProfileDropdown");
+    const profileMenuUser = document.getElementById("profileMenuUser");
 
 
     if (profileBtn && dropdown) {
@@ -21,6 +22,20 @@ document.addEventListener("DOMContentLoaded", function () {
         // 문서 아무 데나 클릭하면 닫기
         document.addEventListener("click", function () {
             dropdown.classList.remove("header__profile-dropdown--open");
+        });
+    }
+
+    // 프로필 메뉴 유저 항목 클릭 시 마이페이지로 이동 (뱃지 링크가 아닌 전체 영역 클릭 시)
+    if (profileMenuUser) {
+        profileMenuUser.addEventListener("click", function (e) {
+            // 뱃지 링크를 클릭한 경우는 기본 동작(링크 이동)을 허용
+            if (e.target.classList.contains("profile-menu__badge") || e.target.closest(".profile-menu__badge")) {
+                return;
+            }
+            // 그 외의 영역을 클릭한 경우 마이페이지로 이동
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = "/mypage";
         });
     }
 

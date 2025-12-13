@@ -33,12 +33,11 @@ body {
 /* 메인 영역 */
 .order-page {
     display: flex;
-    gap: 40px;
+    gap: 10px;
     align-items: flex-start;
     max-width: calc(100% - 75px);
     width: 100%;
     min-width: 0;
-
 }
 
 .order-page__left {

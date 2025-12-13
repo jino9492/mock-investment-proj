@@ -11,8 +11,8 @@
 
 <div class="my-page">
     <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
-        <jsp:param name="menuItems" value="내 정보,자산,주문내역,수익분석"/>
-        <jsp:param name="menuLinks" value="/mypage,/mypage/assets,/mypage/orders,/mypage/analysis"/>
+        <jsp:param name="menuItems" value="내 정보,주문내역,수익분석"/>
+        <jsp:param name="menuLinks" value="/mypage,/mypage/orders,/mypage/analysis"/>
     </jsp:include>
 
     <main class="my-page__content">

@@ -1,13 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/mypage/mypage.css"/>
 <script src="${pageContext.request.contextPath}/static/js/mypage/mypage.js"></script>
 
 <div class="my-page">
     <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
-        <jsp:param name="menuItems" value="내 정보,자산,주문내역,수익분석"/>
-        <jsp:param name="menuLinks" value="/mypage,/mypage/assets,/mypage/orders,/mypage/analysis"/>
+        <jsp:param name="menuItems" value="내 정보,주문내역,수익분석"/>
+        <jsp:param name="menuLinks" value="/mypage,/mypage/orders,/mypage/analysis"/>
     </jsp:include>
 
 
@@ -43,7 +44,7 @@
                 <span class="my-page__subtitle">자산</span>
                 <div class="profile-card">
                     <div class="profile-card__body">
-                        <div class="profile-card__item">${member.getVirtualCash()}원</div>
+                        <div class="profile-card__item"><fmt:formatNumber value="${member.getVirtualCash()}" pattern="#,###"/>원</div>
                     </div>
                 </div>
 

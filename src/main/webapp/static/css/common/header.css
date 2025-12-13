@@ -142,8 +142,8 @@
 /* 드롭다운 기본 상태 */
 .header__profile-dropdown {
     position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
+    top: calc(100% + 11px);
+    right: 50px;
     min-width: 180px;
     padding: 8px 0;
     background: #fff;

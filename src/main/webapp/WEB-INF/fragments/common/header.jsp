@@ -137,7 +137,7 @@
 
                     <!-- 프로필 드롭다운 -->
                     <div class="header__profile-dropdown" id="headerProfileDropdown">
-                        <div class="profile-menu__item profile-menu__user">
+                        <div class="profile-menu__item profile-menu__user" id="profileMenuUser">
                             <span class="profile-menu__icon">👤</span>
                             <span class="profile-menu__name">
                                     ${member.memNickname}

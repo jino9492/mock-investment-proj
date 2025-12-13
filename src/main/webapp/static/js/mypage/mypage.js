@@ -34,6 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateSubmitButton() {
         const submitButton = document.querySelector('.profile-card__submit input[type="submit"]');
 
+        // submitButton이 없으면 함수 종료 (다른 페이지에서는 submit 버튼이 없을 수 있음)
+        if (!submitButton) {
+            return;
+        }
+
         const allInputs = Array.from(textInputs);
         if (checkInput) {
             allInputs.push(checkInput);

@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/sidebar_left/sidebar.css">
+<script src="${pageContext.request.contextPath}/static/js/common/sidebar_left/sidebar_left.js" defer></script>
 
 <%
   String menuItemsParam = request.getParameter("menuItems");
