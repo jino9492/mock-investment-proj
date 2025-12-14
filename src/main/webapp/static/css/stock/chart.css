@@ -678,3 +678,35 @@ body.stock-page {
 .my-stock-card__profit {
     color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
 }
+
+.my-stock-card__empty-text{
+    margin-bottom: 12px;
+}
+
+.my-stock-card__login-btn{
+    margin-top: 16px;
+    width: 100%;
+    border: none;
+    height: 40px;
+    border-radius: 8px;
+    background-color: gray;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 0 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.my-stock-card__empty-text{
+    text-align: center;
+}
+
+.my-stock-card__empty{
+    height: 650px;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
