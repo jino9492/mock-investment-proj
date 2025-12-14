@@ -3,8 +3,9 @@ package com.dongyang.mock.service;
 import com.dongyang.mock.model.DAO.*;
 import com.dongyang.mock.model.DTO.OrderDTO;
 import com.dongyang.mock.model.DTO.OrderConditionDTO;
-import com.dongyang.mock.model.DTO.StockPriceDailyDTO;
+import com.dongyang.mock.model.DTO.RealtimeDTO;
 import com.dongyang.mock.service.api.StockDetailService;
+import com.dongyang.mock.util.api.InmemoryCacheManager;
 import com.dongyang.mock.util.db.DBManager;
 
 import java.math.BigDecimal;
@@ -13,6 +14,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
+import static com.dongyang.mock.service.api.WebSocketService.REALTIME_CACHE_KEY;
 
 /**
  * 주문 관련 비즈니스 로직 서비스
@@ -26,8 +29,6 @@ public class OrderService {
     private final TradeDAO tradeDAO = new TradeDAO();
     private final HoldingDAO holdingDAO = new HoldingDAO();
     private final CashHistoryDAO cashHistoryDAO = new CashHistoryDAO();
-    private final StockPriceDailyDAO stockPriceDailyDAO = new StockPriceDailyDAO();
-    private final StockDetailService stockDetailService = new StockDetailService();
 
     /**
      * 주문 생성
@@ -72,12 +73,11 @@ public class OrderService {
                         // 지정가 주문
                         totalAmount = order.getPrice().longValue() * order.getQuantity();
                     } else {
+                        InmemoryCacheManager inmemoryCacheManager = InmemoryCacheManager.getInstance();
                         // 시장가 주문 - 현재가로 계산
-                        StockPriceDailyDTO priceDaily = stockPriceDailyDAO.selectLatestPriceDailyById(order.getStockId(), conn);
-                        if (priceDaily == null || priceDaily.getClosePrice() == null) {
-                            throw new RuntimeException(new IllegalArgumentException("시장가 주문을 위해 현재가를 조회할 수 없습니다."));
-                        }
-                        BigDecimal currentPrice = priceDaily.getClosePrice();
+                        StockDAO stockDAO = new StockDAO();
+
+                        BigDecimal currentPrice = new BigDecimal(inmemoryCacheManager.get(REALTIME_CACHE_KEY + stockDAO.getStockCodeById(order.getStockId(), conn), RealtimeDTO.class).getCurPrice());
                         // 현재가가 음수인 경우 절댓값 사용
                         if (currentPrice.compareTo(BigDecimal.ZERO) < 0) {
                             currentPrice = currentPrice.abs();
@@ -191,55 +191,52 @@ public class OrderService {
      */
     private boolean executeOrderInTransaction(OrderDTO order, java.sql.Connection conn) throws SQLException {
         // 현재가 조회
-        StockPriceDailyDTO priceDaily = stockPriceDailyDAO.selectLatestPriceDailyById(order.getStockId(), conn);
-        
-        if (priceDaily == null || priceDaily.getClosePrice() == null) {
-            System.out.println("[OrderService] 종목 ID " + order.getStockId() + "의 현재가를 조회할 수 없습니다.");
-            return false;
+        InmemoryCacheManager inmemoryCacheManager = InmemoryCacheManager.getInstance();
+        // 시장가 주문 - 현재가로 계산
+        StockDAO stockDAO = new StockDAO();
+
+        BigDecimal currentPrice = new BigDecimal(inmemoryCacheManager.get(REALTIME_CACHE_KEY + stockDAO.getStockCodeById(order.getStockId(), conn), RealtimeDTO.class).getCurPrice());
+                
+        // 현재가가 음수인 경우 절댓값 사용 (데이터 오류 방지)
+        if (currentPrice.compareTo(BigDecimal.ZERO) < 0) {
+            System.err.println("[OrderService] 경고: 종목 ID " + order.getStockId() + "의 현재가가 음수입니다: " + currentPrice + ". 절댓값을 사용합니다.");
+            currentPrice = currentPrice.abs();
         }
-                
-                BigDecimal currentPrice = priceDaily.getClosePrice();
-                
-                // 현재가가 음수인 경우 절댓값 사용 (데이터 오류 방지)
-                if (currentPrice.compareTo(BigDecimal.ZERO) < 0) {
-                    System.err.println("[OrderService] 경고: 종목 ID " + order.getStockId() + "의 현재가가 음수입니다: " + currentPrice + ". 절댓값을 사용합니다.");
-                    currentPrice = currentPrice.abs();
-                }
-                BigDecimal orderPrice = order.getPrice();
-                boolean canExecute = false;
-                BigDecimal executionPrice = null;
-                
-                System.out.println("[OrderService] 주문 체결 조건 확인:");
-                System.out.println("  - 주문 ID: " + order.getOrderId());
-                System.out.println("  - 종목 ID: " + order.getStockId());
-                System.out.println("  - 주문 유형: " + order.getOrderType() + ", 거래 방향: " + order.getSide());
-                System.out.println("  - 현재가: " + currentPrice);
-                System.out.println("  - 주문가격: " + orderPrice);
-                
-                // 체결 조건 확인
-                if ("MARKET".equals(order.getOrderType())) {
-                    // 시장가: 즉시 체결
-                    canExecute = true;
-                    executionPrice = currentPrice;
-                    System.out.println("[OrderService] 시장가 주문: 즉시 체결 가능");
-                } else if ("LIMIT".equals(order.getOrderType())) {
-                    // 지정가: 가격 조건 확인
-                    if (orderPrice == null) {
-                        System.out.println("[OrderService] 지정가 주문인데 가격이 없습니다. 주문 ID: " + order.getOrderId());
-                        return false;
-                    }
-                    
-                    if ("BUY".equals(order.getSide())) {
-                        // 매수 지정가: 현재가 <= 주문가격이면 체결
-                        canExecute = currentPrice.compareTo(orderPrice) <= 0;
-                        System.out.println("[OrderService] 매수 지정가 체결 조건: " + currentPrice + " <= " + orderPrice + " = " + canExecute);
-                    } else if ("SELL".equals(order.getSide())) {
-                        // 매도 지정가: 현재가 >= 주문가격이면 체결
-                        canExecute = currentPrice.compareTo(orderPrice) >= 0;
-                        System.out.println("[OrderService] 매도 지정가 체결 조건: " + currentPrice + " >= " + orderPrice + " = " + canExecute);
-                    }
-                    executionPrice = orderPrice; // 지정가는 주문가격으로 체결
-                }
+        BigDecimal orderPrice = order.getPrice();
+        boolean canExecute = false;
+        BigDecimal executionPrice = null;
+
+        System.out.println("[OrderService] 주문 체결 조건 확인:");
+        System.out.println("  - 주문 ID: " + order.getOrderId());
+        System.out.println("  - 종목 ID: " + order.getStockId());
+        System.out.println("  - 주문 유형: " + order.getOrderType() + ", 거래 방향: " + order.getSide());
+        System.out.println("  - 현재가: " + currentPrice);
+        System.out.println("  - 주문가격: " + orderPrice);
+
+        // 체결 조건 확인
+        if ("MARKET".equals(order.getOrderType())) {
+            // 시장가: 즉시 체결
+            canExecute = true;
+            executionPrice = currentPrice;
+            System.out.println("[OrderService] 시장가 주문: 즉시 체결 가능");
+        } else if ("LIMIT".equals(order.getOrderType())) {
+            // 지정가: 가격 조건 확인
+            if (orderPrice == null) {
+                System.out.println("[OrderService] 지정가 주문인데 가격이 없습니다. 주문 ID: " + order.getOrderId());
+                return false;
+            }
+
+            if ("BUY".equals(order.getSide())) {
+                // 매수 지정가: 현재가 <= 주문가격이면 체결
+                canExecute = currentPrice.compareTo(orderPrice) <= 0;
+                System.out.println("[OrderService] 매수 지정가 체결 조건: " + currentPrice + " <= " + orderPrice + " = " + canExecute);
+            } else if ("SELL".equals(order.getSide())) {
+                // 매도 지정가: 현재가 >= 주문가격이면 체결
+                canExecute = currentPrice.compareTo(orderPrice) >= 0;
+                System.out.println("[OrderService] 매도 지정가 체결 조건: " + currentPrice + " >= " + orderPrice + " = " + canExecute);
+            }
+            executionPrice = orderPrice; // 지정가는 주문가격으로 체결
+        }
                 
         if (!canExecute) {
             // 체결 조건 미달성

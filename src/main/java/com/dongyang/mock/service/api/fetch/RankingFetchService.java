@@ -2,6 +2,8 @@ package com.dongyang.mock.service.api.fetch;
 
 import com.dongyang.mock.model.DAO.StockDAO;
 import com.dongyang.mock.model.DTO.RankingItemDTO;
+import com.dongyang.mock.model.DTO.RealtimeDTO;
+import com.dongyang.mock.service.api.RealtimeStockService;
 import com.dongyang.mock.service.auth.AuthService;
 import com.dongyang.mock.util.api.ApiConstants;
 import com.dongyang.mock.util.api.InmemoryCacheManager;
@@ -14,6 +16,7 @@ import java.util.Map;
 public class RankingFetchService extends FetchService {
     public static final String RANKING_CACHE_KEY = "stock:top100:ranking";
     AuthService authService = new AuthService();
+    RealtimeStockService realtimeStockService = new RealtimeStockService();
     private final InmemoryCacheManager cacheManager = InmemoryCacheManager.getInstance();
 
     @Override
@@ -26,6 +29,13 @@ public class RankingFetchService extends FetchService {
 
         try{
             runFetch(token, "000");
+
+            if(!realtimeStockService.isSocketOpen()){
+                List<RankingItemDTO> cachedRanking = cacheManager.getList(RankingFetchService.RANKING_CACHE_KEY);
+                List<String> list = new ArrayList<>();
+                for (RankingItemDTO rankingItemDTO : cachedRanking) { list.add(rankingItemDTO.getStkCode()); }
+                realtimeStockService.connectSocket(list, "1");
+            }
         } catch (Exception e) {
             System.err.println("배치 업데이트 중 오류 발생: " + e.getMessage());
         }

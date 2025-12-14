@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error(`초기 가격 로드 실패 (${code}):`, error.message);
         }
     };
-
     const startRealtimeUpdates = async (code) => {
         const socket = await registerToSocket();
         socket.registerDataUpdateCallback((currentResponse)=>{
@@ -89,6 +88,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!isNaN(currentPrice) && !isNaN(changePrice) && !isNaN(changeRate)) {
                         if (priceElement) {
                             priceElement.textContent = currentPrice.toLocaleString('ko-KR') + '원';
+                            console.log(currentPrice)
+                            document.querySelector('.order-card__input').setAttribute('data-current-price', currentPrice.toString())
+                            document.querySelector('.order-card__input').value = currentPrice.toLocaleString('ko-KR');
                         }
 
                         if (diffValueElement) {
