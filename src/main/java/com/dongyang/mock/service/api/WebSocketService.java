@@ -51,7 +51,7 @@ public class WebSocketService extends WebSocketClient {
                     System.out.println("로그인 성공");
                 }
             } else if ("PING".equals(trnm)) {
-                onMessage(generateRealtimeJson());
+                // onMessage(generateRealtimeJson());
                 sendMessage(response); // 그대로 응답
             }
 
