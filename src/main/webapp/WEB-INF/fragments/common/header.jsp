@@ -73,15 +73,35 @@
                             <input type="text"
                                    class="search-modal__input"
                                    name="q"
-                                   placeholder="검색어를 입력하세요" />
+                                   id="searchModalInput"
+                                   placeholder="검색어를 입력하세요"
+                                   aria-label="종목 검색"
+                                   aria-autocomplete="list"
+                                   aria-controls="searchResults"
+                                   aria-expanded="false" />
+                            <button type="button"
+                                    class="search-modal__clear-btn"
+                                    id="searchModalClearBtn"
+                                    style="display: none;"
+                                    aria-label="검색어 지우기">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                                </svg>
+                            </button>
                         </div>
                     </form>
 
-                    <!-- 최근 검색 -->
-                    <div class="search-modal__section">
+                    <!-- 검색 결과 (검색어 입력 시 표시) -->
+                    <div class="search-modal__section" id="searchResultsSection" style="display: none;">
+                        <ul class="search-modal__results" id="searchResults" role="listbox" aria-label="검색 결과">
+                            <!-- JavaScript가 동적으로 채워 넣을 영역 -->
+                        </ul>
+                    </div>
+
+                    <!-- 최근 검색 (입력이 비어있을 때 표시) -->
+                    <div class="search-modal__section" id="searchRecentSection">
                         <div class="search-modal__section-header">
                             <span class="search-modal__section-title">최근 검색</span>
-                            <button type="button" class="search-recent__clear">전체 삭제</button>
                         </div>
 
                         <!-- JS가 칩을 채워 넣을 영역 -->
@@ -90,30 +110,15 @@
                         </div>
                     </div>
 
-
-                    <div class="search-modal__section">
+                    <!-- 인기 종목 (입력이 비어있을 때 표시) -->
+                    <div class="search-modal__section" id="searchPopularSection">
                         <div class="search-modal__section-header">
-                            <span class="search-modal__section-title">인기 검색</span>
+                            <span class="search-modal__section-title">인기 종목</span>
                             <span class="search-modal__section-sub">현재 시각 기준</span>
                         </div>
 
-                        <ul class="search-modal__list">
-                            
-                            <li class="search-modal__list-item">
-                                <span class="search-modal__rank">1</span>
-                                <span class="search-modal__name">주식회사A</span>
-                                <span class="search-modal__change">+0.00%</span>
-                            </li>
-                            <li class="search-modal__list-item">
-                                <span class="search-modal__rank">2</span>
-                                <span class="search-modal__name">주식회사B</span>
-                                <span class="search-modal__change">-0.15%</span>
-                            </li>
-                            <li class="search-modal__list-item">
-                                <span class="search-modal__rank">3</span>
-                                <span class="search-modal__name">주식회사C</span>
-                                <span class="search-modal__change">+1.20%</span>
-                            </li>
+                        <ul class="search-modal__list" id="searchPopularStocks">
+                            <!-- JavaScript가 동적으로 채워 넣을 영역 -->
                         </ul>
                     </div>
                 </div>
@@ -132,7 +137,7 @@
 
                     <!-- 프로필 드롭다운 -->
                     <div class="header__profile-dropdown" id="headerProfileDropdown">
-                        <div class="profile-menu__item profile-menu__user">
+                        <div class="profile-menu__item profile-menu__user" id="profileMenuUser">
                             <span class="profile-menu__icon">👤</span>
                             <span class="profile-menu__name">
                                     ${member.memNickname}

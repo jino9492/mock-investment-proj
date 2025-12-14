@@ -1,5 +1,6 @@
 package com.dongyang.mock.model.DAO;
 
+import com.dongyang.mock.model.DTO.RealizedProfitDTO;
 import com.dongyang.mock.model.DTO.TradeDTO;
 import com.dongyang.mock.model.DTO.TradeStatsDTO;
 
@@ -223,6 +224,144 @@ public class TradeDAO {
             close(null, pstmt, rs);
         }
         return trades;
+    }
+
+    /**
+     * 특정 회원의 실현수익 조회 (매도 거래만)
+     * @param memId 회원 ID
+     * @param startDate 시작일 (YYYY-MM-DD 형식)
+     * @param endDate 종료일 (YYYY-MM-DD 형식)
+     * @param conn DB 연결
+     * @return 실현수익 목록
+     */
+    public List<RealizedProfitDTO> findRealizedProfits(int memId, String startDate, String endDate, Connection conn) throws SQLException {
+        // 서브쿼리를 변수로 추출하여 한 번만 실행
+        String sql = "SELECT " +
+                "DATE_FORMAT(t.traded_at, '%Y.%m.%d') AS sold_at, " +
+                "s.stock_name, " +
+                "s.stock_symbol, " +
+                "t.trade_price * t.trade_quantity AS total_sales_amount, " +
+                "COALESCE((" +
+                "    SELECT AVG(t2.trade_price) " +
+                "    FROM trade t2 " +
+                "    INNER JOIN trade_order o2 ON t2.order_id = o2.order_id " +
+                "    WHERE t2.mem_id = t.mem_id " +
+                "    AND t2.stock_id = t.stock_id " +
+                "    AND o2.side = 'BUY' " +
+                "    AND o2.status = 'FILLED' " +
+                "    AND DATE(t2.traded_at) < DATE(t.traded_at) " +
+                "    LIMIT 1" +
+                "), t.trade_price) * t.trade_quantity AS total_purchase_amount, " +
+                "(t.trade_price * t.trade_quantity) - (COALESCE((" +
+                "    SELECT AVG(t2.trade_price) " +
+                "    FROM trade t2 " +
+                "    INNER JOIN trade_order o2 ON t2.order_id = o2.order_id " +
+                "    WHERE t2.mem_id = t.mem_id " +
+                "    AND t2.stock_id = t.stock_id " +
+                "    AND o2.side = 'BUY' " +
+                "    AND o2.status = 'FILLED' " +
+                "    AND DATE(t2.traded_at) < DATE(t.traded_at) " +
+                "    LIMIT 1" +
+                "), t.trade_price) * t.trade_quantity) AS total_profit, " +
+                "CASE " +
+                "    WHEN COALESCE((" +
+                "        SELECT AVG(t2.trade_price) " +
+                "        FROM trade t2 " +
+                "        INNER JOIN trade_order o2 ON t2.order_id = o2.order_id " +
+                "        WHERE t2.mem_id = t.mem_id " +
+                "        AND t2.stock_id = t.stock_id " +
+                "        AND o2.side = 'BUY' " +
+                "        AND o2.status = 'FILLED' " +
+                "        AND DATE(t2.traded_at) < DATE(t.traded_at) " +
+                "        LIMIT 1" +
+                "    ), t.trade_price) * t.trade_quantity > 0 " +
+                "    THEN (((t.trade_price * t.trade_quantity) - (COALESCE((" +
+                "        SELECT AVG(t2.trade_price) " +
+                "        FROM trade t2 " +
+                "        INNER JOIN trade_order o2 ON t2.order_id = o2.order_id " +
+                "        WHERE t2.mem_id = t.mem_id " +
+                "        AND t2.stock_id = t.stock_id " +
+                "        AND o2.side = 'BUY' " +
+                "        AND o2.status = 'FILLED' " +
+                "        AND DATE(t2.traded_at) < DATE(t.traded_at) " +
+                "        LIMIT 1" +
+                "    ), t.trade_price) * t.trade_quantity)) / " +
+                "          (COALESCE((" +
+                "        SELECT AVG(t2.trade_price) " +
+                "        FROM trade t2 " +
+                "        INNER JOIN trade_order o2 ON t2.order_id = o2.order_id " +
+                "        WHERE t2.mem_id = t.mem_id " +
+                "        AND t2.stock_id = t.stock_id " +
+                "        AND o2.side = 'BUY' " +
+                "        AND o2.status = 'FILLED' " +
+                "        AND DATE(t2.traded_at) < DATE(t.traded_at) " +
+                "        LIMIT 1" +
+                "    ), t.trade_price) * t.trade_quantity)) * 100 " +
+                "    ELSE 0.0 " +
+                "END AS profit_rate, " +
+                "t.trade_quantity AS quantity " +
+                "FROM trade t " +
+                "INNER JOIN trade_order o ON t.order_id = o.order_id " +
+                "INNER JOIN stock s ON t.stock_id = s.stock_id " +
+                "WHERE t.mem_id = ? " +
+                "AND o.side = 'SELL' " +
+                "AND o.status = 'FILLED' ";
+
+        List<Object> params = new ArrayList<>();
+        params.add(memId);
+
+        // 날짜 범위 필터
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            sql += "AND DATE(t.traded_at) >= ? ";
+            params.add(startDate);
+        }
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            sql += "AND DATE(t.traded_at) <= ? ";
+            params.add(endDate);
+        }
+
+        sql += "ORDER BY t.traded_at DESC, t.trade_id DESC";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<RealizedProfitDTO> profits = new ArrayList<>();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String) {
+                    pstmt.setString(i + 1, (String) param);
+                } else if (param instanceof Integer) {
+                    pstmt.setInt(i + 1, (Integer) param);
+                } else {
+                    pstmt.setObject(i + 1, param);
+                }
+            }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                RealizedProfitDTO profit = new RealizedProfitDTO();
+                profit.setSoldAt(rs.getString("sold_at"));
+                profit.setStockName(rs.getString("stock_name"));
+                profit.setStockSymbol(rs.getString("stock_symbol"));
+                
+                java.math.BigDecimal totalSalesAmount = rs.getBigDecimal("total_sales_amount");
+                profit.setTotalSalesAmount(totalSalesAmount != null ? totalSalesAmount.intValue() : 0);
+                
+                java.math.BigDecimal totalPurchaseAmount = rs.getBigDecimal("total_purchase_amount");
+                profit.setTotalPurchaseAmount(totalPurchaseAmount != null ? totalPurchaseAmount.intValue() : 0);
+                
+                java.math.BigDecimal totalProfit = rs.getBigDecimal("total_profit");
+                profit.setTotalProfit(totalProfit != null ? totalProfit.intValue() : 0);
+                
+                profit.setProfitRate(rs.getDouble("profit_rate"));
+                profit.setQuantity(rs.getInt("quantity"));
+                
+                profits.add(profit);
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        return profits;
     }
 
     /**

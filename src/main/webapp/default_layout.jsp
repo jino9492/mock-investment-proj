@@ -5,6 +5,7 @@
 <head>
     <base href="${pageContext.request.contextPath}">
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/favicon.ico">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/common/default_layout.css">
     <title>MOCK</title>
 </head>

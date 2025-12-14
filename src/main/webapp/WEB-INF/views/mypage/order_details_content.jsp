@@ -1,18 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/mypage/order_details.css"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/mypage/mypage.css"/>
-<script src="${pageContext.request.contextPath}/static/js/mypage/order_details.js"></script>
-
-<body>
 
 <div class="my-page">
     <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
-        <jsp:param name="menuItems" value="내 정보,자산,주문내역,수익분석"/>
-        <jsp:param name="menuLinks" value="/mypage,/mypage/assets,/mypage/orders,/mypage/analysis"/>
+        <jsp:param name="menuItems" value="내 정보,주문내역,수익분석"/>
+        <jsp:param name="menuLinks" value="/mypage,/mypage/orders,/mypage/analysis"/>
     </jsp:include>
 
     <main class="my-page__content">
@@ -75,3 +71,154 @@
         </section>
     </main>
 </div>
+
+<!-- 데이터를 안전하게 전달 (서버에서 생성한 JSON 사용) -->
+<script type="application/json" id="pending-orders-json-data">
+[
+<c:if test="${not empty pendingOrdersJson}">
+<c:forEach var="orderJson" items="${pendingOrdersJson}" varStatus="status">
+<c:out value="${orderJson}" escapeXml="false"/><c:if test="${!status.last}">,</c:if>
+</c:forEach>
+</c:if>
+]
+</script>
+
+<script type="application/json" id="completed-orders-json-data">
+[
+<c:if test="${not empty completedOrdersJson}">
+<c:forEach var="orderJson" items="${completedOrdersJson}" varStatus="status">
+<c:out value="${orderJson}" escapeXml="false"/><c:if test="${!status.last}">,</c:if>
+</c:forEach>
+</c:if>
+]
+</script>
+
+<script>
+    const BACKEND_PENDING_ORDERS = [];
+    const BACKEND_COMPLETED_ORDERS = [];
+    
+    try {
+        const pendingDataEl = document.getElementById('pending-orders-json-data');
+        if (pendingDataEl && pendingDataEl.textContent.trim()) {
+            const pendingData = JSON.parse(pendingDataEl.textContent);
+            BACKEND_PENDING_ORDERS.push(...pendingData);
+        }
+    } catch (e) {
+        console.error('대기 주문 데이터 파싱 오류:', e);
+    }
+    
+    try {
+        const completedDataEl = document.getElementById('completed-orders-json-data');
+        if (completedDataEl && completedDataEl.textContent.trim()) {
+            const completedData = JSON.parse(completedDataEl.textContent);
+            BACKEND_COMPLETED_ORDERS.push(...completedData);
+        }
+    } catch (e) {
+        console.error('완료 주문 데이터 파싱 오류:', e);
+    }
+</script>
+
+<script>
+    // 백엔드 데이터를 프론트엔드 형식으로 변환
+    try {
+        BACKEND_PENDING_ORDERS.forEach(order => {
+            const side = order.side || 'BUY';
+            const typeLabel = (order.hasCondition ? '조건 ' : '') + (side === 'BUY' ? '구매' : '판매');
+            const sideLabel = side === 'BUY' ? '구매' : '판매';
+            const priceText = order.price != null ? new Intl.NumberFormat('ko-KR').format(order.price) + '원' : '시장가';
+            const sharesLabel = new Intl.NumberFormat('ko-KR').format(order.quantity) + '주';
+            
+            let createdAt = '-';
+            if (order.placedAt) {
+                try {
+                    const date = new Date(order.placedAt);
+                    if (!isNaN(date.getTime())) {
+                        createdAt = (date.getMonth() + 1) + '.' + date.getDate();
+                    }
+                } catch (e) {}
+            }
+            
+            let condition = null;
+            if (order.hasCondition && order.condition) {
+                let validUntil = '무기한';
+                if (order.condition.validUntil) {
+                    try {
+                        const date = new Date(order.condition.validUntil);
+                        if (!isNaN(date.getTime())) {
+                            validUntil = (date.getMonth() + 1) + '월 ' + date.getDate() + '일까지';
+                        }
+                    } catch (e) {}
+                }
+                
+                let orderPrice = '시장가';
+                if (order.price != null) {
+                    orderPrice = '지정가 ' + new Intl.NumberFormat('ko-KR').format(order.price) + '원';
+                }
+                
+                condition = {
+                    profitCondition: side === 'BUY' ? '가격 하락' : '가격 상승',
+                    orderPrice: orderPrice,
+                    orderQty: sharesLabel,
+                    validUntil: validUntil,
+                    trigger: '정규장일 때만'
+                };
+            }
+            
+            // 원본 데이터에 프론트엔드 형식 추가
+            order.id = String(order.orderId);
+            order.status = '대기';
+            order.corpName = order.stockName || '';
+            order.typeLabel = typeLabel;
+            order.sharesLabel = sharesLabel;
+            order.priceText = priceText;
+            order.sideLabel = sideLabel;
+            order.createdAt = createdAt;
+            order.condition = condition;
+        });
+        
+        BACKEND_COMPLETED_ORDERS.forEach(order => {
+            const side = order.side || 'BUY';
+            const status = order.status || 'FILLED';
+            const sideLabel = side === 'BUY' ? '구매' : '판매';
+            let typeLabel = '';
+            if (status === 'FILLED') {
+                typeLabel = side === 'BUY' ? '구매체결' : '판매체결';
+            } else if (status === 'CANCELLED') {
+                typeLabel = side === 'BUY' ? '구매취소' : '판매취소';
+            } else {
+                typeLabel = status;
+            }
+            
+            let priceText = '-';
+            if (status !== 'CANCELLED' && order.price != null) {
+                priceText = new Intl.NumberFormat('ko-KR').format(order.price) + '원';
+            }
+            
+            const sharesLabel = new Intl.NumberFormat('ko-KR').format(order.quantity) + '주';
+            
+            let date = '-';
+            const dateStr = order.cancelledAt || order.placedAt;
+            if (dateStr) {
+                try {
+                    const dateObj = new Date(dateStr);
+                    if (!isNaN(dateObj.getTime())) {
+                        date = (dateObj.getMonth() + 1) + '.' + dateObj.getDate();
+                    }
+                } catch (e) {}
+            }
+            
+            // 원본 데이터에 프론트엔드 형식 추가
+            order.id = String(order.orderId);
+            order.date = date;
+            order.corpName = order.stockName || '';
+            order.typeLabel = typeLabel;
+            order.sharesLabel = sharesLabel;
+            order.priceText = priceText;
+            order.sideLabel = sideLabel;
+            order.hasCondition = false;
+        });
+    } catch (e) {
+        console.error('데이터 변환 오류:', e);
+    }
+</script>
+<script src="${pageContext.request.contextPath}/static/js/mypage/order_details.js"></script>

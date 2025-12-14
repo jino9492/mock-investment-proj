@@ -1,6 +1,7 @@
 package com.dongyang.mock.service;
 
 import com.dongyang.mock.model.DAO.TradeDAO;
+import com.dongyang.mock.model.DTO.RealizedProfitDTO;
 import com.dongyang.mock.model.DTO.TradeDTO;
 import com.dongyang.mock.model.DTO.TradeStatsDTO;
 import com.dongyang.mock.util.db.DBManager;
@@ -51,6 +52,31 @@ public class TradeService {
      */
     public List<TradeDTO> getMemberRecentTrades(int memberId, int limit) throws SQLException {
         return DBManager.withConnection(conn -> tradeDAO.findMemberRecentTrades(memberId, limit, conn));
+    }
+
+    /**
+     * 특정 회원의 실현수익 조회
+     * @param memberId 회원 ID
+     * @param startDate 시작일 (YYYY-MM-DD 형식)
+     * @param endDate 종료일 (YYYY-MM-DD 형식)
+     * @return 실현수익 목록
+     */
+    public List<RealizedProfitDTO> getRealizedProfits(int memberId, String startDate, String endDate) throws SQLException {
+        return DBManager.withConnection(conn -> tradeDAO.findRealizedProfits(memberId, startDate, endDate, conn));
+    }
+
+    /**
+     * 특정 회원의 총 실현수익 합계 조회
+     * @param memberId 회원 ID
+     * @param startDate 시작일 (YYYY-MM-DD 형식)
+     * @param endDate 종료일 (YYYY-MM-DD 형식)
+     * @return 총 실현수익 합계
+     */
+    public int getTotalRealizedProfit(int memberId, String startDate, String endDate) throws SQLException {
+        List<RealizedProfitDTO> profits = getRealizedProfits(memberId, startDate, endDate);
+        return profits.stream()
+                .mapToInt(RealizedProfitDTO::getTotalProfit)
+                .sum();
     }
 }
 

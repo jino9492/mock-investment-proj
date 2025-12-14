@@ -112,7 +112,7 @@ public class StockDAO {
     public StockDTO selectStockByCode(Long stockCode, Connection conn) throws SQLException {
         final String sql = "SELECT stock_id, stock_symbol, stock_name, market_type, stock_code_id, " +
                 "listing_date, status, created_at, updated_at " +
-                "FROM stock WHERE stock_symbol = ?";
+                "FROM stock WHERE stock_code_id = ?";
 
         StockDTO stock = null;
 
@@ -126,7 +126,31 @@ public class StockDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Stock ID " + stockCode + " 조회 실패: " + e.getMessage());
+            System.err.println("Stock Code " + stockCode + " 조회 실패: " + e.getMessage());
+            throw e;
+        }
+
+        return stock;
+    }
+
+    public StockDTO selectStockBySymbol(String stockSymbol, Connection conn) throws SQLException {
+        final String sql = "SELECT stock_id, stock_symbol, stock_name, market_type, stock_code_id, " +
+                "listing_date, status, created_at, updated_at " +
+                "FROM stock WHERE stock_symbol = ?";
+
+        StockDTO stock = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, stockSymbol);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    stock = mapResultSetToStockDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Stock Symbol " + stockSymbol + " 조회 실패: " + e.getMessage());
             throw e;
         }
 

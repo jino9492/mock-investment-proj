@@ -1,154 +1,148 @@
-const MOCK_PENDING_ORDERS = [
-    {
-        id: "P1",
-        status: "대기",
-        corpName: "A기업",
-        typeLabel: "조건 구매",
-        sharesLabel: "00주",
-        priceText: "00,000원",
-        sideLabel: "구매",
-        createdAt: "10.3",
-        condition: {
-            profitCondition: "+0%일 때",
-            orderPrice: "0원 예상",
-            orderQty: "00주",
-            validUntil: "10월 30일까지",
-            trigger: "정규장일 때만"
-        }
-    },
-    {
-        id: "P2",
-        status: "대기",
-        corpName: "B기업",
-        typeLabel: "구매",
-        sharesLabel: "00주",
-        priceText: "00,000원",
-        sideLabel: "구매",
-        createdAt: "11.3",
-        condition: {
-            profitCondition: "+3%일 때",
-            orderPrice: "지정가 10,000원",
-            orderQty: "00주",
-            validUntil: "12월 10일까지",
-            trigger: "장중 언제나"
-        }
-    },
-    {
-        id: "P3",
-        status: "대기",
-        corpName: "C기업",
-        typeLabel: "판매",
-        sharesLabel: "00주",
-        priceText: "00,000원",
-        sideLabel: "판매",
-        createdAt: "11.3",
-        condition: {
-            profitCondition: "+5%일 때",
-            orderPrice: "시장가",
-            orderQty: "00주",
-            validUntil: "11월 30일까지",
-            trigger: "장마감 전"
-        }
-    }
-];
-
-const MOCK_COMPLETED_ORDERS = [
-    {
-        id: "C1",
-        date: "10.3",
-        corpName: "A기업",
-        typeLabel: "구매체결",
-        sharesLabel: "00주",
-        priceText: "00,000원"
-    },
-    {
-        id: "C2",
-        date: "11.3",
-        corpName: "A기업",
-        typeLabel: "판매체결",
-        sharesLabel: "00주",
-        priceText: "00,000원"
-    },
-    {
-        id: "C3",
-        date: "11.2",
-        corpName: "B기업",
-        typeLabel: "구매취소",
-        sharesLabel: "00주",
-        priceText: "-"
-    },
-    {
-        id: "C4",
-        date: "11.2",
-        corpName: "C기업",
-        typeLabel: "판매취소",
-        sharesLabel: "00주",
-        priceText: "-"
-    }
-];
+// 백엔드에서 전달된 데이터 사용
+// 모크 데이터는 주석 처리됨
+const MOCK_PENDING_ORDERS = typeof BACKEND_PENDING_ORDERS !== 'undefined' ? BACKEND_PENDING_ORDERS : [];
+const MOCK_COMPLETED_ORDERS = typeof BACKEND_COMPLETED_ORDERS !== 'undefined' ? BACKEND_COMPLETED_ORDERS : [];
 
 
 // ------ 오른쪽 조건구매 컴포넌트 ------
 function renderConditionOrderComponent(container, order) {
     if (!container) return;
 
-    if (!order || !order.condition) {
+    if (!order) {
         container.innerHTML = `
       <div class="condition-order">
-        <p class="condition-order__empty">선택된 조건 주문이 없습니다.</p>
+        <p class="condition-order__empty">선택된 주문이 없습니다.</p>
       </div>
     `;
         return;
     }
 
-    const { condition } = order;
+    const isConditional = order.hasCondition && order.condition;
+    // sideLabel이 없으면 side로 판단
+    const isBuy = (order.sideLabel === '구매') || (order.side === 'BUY') || (order.sideLabel === undefined && order.side === undefined);
+    const orderType = (order.orderType === 'MARKET') ? '시장가' : '지정가';
+    
+    // 1주 가격 계산
+    const pricePerShare = order.price != null ? order.price : 0;
+    const pricePerShareFormatted = pricePerShare > 0 
+        ? new Intl.NumberFormat('ko-KR').format(pricePerShare) + '원'
+        : '시장가';
+    
+    // 총 금액 계산
+    const totalAmount = pricePerShare * order.quantity;
+    const totalAmountFormatted = new Intl.NumberFormat('ko-KR').format(totalAmount) + '원';
+    
+    // 날짜 포맷팅
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === '-') return '-';
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) {
+                // M.d 형식인 경우
+                return dateStr;
+            }
+            return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        } catch (e) {
+            return dateStr;
+        }
+    };
+    
+    const orderTime = formatDate(order.createdAt || order.placedAt);
+    
+    // 구매/판매 시간 (완료된 주문의 경우 tradedAt 사용)
+    let tradeTime = '-';
+    if (order.status !== '대기') {
+        if (order.tradedAt) {
+            tradeTime = formatDate(order.tradedAt);
+        } else if (order.cancelledAt) {
+            tradeTime = formatDate(order.cancelledAt);
+        } else {
+            const currentTime = new Date();
+            tradeTime = `${currentTime.getFullYear()}년 ${currentTime.getMonth() + 1}월 ${currentTime.getDate()}일 ${String(currentTime.getHours()).padStart(2, '0')}:${String(currentTime.getMinutes()).padStart(2, '0')}`;
+        }
+    }
 
     container.innerHTML = `
     <article class="condition-order">
       <header class="condition-order__header">
-        <div>
-          <div class="condition-order__corp">${order.corpName}</div>
-          <div class="condition-order__title">조건 구매</div>
+        <div class="condition-order__header-left">
+          <div class="condition-order__stock-code">${order.corpName || ''}</div>
+          <div class="condition-order__title">${isConditional ? '조건 ' : ''}${isBuy ? '구매' : '판매'}${order.status === '대기' ? '' : ' 완료'}</div>
         </div>
-        <div class="condition-order__thumbnail"></div>
+        <div class="condition-order__badge-container">
+          ${isConditional ? '<div class="condition-order__status-badge">진행중</div>' : ''}
+        </div>
       </header>
 
-      <div class="condition-order__body">
-        <div class="condition-order__row">
-          <span class="condition-order__label">설정한 수익률일 때 현재가로 주문해요</span>
-          <span class="condition-order__badge">진행중</span>
+      <div class="condition-order__summary">
+        <div class="condition-order__summary-row">
+          <span class="condition-order__summary-label">1주 ${isBuy ? '구매' : '판매'} 가격</span>
+          <span class="condition-order__summary-value">${pricePerShareFormatted}</span>
         </div>
-
-        <div class="condition-order__row">
-          <span class="condition-order__label">수익률 조건</span>
-          <span class="condition-order__value">${condition.profitCondition}</span>
+        <div class="condition-order__summary-row">
+          <span class="condition-order__summary-label">${isBuy ? '구매' : '판매'} 수량</span>
+          <span class="condition-order__summary-value">${order.sharesLabel || order.quantity + '주'}</span>
         </div>
-
-        <div class="condition-order__row">
-          <span class="condition-order__label">주문 가격</span>
-          <span class="condition-order__value">${condition.orderPrice}</span>
-        </div>
-
-        <div class="condition-order__row">
-          <span class="condition-order__label">주문 수량</span>
-          <span class="condition-order__value">${condition.orderQty}</span>
-        </div>
-
-        <div class="condition-order__row">
-          <span class="condition-order__label">주문 유지</span>
-          <span class="condition-order__value">${condition.validUntil}</span>
-        </div>
-
-        <div class="condition-order__row">
-          <span class="condition-order__label">주문 수행</span>
-          <span class="condition-order__value">${condition.trigger}</span>
+        <div class="condition-order__divider"></div>
+        <div class="condition-order__summary-row condition-order__summary-row--total">
+          <span class="condition-order__summary-label">총 ${isBuy ? '구매' : '판매'} 금액</span>
+          <span class="condition-order__summary-value condition-order__summary-value--total">${totalAmountFormatted}</span>
         </div>
       </div>
 
+      <div class="condition-order__details">
+        <h3 class="condition-order__details-title">주문 내역</h3>
+        <div class="condition-order__details-list">
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">주문 시간</span>
+            <span class="condition-order__details-value">${orderTime}</span>
+          </div>
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">${isBuy ? '구매' : '판매'} 시간</span>
+            <span class="condition-order__details-value">${tradeTime}</span>
+          </div>
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">주문 유형</span>
+            <span class="condition-order__details-value">${orderType}</span>
+          </div>
+          ${order.status !== '대기' && order.price != null ? `
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">주문 당시 시장가</span>
+            <span class="condition-order__details-value">${pricePerShareFormatted}</span>
+          </div>
+          ` : ''}
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">주문 수량</span>
+            <span class="condition-order__details-value">${order.sharesLabel || order.quantity + '주'}</span>
+          </div>
+          ${isConditional && order.condition ? `
+          <div class="condition-order__divider"></div>
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">수익률 조건</span>
+            <span class="condition-order__details-value">${order.condition.profitCondition || '-'}</span>
+          </div>
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">주문 가격</span>
+            <span class="condition-order__details-value">${order.condition.orderPrice || '-'}</span>
+          </div>
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">주문 유지</span>
+            <span class="condition-order__details-value">${order.condition.validUntil || '무기한'}</span>
+          </div>
+          <div class="condition-order__details-row">
+            <span class="condition-order__details-label">주문 수행</span>
+            <span class="condition-order__details-value">${order.condition.trigger || '정규장일 때만'}</span>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+
+      ${order.status === '대기' && isConditional ? `
       <footer class="condition-order__footer">
         <button class="condition-order__btn" type="button">삭제하기</button>
         <button class="condition-order__btn condition-order__btn--primary" type="button">수정하기</button>
       </footer>
+      ` : ''}
     </article>
   `;
 }
@@ -290,7 +284,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     li.addEventListener("click", () => {
                         setActiveItem(li);
-                        renderConditionOrderComponent(conditionPanel, null);
+                        // 완료된 주문의 경우 order 객체 전달
+                        const orderData = MOCK_COMPLETED_ORDERS.find(o => o.id === order.id);
+                        renderConditionOrderComponent(conditionPanel, orderData || null);
                     });
 
                     ul.appendChild(li);
@@ -458,9 +454,10 @@ document.addEventListener("DOMContentLoaded", () => {
             li.addEventListener("click", () => {
                 setActiveItem(li);
 
-                // 종료내역(완료 주문)은 오른쪽 패널을 비우거나 안내만 띄우기
+                // 완료된 주문도 상세 정보 표시
                 if (item.isCompleted) {
-                    renderConditionOrderComponent(conditionPanel, null);
+                    const completedOrder = MOCK_COMPLETED_ORDERS.find(o => o.id === item.id);
+                    renderConditionOrderComponent(conditionPanel, completedOrder || null);
                 } else {
                     // 설정내역(조건 주문)은 오른쪽에 상세 표시
                     renderConditionOrderComponent(conditionPanel, item.raw);
@@ -469,8 +466,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (index === 0) {
                 li.classList.add("order-item--active");
-                if (item.isCompleted) renderConditionOrderComponent(conditionPanel, null);
-                else renderConditionOrderComponent(conditionPanel, item.raw);
+                // 완료된 주문도 표시 가능하도록 수정
+                if (item.isCompleted) {
+                    const completedOrder = MOCK_COMPLETED_ORDERS.find(o => o.id === item.id);
+                    renderConditionOrderComponent(conditionPanel, completedOrder || null);
+                } else {
+                    renderConditionOrderComponent(conditionPanel, item.raw);
+                }
             }
 
             pendingListEl.appendChild(li);

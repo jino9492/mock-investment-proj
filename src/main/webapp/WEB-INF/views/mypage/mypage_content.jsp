@@ -1,13 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="jps" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/mypage/mypage.css"/>
 <script src="${pageContext.request.contextPath}/static/js/mypage/mypage.js"></script>
 
 <div class="my-page">
     <jsp:include page="/WEB-INF/fragments/common/sidebar_left/sidebar.jsp">
-        <jsp:param name="menuItems" value="내 정보,자산,주문내역,수익분석"/>
-        <jsp:param name="menuLinks" value="/mypage,/mypage/assets,/mypage/orders,/mypage/analysis"/>
+        <jsp:param name="menuItems" value="내 정보,주문내역,수익분석"/>
+        <jsp:param name="menuLinks" value="/mypage,/mypage/orders,/mypage/analysis"/>
     </jsp:include>
 
 
@@ -43,14 +44,27 @@
                 <span class="my-page__subtitle">자산</span>
                 <div class="profile-card">
                     <div class="profile-card__body">
-                        <div class="profile-card__item">${member.getVirtualCash()}원</div>
+                        <div class="profile-card__item"><fmt:formatNumber value="${totalAsset != null ? totalAsset : 0}" pattern="#,###"/>원</div>
                     </div>
                 </div>
 
-                <span class="my-page__subtitle--small">11월 수익</span>
+                <span class="my-page__subtitle--small" id="monthly-profit-title">수익</span>
                 <div class="profile-card">
                     <div class="profile-card__body">
-                        <div class="profile-card__item">?원</div>
+                        <div class="profile-card__item" id="monthly-profit-amount">
+                            <c:set var="profit" value="${monthlyProfit != null ? monthlyProfit : 0}"/>
+                            <c:choose>
+                                <c:when test="${profit > 0}">
+                                    <span class="price-color--up">+<fmt:formatNumber value="${profit}" pattern="#,###"/>원</span>
+                                </c:when>
+                                <c:when test="${profit < 0}">
+                                    <span class="price-color--down"><fmt:formatNumber value="${profit}" pattern="#,###"/>원</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="price-color--neutral"><fmt:formatNumber value="${profit}" pattern="#,###"/>원</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
                 </div>
 
@@ -58,11 +72,11 @@
                     <div class="profile-card__body flex-column">
                         <div class="profile-card__item-wrapper">
                             <div class="profile-card__item">주문 가능 금액</div>
-                            <div class="profile-card__item">?원</div>
+                            <div class="profile-card__item"><fmt:formatNumber value="${availableCash != null ? availableCash : 0}" pattern="#,###"/>원</div>
                         </div>
                         <div class="profile-card__item-wrapper">
                             <div class="profile-card__item">투자 중인 금액</div>
-                            <div class="profile-card__item">?원</div>
+                            <div class="profile-card__item"><fmt:formatNumber value="${investedAmount != null ? investedAmount : 0}" pattern="#,###"/>원</div>
                         </div>
                     </div>
                 </div>
@@ -134,8 +148,15 @@
             </section>
         </c:if>
         <ul class="my-page__member-control-wrapper">
-            <li class="my-page__bankruptcy">모의 투자를 재시작 할 수 있습니다 <button>파산 신청</button></li>
-            <li class="my-page__member-cancel">회원탈퇴 후 일주일 이내로 동일 아이디 재가입이 불가합니다 <button class="member-delete-trigger" name="withdrawal">회원 탈퇴</button></li>
+            <li class="my-page__bankruptcy">모의 투자를 재시작 할 수 있습니다 
+                <form method="POST" style="display: inline;">
+                    <input type="hidden" name="action" value="bankruptcy"/>
+                    <button type="submit" class="bankruptcy-trigger">파산 신청</button>
+                </form>
+            </li>
+            <li class="my-page__member-cancel">회원탈퇴 후 일주일 이내로 동일 아이디 재가입이 불가합니다 
+                <button class="member-delete-trigger" name="withdrawal">회원 탈퇴</button>
+            </li>
             <form method="POST" class="member-delete-form">
                 <input type="hidden" name="action" value="withdrawal"/>
             </form>

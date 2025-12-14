@@ -1,73 +1,67 @@
-//package com.dongyang.mock.controller;
-//
-//import com.dongyang.mock.model.DTO.StockDTO;
-//import com.dongyang.mock.service.SearchService;
-//
-//import javax.servlet.ServletException;
-//import javax.servlet.annotation.WebServlet;
-//import javax.servlet.http.HttpServlet;
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
-//import javax.servlet.http.HttpSession;
-//import java.io.IOException;
-//import java.util.LinkedList;
-//import java.util.List;
-//
-//@WebServlet("/search")
-//public class SearchServlet extends HttpServlet {
-//
-//    private static final int RECENT_LIMIT = 5;
-//    private final SearchService searchService = new SearchService();
-//
-//    @Override
-//    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-//            throws ServletException, IOException {
-//
-//        System.out.println(">>> [SearchServlet] doGet 진입");
-//
-//        String query = req.getParameter("q");
-//        System.out.println(">>> [SearchServlet] q = " + query);
-//
-//        if (query == null || query.trim().isEmpty()) {
-//            req.setAttribute("searchQuery", "");
-//            req.setAttribute("searchResults", null);
-//            req.getRequestDispatcher("/WEB-INF/views/search/searchResult.jsp")
-//                    .forward(req, resp);
-//            return;
-//        }
-//
-//        query = query.trim();
-//
-//        // ========= 최근 검색어 세션에 저장 =========
-//        HttpSession session = req.getSession();
-//        @SuppressWarnings("unchecked")
-//        LinkedList<String> recent =
-//                (LinkedList<String>) session.getAttribute("recentSearches");
-//
-//        if (recent == null) {
-//            recent = new LinkedList<>();
-//        }
-//
-//        // 중복 제거 후 맨 앞에 추가
-//        recent.remove(query);
-//        recent.addFirst(query);
-//
-//        // 최대 개수 제한
-//        while (recent.size() > RECENT_LIMIT) {
-//            recent.removeLast();
-//        }
-//
-//        session.setAttribute("recentSearches", recent);
-//        System.out.println(">>> [SearchServlet] recentSearches in session = " + recent);
-//
-//        // =========  실제 검색 실행 =========
-//        List<StockDTO> resultList = searchService.searchStock(query);
-//
-//        req.setAttribute("searchQuery", query);
-//        req.setAttribute("searchResults", resultList);
-//
-//        // ========= 결과 페이지로 포워드 =========
-//        req.getRequestDispatcher("/WEB-INF/views/search/searchResult.jsp")
-//                .forward(req, resp);
-//    }
-//}
+package com.dongyang.mock.controller;
+
+import com.dongyang.mock.model.DTO.SearchResultDTO;
+import com.dongyang.mock.service.SearchService;
+import com.google.gson.Gson;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet("/api/search")
+public class SearchServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchServlet.class);
+    private final SearchService searchService = new SearchService();
+    private final Gson gson = new Gson();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        String query = req.getParameter("q");
+
+        if (query == null || query.trim().isEmpty()) {
+            logger.debug("빈 검색어 요청");
+            Map<String, Object> response = new HashMap<>();
+            response.put("results", List.of());
+            resp.getWriter().write(gson.toJson(response));
+            return;
+        }
+
+        query = query.trim();
+        logger.info("검색 요청 - 검색어: '{}'", query);
+
+        try {
+            // 검색 실행
+            List<SearchResultDTO> resultList = searchService.searchStock(query);
+            logger.debug("검색 완료 - 검색어: '{}', 결과 수: {}", query, resultList.size());
+
+            // 응답 데이터 구성
+            Map<String, Object> response = new HashMap<>();
+            response.put("results", resultList);
+            
+            String jsonResponse = gson.toJson(response);
+            resp.getWriter().write(jsonResponse);
+
+        } catch (Exception e) {
+            logger.error("검색 중 오류 발생 - 검색어: '{}'", query, e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Map<String, String> errorResponse = new HashMap<>();
+            // 프로덕션 환경에서는 상세 에러 메시지 노출하지 않음
+            errorResponse.put("error", "검색 중 오류가 발생했습니다.");
+            resp.getWriter().write(gson.toJson(errorResponse));
+        }
+    }
+}

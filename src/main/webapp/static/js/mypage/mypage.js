@@ -1,4 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // 실시간 날짜를 이용해 월 표시
+    const monthlyProfitTitle = document.getElementById('monthly-profit-title');
+    if (monthlyProfitTitle) {
+        const now = new Date();
+        const month = now.getMonth() + 1; // 0-11이므로 +1
+        monthlyProfitTitle.textContent = month + '월 수익';
+    }
+
+    // 파산 신청 버튼 처리
+    const bankruptcyTrigger = document.querySelector('.bankruptcy-trigger');
+    if (bankruptcyTrigger) {
+        bankruptcyTrigger.addEventListener('click', (e) => {
+            const confirmBankruptcy = window.confirm('파산 신청을 하시겠습니까? 모든 거래 내역과 보유 주식이 삭제되고 초기 자금(100만원)으로 리셋됩니다.');
+            if (!confirmBankruptcy) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // 회원 탈퇴 버튼 처리
     const deleteTrigger = document.querySelector('.member-delete-trigger');
     const deleteForm = document.querySelector('.member-delete-form');
     if (deleteTrigger && deleteForm) {
@@ -33,6 +53,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateSubmitButton() {
         const submitButton = document.querySelector('.profile-card__submit input[type="submit"]');
+
+        // submitButton이 없으면 함수 종료 (다른 페이지에서는 submit 버튼이 없을 수 있음)
+        if (!submitButton) {
+            return;
+        }
 
         const allInputs = Array.from(textInputs);
         if (checkInput) {

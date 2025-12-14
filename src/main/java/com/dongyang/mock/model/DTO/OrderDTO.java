@@ -17,6 +17,7 @@ public class OrderDTO {
     private String status; // 'PENDING', 'PARTIAL', 'FILLED', 'CANCELLED'
     private Timestamp placedAt;
     private Timestamp cancelledAt;
+    private Timestamp tradedAt; // 체결 시간 (FILLED 상태일 때)
     private boolean hasCondition;
     
     // 조건 주문용 필드
@@ -136,6 +137,14 @@ public class OrderDTO {
 
     public void setWatchPrice(BigDecimal watchPrice) {
         this.watchPrice = watchPrice;
+    }
+
+    public Timestamp getTradedAt() {
+        return tradedAt;
+    }
+
+    public void setTradedAt(Timestamp tradedAt) {
+        this.tradedAt = tradedAt;
     }
 }
 

@@ -347,7 +347,7 @@ public class MemberDAO {
         StringBuilder sql = new StringBuilder(
                 "SELECT mem_id, mem_email, mem_nickname, mem_join_at, mem_last_login_at, mem_last_login_ip, mem_password, " +
                         "agree_privacy_at, agree_third_at, agree_notification_at, virtual_cash, " +
-                        "((virtual_cash - 10000000) / 10000000.0) * 100 AS profit_rate, " +
+                        "((virtual_cash - 1000000) / 1000000.0) * 100 AS profit_rate, " +
                         "CASE " +
                         " WHEN mem_last_login_at IS NULL THEN '신규' " +
                         " WHEN mem_last_login_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) THEN '활동' " +
@@ -372,11 +372,11 @@ public class MemberDAO {
         }
 
         if ("10".equals(profitFilter)) {
-            sql.append(" AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 10");
+            sql.append(" AND ((virtual_cash - 1000000) / 1000000.0) * 100 >= 10");
         } else if ("30".equals(profitFilter)) {
-            sql.append(" AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 30");
+            sql.append(" AND ((virtual_cash - 1000000) / 1000000.0) * 100 >= 30");
         } else if ("50".equals(profitFilter)) {
-            sql.append(" AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 50");
+            sql.append(" AND ((virtual_cash - 1000000) / 1000000.0) * 100 >= 50");
         }
 
         if ("1m".equals(joinFilter)) {
@@ -514,9 +514,9 @@ public class MemberDAO {
         }
 
         // 회원 정보 조회 (예치금, 초기 자본)
-        String memberSql = "SELECT virtual_cash, 10000000 as initial_capital FROM member WHERE mem_id = ?";
+        String memberSql = "SELECT virtual_cash, 1000000 as initial_capital FROM member WHERE mem_id = ?";
         long virtualCash = 0L;
-        long initialCapital = 10000000L;
+        long initialCapital = 1000000L;
         try {
             pstmt = conn.prepareStatement(memberSql);
             pstmt.setInt(1, memberId);
@@ -688,6 +688,135 @@ public class MemberDAO {
             return newCash;
         } finally {
             close(null, pstmt);
+        }
+    }
+
+    /**
+     * 파산 신청 처리
+     * - member 정보와 관심 테이블은 유지
+     * - trade_order, order_condition, trade, holding, cash_history 데이터 삭제
+     * - virtual_cash를 초기 자금(100만원)으로 리셋
+     * @param memberId 회원 ID
+     * @param conn DB 연결
+     * @return 성공 시 true, 실패 시 false
+     * @throws SQLException
+     */
+    public boolean declareBankruptcy(int memberId, Connection conn) throws SQLException {
+        try {
+            // 1. order_condition 삭제 (trade_order와 연결된 데이터)
+            String deleteOrderConditionSql = "DELETE oc FROM order_condition oc " +
+                    "INNER JOIN trade_order o ON oc.order_id = o.order_id " +
+                    "WHERE o.mem_id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(deleteOrderConditionSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 2. trade 삭제 (trade_order와 연결된 데이터)
+            String deleteTradeSql = "DELETE t FROM trade t " +
+                    "INNER JOIN trade_order o ON t.order_id = o.order_id " +
+                    "WHERE o.mem_id = ?";
+            pstmt = conn.prepareStatement(deleteTradeSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 3. trade_order 삭제
+            String deleteTradeOrderSql = "DELETE FROM trade_order WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(deleteTradeOrderSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 4. holding 삭제
+            String deleteHoldingSql = "DELETE FROM holding WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(deleteHoldingSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 5. cash_history 삭제
+            String deleteCashHistorySql = "DELETE FROM cash_history WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(deleteCashHistorySql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 6. virtual_cash를 초기 자금(100만원)으로 리셋
+            String resetCashSql = "UPDATE member SET virtual_cash = 1000000 WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(resetCashSql);
+            pstmt.setInt(1, memberId);
+            int updated = pstmt.executeUpdate();
+            pstmt.close();
+
+            return updated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * 회원 탈퇴 처리 (모든 관련 데이터 삭제)
+     * - trade_order, order_condition, trade, holding, cash_history 삭제
+     * - member 삭제
+     * @param memberId 회원 ID
+     * @param conn DB 연결
+     * @return 성공 시 true, 실패 시 false
+     * @throws SQLException
+     */
+    public boolean deleteMemberWithAllData(int memberId, Connection conn) throws SQLException {
+        try {
+            // 1. order_condition 삭제
+            String deleteOrderConditionSql = "DELETE oc FROM order_condition oc " +
+                    "INNER JOIN trade_order o ON oc.order_id = o.order_id " +
+                    "WHERE o.mem_id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(deleteOrderConditionSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 2. trade 삭제
+            String deleteTradeSql = "DELETE t FROM trade t " +
+                    "INNER JOIN trade_order o ON t.order_id = o.order_id " +
+                    "WHERE o.mem_id = ?";
+            pstmt = conn.prepareStatement(deleteTradeSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 3. trade_order 삭제
+            String deleteTradeOrderSql = "DELETE FROM trade_order WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(deleteTradeOrderSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 4. holding 삭제
+            String deleteHoldingSql = "DELETE FROM holding WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(deleteHoldingSql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 5. cash_history 삭제
+            String deleteCashHistorySql = "DELETE FROM cash_history WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(deleteCashHistorySql);
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 6. member 삭제
+            String deleteMemberSql = "DELETE FROM member WHERE mem_id = ?";
+            pstmt = conn.prepareStatement(deleteMemberSql);
+            pstmt.setInt(1, memberId);
+            int deleted = pstmt.executeUpdate();
+            pstmt.close();
+
+            return deleted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 }

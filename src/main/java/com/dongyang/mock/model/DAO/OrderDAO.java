@@ -221,6 +221,43 @@ public class OrderDAO {
     }
 
     /**
+     * 회원의 완료된 주문 목록 조회 (FILLED, CANCELLED)
+     * @param memId 회원 ID
+     * @param conn DB 연결
+     * @return 완료된 주문 목록 (날짜별 내림차순 정렬)
+     * @throws SQLException
+     */
+    public List<OrderDTO> findCompletedOrdersByMember(int memId, Connection conn) throws SQLException {
+        String sql = "SELECT o.order_id, o.mem_id, o.stock_id, o.side, o.order_type, o.price, " +
+                     "o.quantity, o.status, o.placed_at, o.cancelled_at, o.has_condition, " +
+                     "s.stock_name, t.traded_at " +
+                     "FROM trade_order o " +
+                     "INNER JOIN stock s ON o.stock_id = s.stock_id " +
+                     "LEFT JOIN trade t ON o.order_id = t.order_id " +
+                     "WHERE o.mem_id = ? AND (o.status = 'FILLED' OR o.status = 'CANCELLED') " +
+                     "ORDER BY COALESCE(t.traded_at, o.cancelled_at, o.placed_at) DESC, o.order_id DESC";
+        
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<OrderDTO> orders = new ArrayList<>();
+        
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memId);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                OrderDTO order = mapToOrder(rs);
+                orders.add(order);
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        
+        return orders;
+    }
+
+    /**
      * ResultSet을 OrderDTO로 변환
      */
     private OrderDTO mapToOrder(ResultSet rs) throws SQLException {
@@ -243,6 +280,10 @@ public class OrderDAO {
         
         order.setHasCondition(rs.getBoolean("has_condition"));
         order.setStockName(rs.getString("stock_name"));
+        
+        // traded_at 필드 매핑 (완료된 주문의 경우)
+        Timestamp tradedAt = rs.getTimestamp("traded_at");
+        order.setTradedAt(rs.wasNull() ? null : tradedAt);
         
         // JSP용 tradeType 변환
         if ("BUY".equals(order.getSide())) {

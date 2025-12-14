@@ -1,8 +1,10 @@
 package com.dongyang.mock.util.db;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,35 +12,67 @@ import java.util.Properties;
 
 public class DBManager {
     private static final Properties props = new Properties();
+    private static HikariDataSource dataSource;
 
-    // db 설정 파일 열기
+    // db 설정 파일 열기 및 Connection Pool 초기화
     static {
         try (InputStream is = DBManager.class.getClassLoader().getResourceAsStream("db.properties")) {
             if (is == null) {
                 throw new RuntimeException("db.properties 파일을 찾을 수 없습니다.");
             }
             props.load(is);
-            Class.forName(props.getProperty("db.driver"));
+            
+            // HikariCP 설정
+            HikariConfig config = new HikariConfig();
+            config.setDriverClassName(props.getProperty("db.driver"));
+            config.setJdbcUrl(props.getProperty("db.url"));
+            config.setUsername(props.getProperty("db.user"));
+            config.setPassword(props.getProperty("db.password"));
+            
+            // Connection Pool 설정
+            config.setMinimumIdle(5);                    // 최소 유휴 연결 수
+            config.setMaximumPoolSize(20);               // 최대 연결 수
+            config.setConnectionTimeout(30000);          // 연결 대기 시간 (30초)
+            config.setIdleTimeout(600000);                // 유휴 연결 타임아웃 (10분)
+            config.setMaxLifetime(1800000);              // 연결 최대 수명 (30분)
+            config.setLeakDetectionThreshold(60000);    // 연결 누수 감지 (60초)
+            
+            // Connection Pool 초기화
+            dataSource = new HikariDataSource(config);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ExceptionInInitializerError(e);
         }
     }
 
-    // 연결
+    /**
+     * Connection Pool에서 연결 획득
+     * @return Connection Pool에서 가져온 데이터베이스 연결
+     * @throws SQLException 연결 획득 실패 시
+     */
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-                props.getProperty("db.url"),
-                props.getProperty("db.user"),
-                props.getProperty("db.password")
-        );
+        return dataSource.getConnection();
+    }
+    
+    /**
+     * 애플리케이션 종료 시 Connection Pool 정리
+     */
+    public static void shutdown() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
     }
 
+    /**
+     * DB 자원 해제
+     * Connection Pool 사용 시 conn.close()는 실제로 연결을 닫는 것이 아니라
+     * Connection Pool로 반환하는 것입니다.
+     */
     public static void close(Connection conn, PreparedStatement pstmt, ResultSet rs) {
         try {
             if (rs != null) rs.close();
             if (pstmt != null) pstmt.close();
-            if (conn != null) conn.close();
+            if (conn != null) conn.close(); // Connection Pool로 반환
         } catch (SQLException e) {
             System.err.println("DB 자원 해제 중 오류 발생: " + e.getMessage());
         }

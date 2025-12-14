@@ -1,0 +1,252 @@
+/* 공통 */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #F6F7F9;
+
+}
+
+
+
+/* 전체 레이아웃 */
+.analysis-page {
+    display: flex;
+    padding-left: 300px;
+    width: 100%;
+}
+
+
+/* 메인 영역 */
+.analysis__content {
+    flex: 1;
+    max-width: calc(100% - 75px);
+
+}
+
+.analysis__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    margin-top: 30px;
+}
+
+.analysis__layout {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px 24px;
+    width: 100%;
+    height: 800px;
+    max-width: 1400px;
+    min-width: 800px;
+}
+
+
+.analysis__filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 6px;
+}
+
+.analysis__pill,
+.analysis__pill-selectBtn {
+    height:32px;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:0 10px;
+    font-size: 14px;
+    background-color: white;
+}
+
+.analysis__pill:active,
+.analysis__pill-selectBtn:active {
+    transform: translateY(1px);
+}
+
+.analysis__chev {
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+/* viewType 드롭다운 */
+.analysis__pill-select {
+    position: relative;
+}
+
+.analysis__pill-menu {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    min-width: 58px;
+    background: #fff;
+    border: 1px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+    display: none;
+    z-index: 10;
+}
+
+.analysis__pill-select.is-open .analysis__pill-menu {
+    display: block;
+}
+
+.analysis__pill-item {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 5px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.analysis__pill-item:hover {
+    background: #F3F4F6;
+}
+
+.analysis__pill-item.is-active {
+    background: #E6E6E6;
+
+}
+
+/* month input은 버튼 클릭 시 열기용이라 숨김 */
+.analysis__monthInput {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 요약 */
+.analysis__summary {
+    margin-top: 36px;
+}
+
+.analysis__summaryLabel {
+    font-size: 15px;
+    color: #111;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.analysis__summaryRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 36px;
+    margin-bottom: 18px;
+
+
+}
+
+.analysis__summaryMain {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+
+.analysis__summarySub {
+    font-size: 15px;
+    color: #333;
+}
+
+.analysis__table{
+    width: 100%;
+    max-width: 1100px;
+    min-width: 800px;
+}
+
+
+.analysis__thead {
+    display: grid;
+    grid-template-columns: 90px 120px 130px 90px 130px 130px 90px;
+    gap: 10px;
+    padding: 10px 8px;
+    color: #111;
+    font-size: 14px;
+    margin-bottom: 10px;
+
+}
+
+.analysis__th--right {
+    text-align: right;
+}
+
+.analysis__tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.analysis__row {
+    display: grid;
+    grid-template-columns: 90px 120px 130px 90px 130px 130px 90px;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    height: 55px;
+    border-radius: 10px;
+    padding: 10px 8px;
+    font-size: 16px;
+    color: #111;
+
+    border: 1px solid transparent;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    margin-bottom: 8px;
+
+}
+
+
+/* 화면이 줄어들 때 */
+@media (max-width: 1200px) {
+    .analysis__row {
+        max-width: 800px;
+        min-width: 800px;
+    }
+}
+
+
+.analysis__cell--right {
+    text-align: right;
+}
+
+.analysis__stock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.analysis__dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #111;
+    display: inline-block;
+}
+
+.analysis__pill-select.is-open .analysis__pill-menu {
+    display: block;
+}
+
+/* 수익/손실 색상 */
+.analysis__profit--positive {
+    color: #E53935; /* 빨강 - 수익 */
+    font-weight: 500;
+}
+
+.analysis__profit--negative {
+    color: #1976D2; /* 파랑 - 손실 */
+    font-weight: 500;
+}
+
