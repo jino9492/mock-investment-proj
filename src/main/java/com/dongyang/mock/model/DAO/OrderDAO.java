@@ -411,7 +411,7 @@ public class OrderDAO {
         order.setStockName(rs.getString("stock_name"));
         
         // traded_at 필드 매핑 (완료된 주문의 경우)
-        Timestamp tradedAt = rs.getTimestamp("traded_at");
+        Timestamp tradedAt = new Timestamp(System.currentTimeMillis());
         order.setTradedAt(rs.wasNull() ? null : tradedAt);
         
         // JSP용 tradeType 변환

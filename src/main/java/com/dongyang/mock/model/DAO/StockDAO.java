@@ -112,7 +112,7 @@ public class StockDAO {
     public StockDTO selectStockByCode(String stockCode, Connection conn) throws SQLException {
         final String sql = "SELECT stock_id, stock_symbol, stock_name, market_type, stock_code_id, " +
                 "listing_date, status, created_at, updated_at " +
-                "FROM stock WHERE stock_code_id = ?";
+                "FROM stock WHERE stock_symbol = ?";
 
         StockDTO stock = null;
 
