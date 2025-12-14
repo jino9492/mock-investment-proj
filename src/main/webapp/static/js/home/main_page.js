@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     url.searchParams.set('code', stkCode);
                     window.history.pushState({path: url.href}, '', url.href);
 
+                    loadChartByUrlCode();
                     fetchAndUpdateStockDetail(stkCode);
                 }
 
