@@ -64,7 +64,7 @@ html {
 
 .login__card {
   background-color: #FFFFFF;
-  width: 500px;
+  width: 400px;
   height: 500px;
   margin-top: 0;
   border-radius: 24px;
@@ -72,12 +72,11 @@ html {
 }
 
 .login__card-title {
-
-  margin-top: 40px;
-  margin-bottom: 30px;
+  margin-top: 45px;
+  margin-bottom: 60px;
   font-size: 30px;
   font-weight: 800;
-
+  color: #333d4b;
 }
 
 /* 폼 */
@@ -93,12 +92,12 @@ html {
 }
 
 .login__card-input {
-  width: 420px;
-  height: 65px;
+  width: 340px;
+  height: 50px;
   border-radius: 10px;
-  border: 0.5px solid #ABABAB;
-  padding-left: 27px;
-  font-size: 20px;
+  border: 0.5px solid #e5e8eb;
+  padding-left: 20px;
+  font-size: 16px;
   outline: none;
   box-sizing: border-box;
   background-color: #F9F9F9;
@@ -116,29 +115,30 @@ html {
 /* 로그인 버튼 */
 
 .login__card-button {
-  margin-top: 45px;
-  height: 65px;
-  width: 420px;
+  margin-top: 15px;
+  width: 340px;
+  height: 50px;
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
   color: #FFFFFF;
   background: #689DFF;
-  margin-left: 40px;
+  align-self: center;
 }
 
 /* 푸터 텍스트 */
 
 .login__card-footer {
   margin-top: 35px;
-  font-size: 16px;
+  font-size: 14px;
   color: #17171B;
 }
 
 .login__card-footer-text {
   margin-right: 4px;
+  color: #333d4b;
 }
 
 .login__card-footer-link {
