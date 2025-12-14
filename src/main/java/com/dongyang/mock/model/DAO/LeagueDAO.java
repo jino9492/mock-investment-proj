@@ -18,6 +18,49 @@ import static com.dongyang.mock.util.db.DBManager.close;
 public class LeagueDAO {
 
     /**
+     * 각 주식의 수익률 평균 계산
+     * 각 주식의 수익률 = ((현재가 - 매수평균가) / 매수평균가) × 100
+     * 전체 계좌 수익률 = 모든 주식 수익률의 평균
+     */
+    private double calculateAverageStockReturnRate(int memId, Connection conn) throws SQLException {
+        String sql = "SELECT " +
+                "CASE " +
+                "  WHEN h.avg_buy_price > 0 " +
+                "  THEN ((spd.close_price - h.avg_buy_price) / h.avg_buy_price) * 100 " +
+                "  ELSE 0 " +
+                "END as return_rate " +
+                "FROM holding h " +
+                "INNER JOIN stock_price_daily spd ON h.stock_id = spd.stock_id " +
+                "AND spd.price_date = (SELECT MAX(price_date) FROM stock_price_daily WHERE stock_id = h.stock_id) " +
+                "WHERE h.mem_id = ? AND h.quantity > 0 AND h.avg_buy_price > 0";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        double sumReturnRate = 0.0;
+        int count = 0;
+        
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memId);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                double returnRate = rs.getDouble("return_rate");
+                sumReturnRate += returnRate;
+                count++;
+            }
+
+            // 평균 계산
+            if (count > 0) {
+                return sumReturnRate / count;
+            }
+            return 0.0;
+        } finally {
+            close(null, pstmt, rs);
+        }
+    }
+
+    /**
      * 투자중인 금액 계산 (보유주식 평가액)
      */
     private long calculateStockValue(int memId, Connection conn) throws SQLException {
@@ -131,15 +174,12 @@ public class LeagueDAO {
         // 투자중인 금액 (보유주식 평가액)
         long stockValue = calculateStockValue(memId, conn);
 
-        // 계좌 총 금액
+        // 계좌 총 잔액
         long totalAsset = cashBalance + stockValue;
 
-        // 총 수익률 계산
-        double totalReturn = 0.0;
-        if (initialCapital > 0) {
-            totalReturn = ((double) (totalAsset - initialCapital) / initialCapital) * 100.0;
-            totalReturn = Math.round(totalReturn * 100.0) / 100.0; // 소수점 2자리 반올림
-        }
+        // 전체 계좌 수익률 계산: 각 주식의 수익률을 모두 더해서 평균을 낸 값
+        double totalReturn = calculateAverageStockReturnRate(memId, conn);
+        totalReturn = Math.round(totalReturn * 100.0) / 100.0; // 소수점 2자리 반올림
 
         // 상위 백분율 계산
         double percentile = calculatePercentile(memId, totalAsset, conn);
@@ -306,14 +346,15 @@ public class LeagueDAO {
             rs = pstmt.executeQuery();
 
             // 모든 회원 데이터를 먼저 수집하고 수익률 계산
+            // 전체 계좌 수익률 = 각 주식의 수익률을 모두 더해서 평균을 낸 값
             while (rs.next()) {
                 int userId = rs.getInt("mem_id");
                 // decimal(18,2)를 정확하게 처리
                 BigDecimal totalAssetBD = rs.getBigDecimal("total_asset");
-                BigDecimal initialCapitalBD = rs.getBigDecimal("initial_capital");
                 long totalAsset = totalAssetBD != null ? totalAssetBD.longValue() : 0L;
-                long initialCapital = initialCapitalBD != null ? initialCapitalBD.longValue() : 1000000L;
-                double returnRate = initialCapital > 0 ? ((double) (totalAsset - initialCapital) / initialCapital) * 100.0 : 0.0;
+                
+                // 각 주식의 수익률 평균 계산
+                double returnRate = calculateAverageStockReturnRate(userId, conn);
                 returnRate = Math.round(returnRate * 100.0) / 100.0;
 
                 LeagueDTO.Ranking ranking = new LeagueDTO.Ranking();

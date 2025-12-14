@@ -129,7 +129,6 @@
             <c:otherwise>
                 <section class="my-stock-card">
                     <h2 class="my-stock-card__title">내 주식</h2>
-
                     <div class="my-stock-card__empty">
                         <p class="my-stock-card__empty-text">
                             내 주식을 보려면 로그인이 필요해요

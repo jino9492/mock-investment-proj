@@ -16,9 +16,9 @@ html {
 
 
 .login__page-wrap {
-
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 /* 헤더 */
@@ -29,7 +29,6 @@ html {
   justify-content: space-between;
   height: 70px;
   padding-left: 25px;
-  margin-bottom: 200px;
 }
 
 .login__brand {
@@ -58,14 +57,14 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-
+  flex: 1;
 }
 
 /* 로그인 카드 */
 
 .login__card {
   background-color: #FFFFFF;
-  width: 400px;
+  width: 460px;
   height: 500px;
   margin-top: 0;
   border-radius: 24px;
@@ -73,8 +72,8 @@ html {
 }
 
 .login__card-title {
-  margin-top: 45px;
-  margin-bottom: 60px;
+  margin-top: 40px;
+  margin-bottom: 30px;
   font-size: 30px;
   font-weight: 800;
   color: #333d4b;
@@ -85,6 +84,7 @@ html {
 .login__card-form {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
 }
 
@@ -93,15 +93,15 @@ html {
 }
 
 .login__card-input {
-  width: 340px;
-  height: 50px;
+  width: 420px;
+  height: 65px;
   border-radius: 10px;
   border: 0.5px solid #e5e8eb;
-  padding-left: 20px;
-  font-size: 16px;
+  padding-left: 27px;
+  font-size: 20px;
+  font-weight: 500;
   outline: none;
   box-sizing: border-box;
-  background-color: #F9F9F9;
 }
 
 .login__card-input::placeholder {
@@ -109,37 +109,35 @@ html {
 }
 
 .login__card-input:focus {
-  border-color: #4B8AFF;
-  box-shadow: 0 0 0 1px #689DFF;
+  border-color: #3182f6;
+  box-shadow: 0 0 0 1px #3182f6;
 }
 
 /* 로그인 버튼 */
 
 .login__card-button {
-  margin-top: 15px;
-  width: 340px;
-  height: 50px;
+  margin-top: 45px;
+  height: 65px;
+  width: 420px;
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 600;
   color: #FFFFFF;
   background: #689DFF;
-  align-self: center;
 }
 
 /* 푸터 텍스트 */
 
 .login__card-footer {
   margin-top: 35px;
-  font-size: 14px;
+  font-size: 16px;
   color: #17171B;
 }
 
 .login__card-footer-text {
   margin-right: 4px;
-  color: #333d4b;
 }
 
 .login__card-footer-link {

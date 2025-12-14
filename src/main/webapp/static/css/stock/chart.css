@@ -1116,7 +1116,7 @@ body.stock-page {
     background-color: #ffffff;
     border-radius: 20px;
     padding: 20px 24px 24px;
-    width: 380px;
+    width: 360px;
     max-width: calc(100% - 75px);
     height: 778px;
 }
@@ -1138,6 +1138,17 @@ body.stock-page {
     color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
 }
 
+
+.my-stock-card__empty-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    font-size: 16px;
+    color: #666666;
+    text-align: center;
+}
 /* 일반 주문 편집 모달 스타일 */
 .order-modal--general .order-modal__dialog--center {
     position: fixed;

@@ -112,20 +112,6 @@ ul {
 
 .league__summary-value span {
   font-size: 16px;
-  color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
-}
-
-/* 호환성을 위한 기존 클래스 - 공통 클래스 사용 권장 */
-.league__summary-value span.league__text-gray {
-  color: #666666; /* 공통 색상으로 통일 */
-}
-
-.league__summary-value span.league__text-red {
-  color: #F04452; /* 공통 색상으로 통일 */
-}
-
-.league__summary-value span.league__text-blue {
-  color: #3182F6; /* 공통 색상으로 통일 */
 }
 
 .league__divider {
@@ -199,26 +185,11 @@ ul {
 /* ============================================
  * 텍스트 색상 유틸리티 클래스
  * ============================================
- * - gray: 회색 (보합/0%, 기본값)
- * - red: 빨간색 (상승/+)
- * - blue: 파란색 (하락/-)
+ * 가격 변동 색상은 공통 유틸리티 클래스 사용:
+ * - price-color--up: 상승 (빨간색)
+ * - price-color--down: 하락 (파란색)
+ * - price-color--neutral: 보합 (회색)
  * ============================================ */
-
-/* 호환성을 위한 기존 클래스 - 공통 클래스 사용 권장 */
-.league__text-gray {
-  color: #666666; /* 공통 색상으로 통일 */
-  font-size: 16px;
-}
-
-.league__text-red {
-  color: #F04452; /* 공통 색상으로 통일 */
-  font-size: 16px;
-}
-
-.league__text-blue {
-  color: #3182F6; /* 공통 색상으로 통일 */
-  font-size: 16px;
-}
 
 /* ============================================
  * 랭킹 카드 영역

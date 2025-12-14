@@ -7,20 +7,17 @@
   );
 }
 
-html,
-body {
+body,
+html {
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
-/* 배경 */
-
 .signup__page-wrap {
-  min-height: 100vh;
-
   display: flex;
   flex-direction: column;
-
+  min-height: 100vh;
 }
 
 /* 헤더 */
@@ -31,7 +28,6 @@ body {
   justify-content: space-between;
   height: 70px;
   padding-left: 25px;
-  
 }
 
 .signup__brand {
@@ -60,26 +56,26 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1;
 }
 
-/* 카드 */
+/* 회원가입 카드 */
 
 .signup__card {
-  margin-top: 50px;
-  background-color: #ffffff;
-  width: 500px;
+  background-color: #FFFFFF;
+  width: 460px;
   height: 830px;
+  margin-top: 0;
   border-radius: 24px;
-  text-align: left;
-  margin-bottom: 20px;
+  text-align: center;
 }
 
 .signup__card-title {
-  margin-top: 50px;
-  margin-bottom: 64px;
-  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 30px;
   font-size: 30px;
   font-weight: 800;
+  color: #333d4b;
 }
 
 /* 폼 */
@@ -87,8 +83,8 @@ body {
 .signup__card-form {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
-  margin-left: 40px;
 }
 
 .signup__card-field {
@@ -97,14 +93,14 @@ body {
 
 .signup__card-input {
   width: 420px;
-  height: 60px;
+  height: 65px;
   border-radius: 10px;
-  border: 0.5px solid #ABABAB;
-  padding-left: 20px;
+  border: 0.5px solid #e5e8eb;
+  padding-left: 27px;
   font-size: 20px;
+  font-weight: 500;
   outline: none;
   box-sizing: border-box;
-  background-color: #f9f9f9;
 }
 
 .signup__card-input::placeholder {
@@ -112,8 +108,8 @@ body {
 }
 
 .signup__card-input:focus {
-  border-color: #4b8aff;;
-  box-shadow: 0 0 0 1px #689dff;
+  border-color: #3182f6;
+  box-shadow: 0 0 0 1px #3182f6;
 }
 
 
@@ -121,7 +117,8 @@ body {
 
 .signup__agreements {
   margin-top: 60px;
-  color: #17171b;
+  margin-left: 40px;
+  color: #333d4b;
 }
 
 .signup__agreement-all {
@@ -165,31 +162,29 @@ body {
   background-color: #ABABAB;
   margin-top: 2px;
   margin-right: 40px;
-  
 }
 
-/* 버튼 */
+/* 회원가입 버튼 */
 
 .signup__card-button {
-  margin-top: 17px;
-  width: 420px;
+  margin-top: 45px;
   height: 65px;
+  width: 420px;
   border-radius: 10px;
   border: none;
   cursor: pointer;
   font-size: 20px;
-  font-weight: 700;
-  color: #ffffff;
-  background: #689dff;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: #689DFF;
 }
 
 /* 푸터 텍스트 */
 
 .signup__card-footer {
-  margin-top: 32px;
-  text-align: center;
+  margin-top: 35px;
   font-size: 16px;
-  color: #17171b;
+  color: #17171B;
 }
 
 .signup__card-footer-text {
@@ -197,9 +192,9 @@ body {
 }
 
 .signup__card-footer-link {
-  color: #4b8aff;;
+  color: #4B8AFF;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .signup__card-footer-link:hover {
