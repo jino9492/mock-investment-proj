@@ -100,3 +100,44 @@ export function loadRealtimeData(code) {
             });
     });
 }
+
+export async function fetchStockChartData(stockCode) {
+    // 1. 요청할 기본 URL 정의
+    const baseUrl = '/api/stock/chart';
+
+    // 2. URLSearchParams를 사용하여 쿼리 파라미터 (code=...) 생성
+    const params = new URLSearchParams({
+        code: stockCode
+    });
+
+    // 3. 최종 URL 결합 ( /api/stock/chart?code=005930 )
+    const url = `${baseUrl}?${params.toString()}`;
+
+    console.log(`요청 URL: ${url}`);
+
+    try {
+        // GET 요청 보내기
+        const response = await fetch(url, {
+            method: 'GET', // GET 요청 명시
+            headers: {
+                'Content-Type': 'application/json' // 일반적으로 JSON 응답을 기대
+            }
+        });
+
+        // HTTP 상태 코드 확인 (4xx, 5xx 에러 처리)
+        if (!response.ok) {
+            // 에러 응답 본문을 읽기 시도
+            const errorText = await response.text();
+            throw new Error(`HTTP 오류! 상태 코드: ${response.status} (${errorText})`);
+        }
+
+        // 응답 본문을 JSON으로 파싱하여 반환
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error('API 요청 중 오류 발생:', error.message);
+        // 에러를 호출자에게 다시 던지거나 적절한 오류 값을 반환
+        return null;
+    }
+}
