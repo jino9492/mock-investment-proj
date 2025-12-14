@@ -40,7 +40,7 @@ public class StockCodeResolver {
         // stock_symbol로 조회 실패 시, 숫자로 파싱하여 stock_code_id로 조회 시도
         try {
             Long numericCode = Long.parseLong(codeParam);
-            return stockDetailService.getStockByCode(numericCode);
+            return stockDetailService.getStockByCode(String.valueOf(numericCode));
         } catch (NumberFormatException e) {
             // 숫자가 아니면 null 반환
             return null;
