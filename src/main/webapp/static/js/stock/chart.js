@@ -15,9 +15,10 @@ import {
     setupPriceModePills,
     setupWatchPriceInput
 } from '../common/stock/stock_order_card.js';
+import {loadChartByUrlCode} from "../common/chart/candle_chart.js";
 
 document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
-
+    loadChartByUrlCode();
     /* 일/주/월/년 버튼 활성화*/
 
     const rangeButtons = document.querySelectorAll(".stock-range-tabs__item");

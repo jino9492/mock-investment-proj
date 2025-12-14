@@ -29,23 +29,23 @@
             <!-- 차트 박스 -->
             <section class="stock-chart-card">
                 <!-- 기간 탭 -->
-                <div class="stock-range-tabs">
-                    <select class="stock-range-tabs__select">
-                        <option value="1">1분</option>
-                        <option value="3">3분</option>
-                        <option value="5" selected>5분</option>
-                        <option value="10">10분</option>
-                        <option value="15">15분</option>
-                        <option value="30">30분</option>
-                        <option value="60">60분</option>
-                    </select>
-                    <button class="stock-range-tabs__item">일</button>
-                    <button class="stock-range-tabs__item stock-range-tabs__item--active">주</button>
-                    <button class="stock-range-tabs__item">월</button>
-                    <button class="stock-range-tabs__item">년</button>
-                    <button class="stock-range-tabs__item stock-range-tabs__item--icon">icon</button>
-                </div>
-                <div class="stock-chart-card__content">차트</div>
+<%--                <div class="stock-range-tabs">--%>
+<%--                    <select class="stock-range-tabs__select">--%>
+<%--                        <option value="1">1분</option>--%>
+<%--                        <option value="3">3분</option>--%>
+<%--                        <option value="5" selected>5분</option>--%>
+<%--                        <option value="10">10분</option>--%>
+<%--                        <option value="15">15분</option>--%>
+<%--                        <option value="30">30분</option>--%>
+<%--                        <option value="60">60분</option>--%>
+<%--                    </select>--%>
+<%--                    <button class="stock-range-tabs__item">일</button>--%>
+<%--                    <button class="stock-range-tabs__item stock-range-tabs__item--active">주</button>--%>
+<%--                    <button class="stock-range-tabs__item">월</button>--%>
+<%--                    <button class="stock-range-tabs__item">년</button>--%>
+<%--                    <button class="stock-range-tabs__item stock-range-tabs__item--icon">icon</button>--%>
+<%--                </div>--%>
+                <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/chart/candle_chart.jsp"/>
             </section>
 
             <!-- 시세 박스 -->
