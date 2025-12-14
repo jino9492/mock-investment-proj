@@ -28,8 +28,12 @@ public class StockDetailService {
         return stock;
     }
 
-    public StockDTO getStockByCode(long stockCode) throws Exception {
-        StockDTO stock = DBManager.withConnection(conn->stockDAO.selectStockByCode(stockCode, conn));
+    public StockDTO getStockByCode(String stockCode) throws Exception {
+        StockDAO stockDAO = new StockDAO();
+        StockDTO stock = DBManager.withConnection(conn->{
+            // Long stockId = Long.parseLong(stockDAO.getStockIdByCode(stockCode, conn));
+            return stockDAO.selectStockByCode(stockCode, conn);
+        });
         return stock;
     }
 
@@ -43,8 +47,7 @@ public class StockDetailService {
     }
 
     public StockFinancialIndicatorDTO getFinancialIndicatorById(long stockId) throws Exception {
-        Date todaySqlDate = getTodayDate();
-        return DBManager.withConnection(conn -> indicatorDAO.selectIndicatorByIdAndDate(stockId, todaySqlDate, conn));
+        return DBManager.withConnection(conn -> indicatorDAO.selectIndicatorByStockId(stockId, conn));
     }
 
     public StockFinancialSummaryDTO getFinancialSummaryById(long stockId) throws Exception {

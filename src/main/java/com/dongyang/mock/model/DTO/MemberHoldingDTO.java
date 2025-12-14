@@ -5,6 +5,7 @@ package com.dongyang.mock.model.DTO;
  */
 public class MemberHoldingDTO {
     private String stockName;        // 종목명
+    private String stockSymbol;      // 종목 코드
     private int quantity;           // 보유 수량
     private int averagePrice;       // 평균 단가
     private int currentPrice;       // 현재가
@@ -18,6 +19,14 @@ public class MemberHoldingDTO {
 
     public void setStockName(String stockName) {
         this.stockName = stockName;
+    }
+
+    public String getStockSymbol() {
+        return stockSymbol;
+    }
+
+    public void setStockSymbol(String stockSymbol) {
+        this.stockSymbol = stockSymbol;
     }
 
     public int getQuantity() {

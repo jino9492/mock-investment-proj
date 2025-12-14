@@ -16,19 +16,20 @@
     z-index: 100;
 }
 
+
 .sidebar__rail-item {
     cursor: pointer;
-    background: white;
     border: none;
     display: block;
     user-select: none;
     margin: 30px auto;
     color: #aab3bd;
+    background-color: #f6f7f9;
+
 }
 
-.sidebar__rail-icon {
-    color: inherit;
-}
+
+
 
 .sidebar__right-rail-toggle{
     margin: 15px 0;
@@ -41,7 +42,8 @@
     width: 40px;
     height: 40px;
     margin: 0 auto 4px;
-    background: #D9D9D9;
+    background: #8cb1fa;
+    border-radius: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -49,15 +51,28 @@
     color: initial;
 }
 
+
+
 .sidebar__arrow-icon.activated img {
     transform: rotate(180deg);
     transition: transform .5s;
     filter: brightness(0) saturate(100%) invert(70%) sepia(5%) saturate(500%) hue-rotate(180deg);
+
 }
 
 .sidebar__arrow-icon img{
     transition: transform .5s;
     filter: brightness(0) saturate(100%) invert(70%) sepia(5%) saturate(500%) hue-rotate(180deg);
+
+
+}
+
+.sidebar__investment-btn img {
+    filter: brightness(0) invert(1);
+}
+
+.sidebar__favorite-btn img {
+    filter: brightness(0) invert(1);
 }
 
 .sidebar__work-area.activated {
@@ -68,6 +83,21 @@
 
 ul {
     padding-left: 1em;
+}
+
+#sidebar-holdings-list {
+    padding-left: 0;
+    margin: 10px;
+    list-style: none;
+}
+
+.sidebar__my-investment ul,
+.sidebar__my-investment.selected ul,
+.sidebar__favorite ul,
+.sidebar__favorite.selected ul {
+    padding-left: 0;
+    margin: 10px;
+    list-style: none;
 }
 
 .sidebar__work-area {

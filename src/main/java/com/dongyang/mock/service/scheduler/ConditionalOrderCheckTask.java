@@ -1,6 +1,7 @@
 package com.dongyang.mock.service.scheduler;
 
 import com.dongyang.mock.model.DAO.OrderConditionDAO;
+import com.dongyang.mock.model.DAO.OrderDAO;
 import com.dongyang.mock.model.DTO.OrderDTO;
 import com.dongyang.mock.model.DTO.StockPriceDailyDTO;
 import com.dongyang.mock.service.OrderService;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ConditionalOrderCheckTask implements Runnable {
 
     private final OrderConditionDAO orderConditionDAO = new OrderConditionDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
     private final OrderService orderService = new OrderService();
     private final StockDetailService stockDetailService = new StockDetailService();
 
@@ -25,6 +27,17 @@ public class ConditionalOrderCheckTask implements Runnable {
     public synchronized void run() {
         try {
             System.out.println("[ConditionalOrderCheckTask] 조건 주문 체크 시작");
+            
+            // 만료된 조건 주문 정리
+            try {
+                int deletedCount = orderService.cleanupExpiredConditionalOrders();
+                if (deletedCount > 0) {
+                    System.out.println("[ConditionalOrderCheckTask] 만료된 조건 주문 " + deletedCount + "개 정리 완료");
+                }
+            } catch (Exception e) {
+                System.err.println("[ConditionalOrderCheckTask] 만료된 조건 주문 정리 중 오류: " + e.getMessage());
+                e.printStackTrace();
+            }
             
             // 활성화된 조건 주문 조회
             List<OrderDTO> conditionalOrders = DBManager.withConnection(conn -> 
@@ -76,30 +89,41 @@ public class ConditionalOrderCheckTask implements Runnable {
                                          ", 현재가: " + currentPrice + 
                                          ", 감시가격: " + watchPrice);
                         
-                        // 일반 주문 생성 (조건 없음)
-                        OrderDTO regularOrder = new OrderDTO();
-                        regularOrder.setMemId(conditionalOrder.getMemId());
-                        regularOrder.setStockId(conditionalOrder.getStockId());
-                        regularOrder.setSide(conditionalOrder.getSide());
-                        regularOrder.setOrderType(conditionalOrder.getOrderType());
-                        regularOrder.setPrice(conditionalOrder.getPrice());
-                        regularOrder.setQuantity(conditionalOrder.getQuantity());
-                        regularOrder.setStatus("PENDING");
-                        regularOrder.setHasCondition(false); // 일반 주문으로 생성
-                        
-                        // 주문 생성
-                        long newOrderId = orderService.createOrder(regularOrder);
-                        createdCount++;
-                        
-                        System.out.println("[ConditionalOrderCheckTask] 일반 주문 생성 완료. 새 주문 ID: " + newOrderId);
-                        
-                        // 조건 주문 비활성화
-                        DBManager.withConnection(conn -> {
-                            orderConditionDAO.deactivateCondition(conditionalOrder.getOrderId(), conn);
-                            return null;
-                        });
-                        
-                        System.out.println("[ConditionalOrderCheckTask] 조건 주문 비활성화 완료. 주문 ID: " + conditionalOrder.getOrderId());
+                        try {
+                            // 일반 주문 생성 (조건 없음)
+                            OrderDTO regularOrder = new OrderDTO();
+                            regularOrder.setMemId(conditionalOrder.getMemId());
+                            regularOrder.setStockId(conditionalOrder.getStockId());
+                            regularOrder.setSide(conditionalOrder.getSide());
+                            regularOrder.setOrderType(conditionalOrder.getOrderType());
+                            regularOrder.setPrice(conditionalOrder.getPrice());
+                            regularOrder.setQuantity(conditionalOrder.getQuantity());
+                            regularOrder.setStatus("PENDING");
+                            regularOrder.setHasCondition(false); // 일반 주문으로 생성
+                            
+                            // 주문 생성
+                            long newOrderId = orderService.createOrder(regularOrder);
+                            createdCount++;
+                            
+                            System.out.println("[ConditionalOrderCheckTask] 일반 주문 생성 완료. 새 주문 ID: " + newOrderId);
+                            
+                            // 조건 주문 비활성화 및 취소 처리
+                            DBManager.executeInTransaction(conn -> {
+                                // 조건 주문 비활성화
+                                orderConditionDAO.deactivateCondition(conditionalOrder.getOrderId(), conn);
+                                
+                                // 조건 주문 상태를 CANCELLED로 변경 (일반 주문이 생성되었으므로)
+                                orderDAO.updateOrderStatus(conditionalOrder.getOrderId(), "CANCELLED", conn);
+                                
+                                return DBManager.TransactionResult.commit(null);
+                            });
+                            
+                            System.out.println("[ConditionalOrderCheckTask] 조건 주문 비활성화 및 취소 완료. 주문 ID: " + conditionalOrder.getOrderId());
+                        } catch (Exception e) {
+                            System.err.println("[ConditionalOrderCheckTask] 조건 달성 후 주문 생성 중 오류: " + e.getMessage());
+                            e.printStackTrace();
+                            // 오류가 발생해도 다음 주문 처리 계속
+                        }
                     }
                     
                     processedCount++;

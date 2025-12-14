@@ -24,11 +24,7 @@
 <script src="${pageContext.request.contextPath}/static/js/league/league_page.js"></script>
 
 <main class="league__content">
-
-    <div class="main__sub-title">
-        <span class="main__dot-green"></span>
-        <strong>국내 장 열림/닫힘</strong>
-    </div>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/market_status.jsp" />
     
     <%-- 
      * 상단 섹션: 계좌 요약 + 주식 보유 목록 + 순위

@@ -63,7 +63,7 @@ public class HoldingController extends HttpServlet {
                 }
                 
                 MemberHoldingDTO holding = DBManager.withConnection(conn -> 
-                    memberDAO.findHoldingByStock(memId, stockId, conn));
+                    memberDAO.findHoldingByStock(memId, stockId, conn));;
                 
                 response.put("success", true);
                 response.put("holding", holding);
