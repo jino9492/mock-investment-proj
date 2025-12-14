@@ -43,8 +43,7 @@ public class StockDetailService {
     }
 
     public StockFinancialIndicatorDTO getFinancialIndicatorById(long stockId) throws Exception {
-        Date todaySqlDate = getTodayDate();
-        return DBManager.withConnection(conn -> indicatorDAO.selectIndicatorByIdAndDate(stockId, todaySqlDate, conn));
+        return DBManager.withConnection(conn -> indicatorDAO.selectIndicatorByStockId(stockId, conn));
     }
 
     public StockFinancialSummaryDTO getFinancialSummaryById(long stockId) throws Exception {
