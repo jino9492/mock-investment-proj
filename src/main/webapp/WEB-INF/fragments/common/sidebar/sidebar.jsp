@@ -97,11 +97,11 @@
       <span class="sidebar__arrow-icon"><img src="${pageContext.request.contextPath}/static/assets/toggle.png" alt=""></span>
     </button>
     <button class="sidebar__rail-item sidebar__investment-btn">
-      <span class="sidebar__rail-icon">icon</span>
+      <span class="sidebar__rail-icon"><img src="${pageContext.request.contextPath}/static/assets/graph-up.png" alt=""></span>
       <span>내 투자</span>
     </button>
     <div class="sidebar__rail-item sidebar__favorite-btn">
-      <div class="sidebar__rail-icon">icon</div>
+      <div class="sidebar__rail-icon"><img src="${pageContext.request.contextPath}/static/assets/heart.png" alt=""></div>
       <div>관심</div>
     </div>
   </div>

@@ -107,24 +107,25 @@
         <section class="main__news-block">
           <div class="main__news-block-header">
             <span class="main__news-block-title">국내 뉴스</span>
-            <button class="main__news-plus">+</button>
+              <button class="main__news-plus" ><a href="https://news.naver.com/" target="_blank" rel="noopener noreferrer">+</a></button>
           </div>
 
           <div class="main__news-main">
-            <div class="main__news-thumb"></div>
+              <a href="https://n.news.naver.com/mnews/article/053/0000054279?sid=101" target="_blank" rel="noopener noreferrer">
+                  <div class="main__news-thumb" ><img src="${pageContext.request.contextPath}/static/assets/news1.jpg" alt=""></div></a>
 
             <div class="main__news-main-right">
               <div class="main__news-headline">
-                제목제목제목제목제목제목제목제목제목제목제목제목제목제목제목
+                  환율 1480원 턱밑...정부, 휴일 반납하고 긴급 회의
               </div>
             </div>
           </div>
 
           <ul class="main__news-list">
-            <li>테스트 메시지 입니다.</li>
-            <li>테스트 메시지 입니다.</li>
-            <li>테스트 메시지 입니다.</li>
-            <li>테스트 메시지 입니다.</li>
+              <li><a href="https://n.news.naver.com/mnews/article/009/0005605686">‘AI 보안’ 연구개발 산학 연구센터 건립</a></li>
+              <li><a href="https://n.news.naver.com/mnews/article/081/0003600769">10억이상 ‘금융부자’ 47만명...</a></li>
+              <li><a href="https://n.news.naver.com/mnews/article/055/0001316043">2030 여윳돈 3년 만에 감소...</a></li>
+              <li><a href="https://n.news.naver.com/mnews/article/025/0003489732">‘차이나’는 가격 경쟁력…중국산 전기차...</a></li>
           </ul>
         </section>
 
@@ -132,24 +133,25 @@
         <section class="main__news-block">
           <div class="main__news-block-header">
             <span class="main__news-block-title">해외 뉴스</span>
-            <button class="main__news-plus">+</button>
+            <button class="main__news-plus"><a href="https://news.naver.com/section/104" target="_blank" rel="noopener noreferrer">+</a></button>
           </div>
 
           <div class="main__news-main">
-            <div class="main__news-thumb"></div>
+              <a href="https://n.news.naver.com/mnews/article/018/0006183227" target="_blank" rel="noopener noreferrer">
+                  <div class="main__news-thumb"><img src="${pageContext.request.contextPath}/static/assets/news2.jpg" alt=""></div></a>
 
             <div class="main__news-main-right">
               <div class="main__news-headline">
-                제목제목제목제목제목제목제목제목제목제목제목제목제목제목제목
+                  내년 경제 주요 위험은?…"AI 거품론 보다 '이것' 주의해야"
               </div>
             </div>
           </div>
 
           <ul class="main__news-list">
-            <li>테스트 메시지 입니다. 테스트 메시지 입니다. 테스트 메시지 입니다.</li>
-            <li>테스트 메시지 입니다.</li>
-            <li>테스트 메시지 입니다.</li>
-            <li>테스트 메시지 입니다.</li>
+              <li><a href="https://n.news.naver.com/mnews/article/421/0008659347">시리아서 IS 매복 공격에 미군 사망…</a></li>
+              <li><a href="https://n.news.naver.com/mnews/article/081/0003600702">‘눈찢기 한 번에 무너졌다’…</a></li>
+              <li><a href="https://n.news.naver.com/mnews/article/056/0012085590">주말 캠퍼스에서 총격 사건…“</a></li>
+              <li><a href="https://n.news.naver.com/mnews/article/008/0005291409">‘핵무기 탑재 가능' 중·러 폭격기…</a></li>
 
           </ul>
         </section>
