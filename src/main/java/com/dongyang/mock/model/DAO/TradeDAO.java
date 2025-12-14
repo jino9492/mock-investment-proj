@@ -356,13 +356,6 @@ public class TradeDAO {
                 profit.setProfitRate(rs.getDouble("profit_rate"));
                 profit.setQuantity(rs.getInt("quantity"));
                 
-                // 디버깅: 값 확인
-                System.out.println("DEBUG - Stock: " + profit.getStockName() + 
-                                 ", totalSalesAmount: " + profit.getTotalSalesAmount() + 
-                                 ", totalPurchaseAmount: " + profit.getTotalPurchaseAmount() + 
-                                 ", totalProfit: " + profit.getTotalProfit() + 
-                                 ", profitRate: " + profit.getProfitRate());
-                
                 profits.add(profit);
             }
         } finally {

@@ -172,6 +172,26 @@ public class OrderService {
     }
 
     /**
+     * 회원의 완료된 주문 목록 조회 (FILLED, CANCELLED)
+     * @param memId 회원 ID
+     * @return 완료된 주문 목록
+     * @throws SQLException
+     */
+    public List<OrderDTO> getCompletedOrders(int memId) throws SQLException {
+        return DBManager.withConnection(conn -> orderDAO.findCompletedOrdersByMember(memId, conn));
+    }
+
+    /**
+     * 주문 ID로 조건 정보 조회
+     * @param orderId 주문 ID
+     * @return 조건 정보, 없으면 null
+     * @throws SQLException
+     */
+    public OrderConditionDTO getOrderCondition(long orderId) throws SQLException {
+        return DBManager.withConnection(conn -> orderConditionDAO.findOrderConditionByOrderId(orderId, conn));
+    }
+
+    /**
      * 특정 종목에 대한 대기 중인 판매 주문 수량 조회
      * @param memId 회원 ID
      * @param stockId 종목 ID

@@ -103,6 +103,51 @@ public class OrderConditionDAO {
     }
 
     /**
+     * 주문 ID로 조건 정보 조회
+     * @param orderId 주문 ID
+     * @param conn DB 연결
+     * @return 조건 정보, 없으면 null
+     * @throws SQLException
+     */
+    public OrderConditionDTO findOrderConditionByOrderId(long orderId, Connection conn) throws SQLException {
+        String sql = "SELECT order_id, condition_type, trigger_price, valid_until, is_active, created_at " +
+                     "FROM order_condition " +
+                     "WHERE order_id = ?";
+        
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, orderId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                OrderConditionDTO condition = new OrderConditionDTO();
+                condition.setOrderId(rs.getLong("order_id"));
+                condition.setConditionType(rs.getString("condition_type"));
+                
+                BigDecimal triggerPrice = rs.getBigDecimal("trigger_price");
+                condition.setTriggerPrice(rs.wasNull() ? null : triggerPrice);
+                
+                Timestamp validUntil = rs.getTimestamp("valid_until");
+                condition.setValidUntil(rs.wasNull() ? null : validUntil);
+                
+                condition.setActive(rs.getBoolean("is_active"));
+                
+                Timestamp createdAt = rs.getTimestamp("created_at");
+                condition.setCreatedAt(rs.wasNull() ? null : createdAt);
+                
+                return condition;
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        
+        return null;
+    }
+
+    /**
      * ResultSet을 OrderDTO로 변환 (조건 정보 포함)
      */
     private OrderDTO mapToOrderWithCondition(ResultSet rs) throws SQLException {
