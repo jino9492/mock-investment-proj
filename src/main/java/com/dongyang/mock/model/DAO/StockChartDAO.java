@@ -11,7 +11,7 @@ public class StockChartDAO {
     public List<StockChartDTO> findRecentStockChartData(Long stkId, int limit, Connection conn) {
         List<StockChartDTO> stockChartDTOS = new ArrayList<>();
 
-        String sql = "SELECT CHART_TIME, OPEN_PRICE, HIGH_PRICE, LOW_PRICE, CLOSE_PRICE, VOLUME, CHANGE_RATE FROM STOCK_CHART_DATA " +
+        String sql = "SELECT CHART_TIME, OPEN_PRICE, HIGH_PRICE, LOW_PRICE, CLOSE_PRICE, VOLUME, CHANGE_RATE FROM stock_chart_data " +
                 "WHERE STK_ID = ? " +
                 "ORDER BY CHART_TIME DESC LIMIT ?";
 
@@ -45,7 +45,7 @@ public class StockChartDAO {
     }
 
     public String findLatestChartTime(Long stkId, Connection conn) throws SQLException {
-        String sql = "SELECT CHART_TIME FROM STOCK_CHART_DATA " +
+        String sql = "SELECT CHART_TIME FROM stock_chart_data " +
                 "WHERE STK_ID = ? " +
                 "ORDER BY CHART_TIME DESC LIMIT 1";
 
@@ -76,7 +76,7 @@ public class StockChartDAO {
         }
 
         // DTO 필드 (OHLCV + 등락률)에 맞게 SQL 수정
-        final String sql = "INSERT INTO STOCK_CHART_DATA " +
+        final String sql = "INSERT INTO stock_chart_data " +
                 "(STK_ID, CHART_TIME, OPEN_PRICE, HIGH_PRICE, LOW_PRICE, CLOSE_PRICE, VOLUME, CHANGE_RATE) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE " +
@@ -130,7 +130,7 @@ public class StockChartDAO {
         List<ChangeRateTarget> targets = new ArrayList<>();
 
         // 등락률이 0인 레코드를 찾는 SQL
-        String sql = "SELECT STK_ID, CHART_TIME, CLOSE_PRICE FROM STOCK_CHART_DATA " +
+        String sql = "SELECT STK_ID, CHART_TIME, CLOSE_PRICE FROM stock_chart_data " +
                 "WHERE CHANGE_RATE = 0.00";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -150,7 +150,7 @@ public class StockChartDAO {
 
     public BigDecimal findPreviousClosePrice(long stkId, String chartTimeStr, Connection conn) throws SQLException {
         // CHART_TIME이 현재 시간보다 작으면서, 가장 최근인 데이터를 조회
-        String sql = "SELECT CLOSE_PRICE FROM STOCK_CHART_DATA " +
+        String sql = "SELECT CLOSE_PRICE FROM stock_chart_data " +
                 "WHERE STK_ID = ? AND CHART_TIME < ? " +
                 "ORDER BY CHART_TIME DESC LIMIT 1";
 
@@ -168,7 +168,7 @@ public class StockChartDAO {
     }
 
     public int updateChangeRate(long stkId, String chartTimeStr, BigDecimal newChangeRate, Connection conn) throws SQLException {
-        String sql = "UPDATE STOCK_CHART_DATA SET CHANGE_RATE = ? " +
+        String sql = "UPDATE stock_chart_data SET CHANGE_RATE = ? " +
                 "WHERE STK_ID = ? AND CHART_TIME = ?";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

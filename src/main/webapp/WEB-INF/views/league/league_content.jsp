@@ -65,12 +65,15 @@
                     <div class="league__summary-value" id="account-stock-value">
                         <c:if test="${not empty accountSummary}">
                             <fmt:formatNumber value="${accountSummary.stockValue}" pattern="#,###"/>원 
-                            <span class="<c:choose><c:when test="${accountSummary.totalReturn == 0}">price-color--neutral</c:when><c:when test="${accountSummary.totalReturn > 0}">price-color--up</c:when><c:otherwise>price-color--down</c:otherwise></c:choose>">
+                            <jsp:include page="/WEB-INF/fragments/common/price_color_class.jsp">
+                                <jsp:param name="value" value="${accountSummary.totalReturn}"/>
+                            </jsp:include>
+                            <span class="${priceColorClass}">
                                 (<c:if test="${accountSummary.totalReturn > 0}">+</c:if><fmt:formatNumber value="${accountSummary.totalReturn}" pattern="0.00"/>%)
                             </span>
                         </c:if>
                         <c:if test="${empty accountSummary}">
-                            0원 <span>(0.00%)</span>
+                            0원 <span class="price-color--neutral">(0.00%)</span>
                         </c:if>
                     </div>
                 </div>
@@ -132,7 +135,12 @@
                                 <span class="league__rank-number"><fmt:formatNumber value="${ranking.rank}" pattern="00000"/></span>
                                 <span class="league__rank-name">${ranking.nickname}</span>
                                 <span class="league__rank-return">
-                                    <c:if test="${ranking.returnRate > 0}">+</c:if><fmt:formatNumber value="${ranking.returnRate}" pattern="0.00"/>%
+                                    <jsp:include page="/WEB-INF/fragments/common/price_color_class.jsp">
+                                        <jsp:param name="value" value="${ranking.returnRate}"/>
+                                    </jsp:include>
+                                    <span class="${priceColorClass}">
+                                        <c:if test="${ranking.returnRate > 0}">+</c:if><fmt:formatNumber value="${ranking.returnRate}" pattern="0.00"/>%
+                                    </span>
                                 </span>
                             </li>
                         </c:forEach>

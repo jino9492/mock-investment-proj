@@ -56,10 +56,30 @@ public class DBManager {
     
     /**
      * 애플리케이션 종료 시 Connection Pool 정리
+     * - HikariCP의 모든 연결을 안전하게 종료
+     * - 백그라운드 스레드 정리
      */
     public static void shutdown() {
         if (dataSource != null && !dataSource.isClosed()) {
-            dataSource.close();
+            try {
+                // HikariCP Connection Pool 종료
+                // 이 메서드는 모든 활성 연결을 닫고 풀의 모든 스레드를 종료합니다
+                dataSource.close();
+                System.out.println("[DBManager] HikariCP Connection Pool이 성공적으로 종료되었습니다.");
+            } catch (NoClassDefFoundError e) {
+                // 클래스 로더가 이미 파괴된 경우 발생하는 오류는 무시
+                // (웹 애플리케이션 종료 시 흔히 발생하는 정상적인 상황)
+                System.err.println("[DBManager] Connection Pool 종료 중 클래스 로더가 이미 파괴되었습니다. (정상적인 종료 과정)");
+            } catch (Exception e) {
+                // 종료 중 예외가 발생해도 로그만 남기고 계속 진행
+                // (이미 컨텍스트가 파괴되는 중일 수 있음)
+                System.err.println("[DBManager] Connection Pool 종료 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            } catch (Error e) {
+                // 기타 Error도 처리 (NoClassDefFoundError 외의 Error)
+                System.err.println("[DBManager] Connection Pool 종료 중 심각한 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 

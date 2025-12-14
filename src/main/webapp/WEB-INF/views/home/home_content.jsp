@@ -15,13 +15,14 @@
 
     <!-- 계좌 카드 + 로그인 팝업 -->
     <div class="main__card-login-wrap">
-      <section class="main__card-account ${isLoggedIn ? "logged-in" : ""}">
+      <section class="main__card-account ${isLoggedIn ? 'logged-in' : ''}">
         <h1 class="league__page-title">
           ${not empty member.memNickname ? member.memNickname : '○○○'}님의 가상 주식 계좌
         </h1>
+        
+        <%-- 계좌 요약 정보 (총 잔액, 상위 백분율, 투자중인 금액) --%>
         <div class="main__summary-grid">
           <div class="main__summary-box">
-
             <div class="main__summary-label">계좌 총 잔액</div>
             <div class="league__summary-value" id="account-total-asset">
               <fmt:formatNumber value="${not empty accountSummary ? accountSummary.totalAsset : 0}" pattern="#,###"/>원
@@ -40,47 +41,55 @@
           <div class="league__summary-value" id="account-stock-value">
             <c:if test="${not empty accountSummary}">
               <fmt:formatNumber value="${accountSummary.stockValue}" pattern="#,###"/>원
-              <span class="<c:choose><c:when test="${accountSummary.totalReturn == 0}">league__text-gray</c:when><c:when test="${accountSummary.totalReturn > 0}">league__text-red</c:when><c:otherwise>league__text-blue</c:otherwise></c:choose>">
-                                (<c:if test="${accountSummary.totalReturn > 0}">+</c:if><fmt:formatNumber value="${accountSummary.totalReturn}" pattern="0.00"/>%)
-                            </span>
+              <jsp:include page="/WEB-INF/fragments/common/price_color_class.jsp">
+                <jsp:param name="value" value="${accountSummary.totalReturn}"/>
+              </jsp:include>
+              <span class="${priceColorClass}">
+                (<c:if test="${accountSummary.totalReturn > 0}">+</c:if><fmt:formatNumber value="${accountSummary.totalReturn}" pattern="0.00"/>%)
+              </span>
             </c:if>
             <c:if test="${empty accountSummary}">
-              0원 <span>(0.00%)</span>
+              0원 <span class="price-color--neutral">(0.00%)</span>
             </c:if>
           </div>
         </div>
 
         <div class="main__divider"></div>
 
+        <%-- 
+         * 수익률 상위 종목 테이블
+         * 컬럼: 순위, 주식명, 총 금액, 총 수익
+         * 데이터: topReturnStocks (서버 사이드 렌더링)
+         --%>
         <table class="main__table-simple">
           <thead>
-          <tr>
-            <th></th>
-            <th>주식 명</th>
-            <th>총 금액</th>
-            <th>총 수익</th>
-          </tr>
+            <tr>
+              <th></th>
+              <th>주식 명</th>
+              <th>총 금액</th>
+              <th>총 수익</th>
+            </tr>
           </thead>
           <tbody id="top-return-stocks-tbody">
-          <c:choose>
-            <c:when test="${not empty topReturnStocks}">
-              <c:forEach items="${topReturnStocks}" var="stock" varStatus="status">
-                <jsp:include page="/WEB-INF/fragments/league/table_row_top_return_stock.jsp">
-                  <jsp:param name="rank" value="${status.count}"/>
-                  <jsp:param name="stockName" value="${stock.stockName}"/>
-                  <jsp:param name="currentPrice" value="${stock.currentPrice}"/>
-                  <jsp:param name="avgPurchasePrice" value="${stock.avgPurchasePrice}"/>
-                  <jsp:param name="changeRate" value="${stock.changeRate}"/>
+            <c:choose>
+              <c:when test="${not empty topReturnStocks}">
+                <c:forEach items="${topReturnStocks}" var="stock" varStatus="status">
+                  <jsp:include page="/WEB-INF/fragments/league/table_row_top_return_stock.jsp">
+                    <jsp:param name="rank" value="${status.count}"/>
+                    <jsp:param name="stockName" value="${stock.stockName}"/>
+                    <jsp:param name="currentPrice" value="${stock.currentPrice}"/>
+                    <jsp:param name="avgPurchasePrice" value="${stock.avgPurchasePrice}"/>
+                    <jsp:param name="changeRate" value="${stock.changeRate}"/>
+                  </jsp:include>
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <jsp:include page="/WEB-INF/fragments/league/empty_state_message.jsp">
+                  <jsp:param name="colspan" value="5"/>
+                  <jsp:param name="message" value="보유하고 있는 주식이 없습니다."/>
                 </jsp:include>
-              </c:forEach>
-            </c:when>
-            <c:otherwise>
-              <jsp:include page="/WEB-INF/fragments/league/empty_state_message.jsp">
-                <jsp:param name="colspan" value="5"/>
-                <jsp:param name="message" value="보유하고 있는 주식이 없습니다."/>
-              </jsp:include>
-            </c:otherwise>
-          </c:choose>
+              </c:otherwise>
+            </c:choose>
           </tbody>
         </table>
       </section>

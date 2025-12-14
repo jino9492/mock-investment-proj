@@ -173,7 +173,6 @@ ul {
 
 .main__summary-value span {
   font-size: 16px;
-  color: #a65af7;
 }
 
 .main__divider {
@@ -237,10 +236,7 @@ ul {
   text-align: left;
 }
 
-.main__text-purple {
-  color: #a65af7;
-  font-size: 16px;
-}
+
 
 /* league__ 스타일 (home_content.jsp의 계좌 카드 영역용) */
 .league__page-title {
@@ -276,19 +272,6 @@ ul {
 
 .league__summary-value span {
   font-size: 16px;
-  color: #a65af7;
-}
-
-.league__summary-value span.league__text-gray {
-  color: #666666;
-}
-
-.league__summary-value span.league__text-red {
-  color: #E74C3C;
-}
-
-.league__summary-value span.league__text-blue {
-  color: #4A90E2;
 }
 
 .league__divider {
@@ -352,20 +335,11 @@ ul {
   text-align: left;
 }
 
-.league__text-gray {
-  color: #666666;
-  font-size: 16px;
-}
-
-.league__text-red {
-  color: #E74C3C;
-  font-size: 16px;
-}
-
-.league__text-blue {
-  color: #4A90E2;
-  font-size: 16px;
-}
+/* 가격 변동 색상은 공통 유틸리티 클래스 사용:
+ * - price-color--up: 상승 (빨간색)
+ * - price-color--down: 하락 (파란색)
+ * - price-color--neutral: 보합 (회색)
+ */
 
 /* 인덱스 카드 */
 .main__index-section {

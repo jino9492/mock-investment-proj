@@ -16,7 +16,7 @@ import java.sql.SQLException;
 @WebServlet(urlPatterns = {"/", "/home"}, loadOnStartup = 1)
 public class HomeController extends HttpServlet {
     private final HomeService homeService = new HomeService();
-    private static final String VIEW_PAGE = "/WEB-INF/views/home/home.jsp";
+    private static final String VIEW_PAGE = "/default_layout.jsp";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -30,7 +30,6 @@ public class HomeController extends HttpServlet {
             if (dispatcher != null) {
                 dispatcher.forward(request, response);
             } else {
-                // 기본 서블릿을 찾을 수 없으면 404
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
             return;
@@ -52,19 +51,24 @@ public class HomeController extends HttpServlet {
                 int memId = member.getMemId();
                 
                 // 계좌 요약 정보
-                request.setAttribute("accountSummary", homeService.getAccountSummary(memId));
+                var accountSummary = homeService.getAccountSummary(memId);
+                request.setAttribute("accountSummary", accountSummary);
                 
                 // 수익률 상위 종목 (3개)
-                request.setAttribute("topReturnStocks", homeService.getTopReturnStocks(memId, 3));
+                var topReturnStocks = homeService.getTopReturnStocks(memId, 3);
+                request.setAttribute("topReturnStocks", topReturnStocks);
             } catch (SQLException e) {
-                System.err.println("계좌 데이터 조회 오류: " + e.getMessage());
+                System.err.println("[HomeController] 계좌 데이터 조회 오류: " + e.getMessage());
+                e.printStackTrace();
                 request.setAttribute("errorMsg", "데이터를 불러오는 중 오류가 발생했습니다.");
             }
         }
 
         request.setAttribute("member", member);
         request.setAttribute("isLoggedIn", isLoggedIn);
-
+        
+        // default_layout.jsp로 forward하고 contentPage를 attribute로 전달
+        request.setAttribute("contentPage", "/WEB-INF/views/home/home_content.jsp");
         request.getRequestDispatcher(VIEW_PAGE).forward(request, response);
     }
     

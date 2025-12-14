@@ -14,9 +14,14 @@
     <div class="layout__inner">
         <!-- 상단 네비게이션 -->
         <jsp:include page="WEB-INF/fragments/common/header.jsp" />
+        
+        <!-- 컨텐츠 페이지 include -->
         <c:choose>
             <c:when test="${not empty param.contentPage}">
-                <jsp:include page="${param.contentPage}" flush="true" />
+                <jsp:include page="${param.contentPage}" />
+            </c:when>
+            <c:when test="${not empty requestScope.contentPage}">
+                <jsp:include page="${requestScope.contentPage}" />
             </c:when>
             <c:otherwise>
                 <p>페이지 내용을 찾을 수 없습니다.</p>

@@ -1,5 +1,6 @@
 package com.dongyang.mock.listener;
 
+import com.dongyang.mock.util.db.DBManager;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import java.sql.Driver;
@@ -21,19 +22,18 @@ public class DatabaseCleanupListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // 등록된 모든 JDBC 드라이버를 등록 해제
-        Enumeration<Driver> drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()) {
-            Driver driver = drivers.nextElement();
-            try {
-                DriverManager.deregisterDriver(driver);
-                logger.info("JDBC 드라이버 등록 해제: " + driver.getClass().getName());
-            } catch (SQLException e) {
-                logger.warning("JDBC 드라이버 등록 해제 실패: " + driver.getClass().getName() + " - " + e.getMessage());
-            }
+        logger.info("애플리케이션 종료 중 - 데이터베이스 리소스 정리 시작");
+        
+        // 1. HikariCP Connection Pool 종료 (가장 먼저 실행)
+        try {
+            DBManager.shutdown();
+            logger.info("HikariCP Connection Pool 종료 완료");
+        } catch (Exception e) {
+            logger.warning("HikariCP Connection Pool 종료 중 오류: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        // MySQL의 AbandonedConnectionCleanupThread 종료
+        
+        // 2. MySQL의 AbandonedConnectionCleanupThread 종료
         try {
             Class<?> cleanupThreadClass = Class.forName("com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
             // MySQL Connector/J 8.0 이상에서는 checkedShutdown() 사용
@@ -62,6 +62,20 @@ public class DatabaseCleanupListener implements ServletContextListener {
             // 기타 예외는 무시
             logger.fine("MySQL cleanup thread 종료 시도 중 오류: " + e.getMessage());
         }
+        
+        // 3. 등록된 모든 JDBC 드라이버를 등록 해제 (마지막에 실행)
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            try {
+                DriverManager.deregisterDriver(driver);
+                logger.info("JDBC 드라이버 등록 해제: " + driver.getClass().getName());
+            } catch (SQLException e) {
+                logger.warning("JDBC 드라이버 등록 해제 실패: " + driver.getClass().getName() + " - " + e.getMessage());
+            }
+        }
+        
+        logger.info("데이터베이스 리소스 정리 완료");
     }
 }
 
