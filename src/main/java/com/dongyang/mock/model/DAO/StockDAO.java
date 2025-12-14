@@ -133,14 +133,14 @@ public class StockDAO {
         return stock;
     }
 
-    public String getStockIdByCode(String stockCode, Connection conn) throws SQLException {
+    public Long getStockIdByCode(String stockCode, Connection conn) throws SQLException {
         final String sql = "SELECT stock_id FROM stock WHERE stock_symbol = ?";
-        String stockId = null;
+        Long stockId = null;
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, stockCode);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    stockId = rs.getString("stock_id");
+                    stockId = rs.getLong("stock_id");
                     return stockId;
                 }
             }

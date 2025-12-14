@@ -6,7 +6,7 @@
         <strong>주식회사이름A</strong>
         <span>000원 +/-0.00%</span>
       </div>
-      <div class="main__chart-box">차트</div>
+      <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/chart/candle_chart.jsp"/>
       <div class="main__chart-info">
         <div>
           <span class="main__chart-info-label">기업명</span>

@@ -37,7 +37,16 @@ public class ApiFetchScheduler implements ServletContextListener {
                 1, // 반복 주기 (1)
                 TimeUnit.MINUTES // 시간 단위 (분)
         );
-        System.out.println("[ApiFetchScheduler] SparklineFetchTask 등록 완료 (5분마다 실행)");
+        System.out.println("[ApiFetchScheduler] 랭킹 등록 완료 (1분마다 실행)");
+
+        // 5분마다 실행하도록 예약
+        scheduler.scheduleAtFixedRate(
+                new StockChartFetchWorker(),
+                5, // 초기 지연 시간 (5초 후 바로 시작)
+                5, // 반복 주기 (5)
+                TimeUnit.MINUTES // 시간 단위 (분)
+        );
+        System.out.println("[ApiFetchScheduler] 차트 주가 등록 완료 (5초 후 시작, 5분마다 실행)");
 
         // 1분마다 실행: 조건 주문 체크 및 자동 주문 생성
         scheduler.scheduleAtFixedRate(

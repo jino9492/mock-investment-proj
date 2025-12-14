@@ -3,6 +3,7 @@ import {loadIndexSparklineData, loadRankingData, loadRealtimeData} from "../comm
 import {getPriceColorClass} from "../common/price_color_utils.js";
 import {registerToSocket} from "../common/api/socket.js";
 import {fetchAndUpdateStockDetail} from "./chart_card.js";
+import {loadChartByUrlCode} from "../common/chart/candle_chart.js";
 
 document.addEventListener('DOMContentLoaded', function () {
     const indexNames = document.querySelectorAll('.main__index-name');
@@ -149,6 +150,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     targetRow.addEventListener('mouseenter', () => {
                         if (!item.stkCode) return;
+
+                        loadChartByUrlCode();
 
                         if (activeHoverElement && activeHoverElement !== targetRow) {
                             activeHoverElement.classList.remove('is-active-hover');

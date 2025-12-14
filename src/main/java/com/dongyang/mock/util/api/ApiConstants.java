@@ -35,14 +35,17 @@ public final class ApiConstants {
     public static final String TR_DOMESTIC_INDEX = getPropertyOrEmpty("kw.index.tr");
     public static final String PATH_DOMESTIC_INDEX = getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.index.endpoint");
 
-    public static final String TR_STOCK_CODE = getPropertyOrEmpty("kw.stockcode.tr");
-    public static final String PATH_STOCK_CODE = getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.stockcode.endpoint");
+    public static final String TR_STOCK_CHART =  getPropertyOrEmpty("kw.stock.chart.tr");
+    public static final String PATH_STOCK_CHART =  getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.stock.chart.endpoint");
+
+    public static final String TR_STOCK_CODE = getPropertyOrEmpty("kw.stock.code.tr");
+    public static final String PATH_STOCK_CODE = getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.stock.code.endpoint");
 
     public static final String TR_STOCK = getPropertyOrEmpty("kw.stock.tr");
     public static final String PATH_STOCK = getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.stock.endpoint");
 
-    public static final String TR_STOCK_DETAIL = getPropertyOrEmpty("kw.stockdetail.tr");
-    public static final String PATH_STOCK_DETAIL = getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.stockdetail.endpoint");
+    public static final String TR_STOCK_DETAIL = getPropertyOrEmpty("kw.stock.detail.tr");
+    public static final String PATH_STOCK_DETAIL = getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.stock.detail.endpoint");
 
     public static final String TR_RANKING = getPropertyOrEmpty("kw.ranking.tr");
     public static final String PATH_RANKING = getPropertyOrEmpty("kw.api.domain") + getPropertyOrEmpty("kw.ranking.endpoint");
