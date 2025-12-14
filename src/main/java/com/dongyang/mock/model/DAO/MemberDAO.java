@@ -2,13 +2,17 @@ package com.dongyang.mock.model.DAO;
 
 
 import java.sql.*;
-import com.dongyang.mock.model.DTO.MemberDTO;
-import com.dongyang.mock.model.DTO.MemberStatsDTO;
-import com.dongyang.mock.model.DTO.MemberAssetDTO;
-import com.dongyang.mock.model.DTO.MemberHoldingDTO;
+
+import com.dongyang.mock.model.DTO.*;
+import com.dongyang.mock.service.api.RealtimeStockService;
+import com.dongyang.mock.service.api.WebSocketService;
 import com.dongyang.mock.util.PasswordHasher;
+import com.dongyang.mock.util.api.InmemoryCacheManager;
+import com.dongyang.mock.util.db.DBManager;
+
 import java.math.BigDecimal;
 
+import static com.dongyang.mock.service.api.WebSocketService.REALTIME_CACHE_KEY;
 import static com.dongyang.mock.util.db.DBManager.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.List;
  * - 중복 체크
  */
 public class MemberDAO {
+    InmemoryCacheManager inmemoryCacheManager = InmemoryCacheManager.getInstance();
 
     /**
      * 신규 회원 추가
@@ -547,112 +552,140 @@ public class MemberDAO {
         return asset;
     }
 
-    /**
-     * 회원 보유 종목 목록 조회
-     */
-    public List<MemberHoldingDTO> fetchMemberHoldings(int memberId, Connection conn) throws SQLException {
-        String sql = "SELECT " +
-                "s.stock_name, " +
-                "h.quantity, " +
-                "h.avg_buy_price as average_price, " +
-                "spd.close_price as current_price, " +
-                "h.quantity * spd.close_price as evaluation_amount, " +
-                "(spd.close_price - h.avg_buy_price) * h.quantity as profit_loss, " +
-                "CASE " +
-                "  WHEN h.avg_buy_price > 0 " +
-                "  THEN ((spd.close_price - h.avg_buy_price) / h.avg_buy_price) * 100 " +
-                "  ELSE 0 " +
-                "END as profit_rate " +
-                "FROM holding h " +
-                "INNER JOIN stock s ON h.stock_id = s.stock_id " +
-                "INNER JOIN stock_price_daily spd ON h.stock_id = spd.stock_id " +
-                "AND spd.price_date = (SELECT MAX(price_date) FROM stock_price_daily WHERE stock_id = h.stock_id) " +
-                "WHERE h.mem_id = ? AND h.quantity > 0 " +
-                "ORDER BY s.stock_name";
-
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        List<MemberHoldingDTO> holdings = new ArrayList<>();
-        try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, memberId);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                MemberHoldingDTO holding = new MemberHoldingDTO();
-                holding.setStockName(rs.getString("stock_name"));
-                holding.setQuantity(rs.getInt("quantity"));
-                
-                BigDecimal avgPrice = rs.getBigDecimal("average_price");
-                holding.setAveragePrice(avgPrice != null ? avgPrice.intValue() : 0);
-                
-                BigDecimal currentPrice = rs.getBigDecimal("current_price");
-                holding.setCurrentPrice(currentPrice != null ? currentPrice.intValue() : 0);
-                
-                BigDecimal evalAmount = rs.getBigDecimal("evaluation_amount");
-                holding.setEvaluationAmount(evalAmount != null ? evalAmount.longValue() : 0L);
-                
-                BigDecimal profitLoss = rs.getBigDecimal("profit_loss");
-                holding.setProfitLoss(profitLoss != null ? profitLoss.longValue() : 0L);
-                
-                holding.setProfitRate(rs.getDouble("profit_rate"));
-                holdings.add(holding);
-            }
-        } finally {
-            close(null, pstmt, rs);
-        }
-        return holdings;
-    }
-
-    /**
-     * 회원의 특정 종목 보유 정보 조회
-     * @param memberId 회원 ID
-     * @param stockId 종목 ID
-     * @param conn DB 연결
-     * @return 보유 정보 (없으면 null)
-     * @throws SQLException
-     */
     public MemberHoldingDTO findHoldingByStock(int memberId, long stockId, Connection conn) throws SQLException {
         String sql = "SELECT " +
                 "s.stock_name, " +
                 "h.quantity, " +
-                "h.avg_buy_price as average_price, " +
-                "spd.close_price as current_price, " +
-                "h.quantity * spd.close_price as evaluation_amount, " +
-                "(spd.close_price - h.avg_buy_price) * h.quantity as profit_loss, " +
-                "CASE " +
-                "  WHEN h.avg_buy_price > 0 " +
-                "  THEN ((spd.close_price - h.avg_buy_price) / h.avg_buy_price) * 100 " +
-                "  ELSE 0 " +
-                "END as profit_rate " +
+                "h.avg_buy_price as average_price " +
                 "FROM holding h " +
                 "INNER JOIN stock s ON h.stock_id = s.stock_id " +
-                "INNER JOIN stock_price_daily spd ON h.stock_id = spd.stock_id " +
-                "AND spd.price_date = (SELECT MAX(price_date) FROM stock_price_daily WHERE stock_id = h.stock_id) " +
                 "WHERE h.mem_id = ? AND h.stock_id = ? AND h.quantity > 0";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
+
         try {
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, memberId);
             pstmt.setLong(2, stockId);
             rs = pstmt.executeQuery();
-            
+
             if (rs.next()) {
                 MemberHoldingDTO holding = new MemberHoldingDTO();
-                holding.setStockName(rs.getString("stock_name"));
-                holding.setQuantity(rs.getInt("quantity"));
-                holding.setAveragePrice(rs.getInt("average_price"));
-                holding.setCurrentPrice(rs.getInt("current_price"));
-                holding.setEvaluationAmount(rs.getLong("evaluation_amount"));
-                holding.setProfitLoss(rs.getLong("profit_loss"));
-                holding.setProfitRate(rs.getDouble("profit_rate"));
+
+                // 1. DB에서 기본 정보 로드
+                String stockName = rs.getString("stock_name");
+                int quantity = rs.getInt("quantity");
+
+                BigDecimal avgPriceBd = rs.getBigDecimal("average_price");
+                int averagePrice = avgPriceBd != null ? avgPriceBd.intValue() : 0;
+
+                holding.setStockName(stockName);
+                holding.setQuantity(quantity);
+                holding.setAveragePrice(averagePrice);
+
+                // 2. 캐시에서 실시간 현재가(curPrice) 로드
+                StockDAO stockDAO = new StockDAO();
+                String code = stockDAO.getStockCodeById(stockId, conn);
+                RealtimeDTO cached = inmemoryCacheManager.get(REALTIME_CACHE_KEY + code, RealtimeDTO.class);
+
+                int currentPrice;
+                if (cached != null) {
+                    currentPrice = (int)Double.parseDouble(cached.getCurPrice());
+                }
+                else {
+                    currentPrice = 0;
+                }
+                holding.setCurrentPrice(currentPrice);
+
+                // 3. Java 코드에서 계산 수행
+                long evaluationAmount = (long) quantity * currentPrice;
+                long profitLoss = ((long) currentPrice - averagePrice) * quantity;
+                double profitRate = 0.0;
+
+                if (averagePrice > 0) {
+                    profitRate = ((double) (currentPrice - averagePrice) / averagePrice) * 100.0;
+                }
+
+                holding.setEvaluationAmount(evaluationAmount);
+                holding.setProfitLoss(profitLoss);
+                holding.setProfitRate(profitRate);
+
                 return holding;
             }
             return null;
         } finally {
             close(null, pstmt, rs);
         }
+    }
+
+
+    public List<MemberHoldingDTO> fetchMemberHoldings(int memberId, Connection conn) throws SQLException {
+        String sql = "SELECT " +
+                "s.stock_name, " +
+                "h.stock_id, " +  // 💡 캐시 조회를 위해 추가
+                "h.quantity, " +
+                "h.avg_buy_price as average_price " +
+                "FROM holding h " +
+                "INNER JOIN stock s ON h.stock_id = s.stock_id " +
+                "WHERE h.mem_id = ? AND h.quantity > 0 " +
+                "ORDER BY s.stock_name";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<MemberHoldingDTO> holdings = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, memberId);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                MemberHoldingDTO holding = new MemberHoldingDTO();
+
+                // 1. DB에서 기본 정보 로드
+                long stockId = rs.getLong("stock_id"); // 💡 종목 ID 로드
+                String stockName = rs.getString("stock_name");
+                int quantity = rs.getInt("quantity");
+
+                BigDecimal avgPriceBd = rs.getBigDecimal("average_price");
+                int averagePrice = avgPriceBd != null ? avgPriceBd.intValue() : 0;
+
+                holding.setStockName(stockName);
+                holding.setQuantity(quantity);
+                holding.setAveragePrice(averagePrice);
+
+                StockDAO stockDAO = new StockDAO();
+                String code = stockDAO.getStockCodeById(stockId, conn);
+                RealtimeDTO cached = inmemoryCacheManager.get(REALTIME_CACHE_KEY + code, RealtimeDTO.class);
+
+                int currentPrice;
+                if (cached != null) {
+                    currentPrice = (int)Double.parseDouble(cached.getCurPrice());
+                }
+                else {
+                    currentPrice = 0;
+                }
+                holding.setCurrentPrice(currentPrice);
+
+                long evaluationAmount = (long) quantity * currentPrice;
+                long profitLoss = ((long) currentPrice - averagePrice) * quantity;
+                double profitRate = 0.0;
+
+                if (averagePrice > 0) {
+                    profitRate = ((double) (currentPrice - averagePrice) / averagePrice) * 100.0;
+                }
+
+                holding.setEvaluationAmount(evaluationAmount);
+                holding.setProfitLoss(profitLoss);
+                holding.setProfitRate(profitRate);
+
+                holdings.add(holding);
+            }
+        } finally {
+            close(null, pstmt, rs);
+        }
+        return holdings;
     }
 
     /**

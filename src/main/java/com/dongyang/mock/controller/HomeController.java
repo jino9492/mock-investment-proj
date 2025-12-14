@@ -1,7 +1,12 @@
 package com.dongyang.mock.controller;
 
 import com.dongyang.mock.model.DTO.MemberDTO;
+import com.dongyang.mock.model.DTO.RankingItemDTO;
+import com.dongyang.mock.model.DTO.RealtimeDTO;
 import com.dongyang.mock.service.HomeService;
+import com.dongyang.mock.service.api.RealtimeStockService;
+import com.dongyang.mock.service.api.fetch.RankingFetchService;
+import com.dongyang.mock.util.api.InmemoryCacheManager;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,6 +17,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(urlPatterns = {"/", "/home"}, loadOnStartup = 1)
 public class HomeController extends HttpServlet {

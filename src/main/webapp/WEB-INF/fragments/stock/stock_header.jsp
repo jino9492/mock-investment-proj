@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+<script type="module" src="${pageContext.request.contextPath}/static/js/stock/stock_header.js"></script>
 <!-- 상단 종목 정보 -->
 <header class="stock-header"
         <c:if test="${not empty stock}">
