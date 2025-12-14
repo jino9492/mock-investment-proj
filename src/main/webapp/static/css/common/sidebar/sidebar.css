@@ -85,6 +85,21 @@ ul {
     padding-left: 1em;
 }
 
+#sidebar-holdings-list {
+    padding-left: 0;
+    margin: 10px;
+    list-style: none;
+}
+
+.sidebar__my-investment ul,
+.sidebar__my-investment.selected ul,
+.sidebar__favorite ul,
+.sidebar__favorite.selected ul {
+    padding-left: 0;
+    margin: 10px;
+    list-style: none;
+}
+
 .sidebar__work-area {
     background: #f6f7f9;
     position: sticky;

@@ -67,7 +67,6 @@
                          data-stock-id="${stock.stockId}"
                          </c:if>>
                     <h2 class="my-stock-card__title">내 주식</h2>
-
                     <c:choose>
                         <c:when test="${not empty holding}">
                             <div class="my-stock-card__row">
@@ -78,18 +77,18 @@
                                         <c:when test="${holding.profitLoss < 0}">my-stock-card__profit--negative</c:when>
                                         <c:otherwise>my-stock-card__profit--neutral</c:otherwise>
                                     </c:choose>">
-                                    <c:choose>
-                                        <c:when test="${holding.profitLoss > 0}">+</c:when>
-                                        <c:when test="${holding.profitLoss < 0}">-</c:when>
-                                    </c:choose>
                                     <c:set var="absProfitLoss" value="${holding.profitLoss >= 0 ? holding.profitLoss : -holding.profitLoss}" />
-                                    <fmt:formatNumber value="${absProfitLoss}" pattern="#,###"/>
+                                    <fmt:formatNumber value="${absProfitLoss}" pattern="#,###"/>원
+                                    <c:if test="${holding.profitRate != 0}">
+                                        (<fmt:formatNumber value="${holding.profitRate >= 0 ? holding.profitRate : -holding.profitRate}" pattern="#,##0.00"/>%)
+                                    </c:if>
                                 </span>
                             </div>
                             <div class="my-stock-card__row">
                                 <span>총 금액</span>
                                 <span id="my-stock-evaluation-amount">
-                                    <fmt:formatNumber value="${holding.evaluationAmount}" pattern="#,###"/>원
+                                    <c:set var="absEvaluationAmount" value="${holding.evaluationAmount >= 0 ? holding.evaluationAmount : -holding.evaluationAmount}" />
+                                    <fmt:formatNumber value="${absEvaluationAmount}" pattern="#,###"/>원
                                 </span>
                             </div>
                             <div class="my-stock-card__row">
@@ -101,7 +100,8 @@
                             <div class="my-stock-card__row">
                                 <span>1주 평균 금액</span>
                                 <span id="my-stock-average-price">
-                                    <fmt:formatNumber value="${holding.averagePrice}" pattern="#,###"/>원
+                                    <c:set var="averageAmount" value="${(holding.averagePrice - holding.currentPrice) * holding.quantity}" />
+                                    <fmt:formatNumber value="${averageAmount >= 0 ? averageAmount : -averageAmount}" pattern="#,###"/>원
                                 </span>
                             </div>
                         </c:when>

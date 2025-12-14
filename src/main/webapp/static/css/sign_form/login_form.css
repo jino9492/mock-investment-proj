@@ -38,6 +38,7 @@ html {
   font-weight: 1000;
   font-size: 32px;
   color: white;
+  text-decoration: none;
 }
 
 .login__close-button {

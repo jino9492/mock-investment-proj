@@ -19,9 +19,7 @@ public class OrderDTO {
     private Timestamp cancelledAt;
     private Timestamp tradedAt; // 체결 시간 (FILLED 상태일 때)
     private boolean hasCondition;
-    
-    // 조건 주문용 필드
-    private BigDecimal watchPrice; // 감시 가격 (조건 주문용)
+    private BigDecimal watchPrice; // 조건 주문 감시 가격
     
     // JSP에서 사용할 필드
     private String tradeType; // 'buy' or 'sell' (JSP용)

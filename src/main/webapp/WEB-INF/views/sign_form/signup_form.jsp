@@ -10,7 +10,7 @@
 </head>
 <body class="signup__page-wrap">
 <header class="signup__header">
-    <div class="signup__brand">MOCK</div>
+    <a href="/" class="signup__brand">MOCK</a>
     <a class="signup__close-button" aria-label="닫기" href="/">✕</a>
 </header>
 

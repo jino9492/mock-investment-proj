@@ -352,7 +352,7 @@ public class MemberDAO {
         StringBuilder sql = new StringBuilder(
                 "SELECT mem_id, mem_email, mem_nickname, mem_join_at, mem_last_login_at, mem_last_login_ip, mem_password, " +
                         "agree_privacy_at, agree_third_at, agree_notification_at, virtual_cash, " +
-                        "((virtual_cash - 1000000) / 1000000.0) * 100 AS profit_rate, " +
+                        "((virtual_cash - 10000000) / 10000000.0) * 100 AS profit_rate, " +
                         "CASE " +
                         " WHEN mem_last_login_at IS NULL THEN '신규' " +
                         " WHEN mem_last_login_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) THEN '활동' " +
@@ -377,11 +377,11 @@ public class MemberDAO {
         }
 
         if ("10".equals(profitFilter)) {
-            sql.append(" AND ((virtual_cash - 1000000) / 1000000.0) * 100 >= 10");
+            sql.append(" AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 10");
         } else if ("30".equals(profitFilter)) {
-            sql.append(" AND ((virtual_cash - 1000000) / 1000000.0) * 100 >= 30");
+            sql.append(" AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 30");
         } else if ("50".equals(profitFilter)) {
-            sql.append(" AND ((virtual_cash - 1000000) / 1000000.0) * 100 >= 50");
+            sql.append(" AND ((virtual_cash - 10000000) / 10000000.0) * 100 >= 50");
         }
 
         if ("1m".equals(joinFilter)) {
@@ -519,9 +519,9 @@ public class MemberDAO {
         }
 
         // 회원 정보 조회 (예치금, 초기 자본)
-        String memberSql = "SELECT virtual_cash, 1000000 as initial_capital FROM member WHERE mem_id = ?";
+        String memberSql = "SELECT virtual_cash, 10000000 as initial_capital FROM member WHERE mem_id = ?";
         long virtualCash = 0L;
-        long initialCapital = 1000000L;
+        long initialCapital = 10000000L;
         try {
             pstmt = conn.prepareStatement(memberSql);
             pstmt.setInt(1, memberId);
@@ -611,6 +611,8 @@ public class MemberDAO {
                 holding.setProfitLoss(profitLoss);
                 holding.setProfitRate(profitRate);
 
+                holding.setStockSymbol(stockDAO.getStockCodeById(stockId, conn));
+
                 return holding;
             }
             return null;
@@ -679,6 +681,8 @@ public class MemberDAO {
                 holding.setEvaluationAmount(evaluationAmount);
                 holding.setProfitLoss(profitLoss);
                 holding.setProfitRate(profitRate);
+
+                holding.setStockSymbol(stockDAO.getStockCodeById(stockId, conn));
 
                 holdings.add(holding);
             }

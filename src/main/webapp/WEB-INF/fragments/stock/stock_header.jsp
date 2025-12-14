@@ -25,6 +25,10 @@
             </div>
         </div>
     </div>
+    <div class="stock-header__right">
+        <input type="checkbox" class="stock-header__checkbox" id="stock-header-checkbox" 
+               <c:if test="${isWatchlist}">checked</c:if> />
+    </div>
 </header>
 
 <!-- 상단 탭 -->
@@ -42,4 +46,6 @@
     <button class="stock-tabs__item">뉴스 · 공시</button>
     <button class="stock-tabs__item">커뮤니티</button>
 </nav>
+
+<script src="${pageContext.request.contextPath}/static/js/common/stock/watchlist.js"></script>
 

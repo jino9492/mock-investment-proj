@@ -19,6 +19,9 @@
          <c:if test="${not empty stock and not empty stock.stockId}">
          data-stock-id="${stock.getStockId()}"
          </c:if>
+         <c:if test="${not empty stock and not empty stock.stockName}">
+         data-stock-name="${stock.stockName}"
+         </c:if>
          data-available-cash="${availableCashAmount}"
          data-holding-quantity="${holdingQuantity}"
          data-pending-sell-quantity="${empty pendingSellQuantity ? 0 : pendingSellQuantity}">
@@ -54,16 +57,20 @@
         <label class="order-card__label">주문유형</label>
         <div class="order-card__field">
             <div class="order-card__dropdown" data-dropdown data-order-type-dropdown>
-                <input type="hidden" name="orderType" value="general" data-dropdown-input>
+                <input type="hidden" name="orderCategory" value="general" data-dropdown-input>
                 <button type="button"
                         class="order-card__dropdown-toggle"
                         aria-haspopup="listbox"
                         aria-expanded="false"
+                        aria-controls="order-type-dropdown-list"
                         data-dropdown-toggle>
                     <span class="order-card__dropdown-label" data-dropdown-label>일반 주문</span>
                     <span class="order-card__dropdown-icon" aria-hidden="true">▼</span>
                 </button>
-                <div class="order-card__dropdown-list" role="listbox" data-dropdown-list>
+                <div class="order-card__dropdown-list" 
+                     id="order-type-dropdown-list"
+                     role="listbox" 
+                     data-dropdown-list>
                     <button type="button"
                             class="order-card__dropdown-option"
                             role="option"
@@ -192,6 +199,7 @@
         <%@ include file="order_conditional_quantity_fields.jsp" %>
 
         <%-- 공통 주문 유지 드롭다운 fragment --%>
+        <c:set var="durationDropdownId" value="conditional-buy-order-duration-dropdown" scope="request" />
         <%@ include file="order_conditional_duration_fields.jsp" %>
 
         <%-- 공통 총 주문 금액 표시 fragment --%>
@@ -221,6 +229,7 @@
         <%@ include file="order_conditional_quantity_fields.jsp" %>
 
         <%-- 공통 주문 유지 드롭다운 fragment --%>
+        <c:set var="durationDropdownId" value="conditional-sell-order-duration-dropdown" scope="request" />
         <%@ include file="order_conditional_duration_fields.jsp" %>
 
         <%-- 공통 총 주문 금액 표시 fragment --%>
@@ -231,29 +240,76 @@
     <div class="order-card__wait-orders order-card__wait-orders--hidden">
         <c:choose>
             <c:when test="${not empty pendingOrders && fn:length(pendingOrders) > 0}">
+                <%-- 조건 주문 먼저 표시 (상위 배치) --%>
                 <c:forEach var="order" items="${pendingOrders}">
-                    <div class="order-card__wait-order-item">
-                        <div class="order-card__wait-order-info">
-                            <span class="order-card__wait-order-type order-card__wait-order-type--${order.tradeType}">
+                    <c:if test="${order.hasCondition}">
+                        <div class="order-card__wait-order-item order-card__wait-order-item--conditional"
+                             data-order-id="${order.orderId}"
+                             data-is-active="${order.watchPrice != null ? 'true' : 'false'}"
+                             data-trade-type="${order.tradeType}">
+                            <%-- 왼쪽: 거래 타입 버튼 --%>
+                            <button type="button" 
+                                    class="order-card__wait-order-type-btn order-card__wait-order-type-btn--${order.tradeType}">
                                 <c:choose>
                                     <c:when test="${order.tradeType == 'buy'}">구매</c:when>
                                     <c:otherwise>판매</c:otherwise>
                                 </c:choose>
-                                <fmt:formatNumber value="${order.quantity}" pattern="#,###"/>주
-                            </span>
-                            <span class="order-card__wait-order-price">
-                                주당 <fmt:formatNumber value="${order.price}" pattern="#,###"/>원
-                            </span>
-                        </div>
-                        <div class="order-card__wait-order-actions">
+                            </button>
+                            
+                            <%-- 중앙: 조건 정보 --%>
+                            <div class="order-card__wait-order-condition-info">
+                                <div class="order-card__wait-order-watch-price">
+                                    현재가 
+                                    <fmt:formatNumber value="${order.watchPrice}" pattern="#,###"/>원
+                                    <c:choose>
+                                        <c:when test="${order.tradeType == 'buy'}">이하</c:when>
+                                        <c:otherwise>이상</c:otherwise>
+                                    </c:choose>
+                                    일 때
+                                </div>
+                                <div class="order-card__wait-order-details">
+                                    <fmt:formatNumber value="${order.quantity}" pattern="#,###"/>주 · 주문가 
+                                    <fmt:formatNumber value="${order.price}" pattern="#,###"/>원
+                                </div>
+                            </div>
+                            
+                            <%-- 오른쪽: 활성화 토글 스위치 --%>
                             <button type="button" 
-                                    class="order-card__wait-order-btn order-card__wait-order-btn--edit"
-                                    data-order-id="${order.orderId}">수정</button>
-                            <button type="button" 
-                                    class="order-card__wait-order-btn order-card__wait-order-btn--cancel"
-                                    data-order-id="${order.orderId}">취소</button>
+                                    class="order-card__wait-order-toggle"
+                                    data-is-active="${order.watchPrice != null ? 'true' : 'false'}"
+                                    aria-label="조건 주문 활성화">
+                                <span class="order-card__wait-order-toggle-slider"></span>
+                            </button>
                         </div>
-                    </div>
+                    </c:if>
+                </c:forEach>
+                
+                <%-- 일반 주문 표시 (하위 배치) --%>
+                <c:forEach var="order" items="${pendingOrders}">
+                    <c:if test="${!order.hasCondition}">
+                        <div class="order-card__wait-order-item">
+                            <div class="order-card__wait-order-info">
+                                <span class="order-card__wait-order-type order-card__wait-order-type--${order.tradeType}">
+                                    <c:choose>
+                                        <c:when test="${order.tradeType == 'buy'}">구매</c:when>
+                                        <c:otherwise>판매</c:otherwise>
+                                    </c:choose>
+                                    <fmt:formatNumber value="${order.quantity}" pattern="#,###"/>주
+                                </span>
+                                <span class="order-card__wait-order-price">
+                                    주당 <fmt:formatNumber value="${order.price}" pattern="#,###"/>원
+                                </span>
+                            </div>
+                            <div class="order-card__wait-order-actions">
+                                <button type="button" 
+                                        class="order-card__wait-order-btn order-card__wait-order-btn--edit"
+                                        data-order-id="${order.orderId}">수정</button>
+                                <button type="button" 
+                                        class="order-card__wait-order-btn order-card__wait-order-btn--cancel"
+                                        data-order-id="${order.orderId}">취소</button>
+                            </div>
+                        </div>
+                    </c:if>
                 </c:forEach>
             </c:when>
             <c:otherwise>
@@ -274,3 +330,9 @@
         </c:otherwise>
     </c:choose>
 </section>
+
+<%-- 조건 주문 편집 모달 --%>
+<%@ include file="conditional_order_edit_modal.jsp" %>
+
+<%-- 일반 주문 편집 모달 --%>
+<%@ include file="general_order_edit_modal.jsp" %>

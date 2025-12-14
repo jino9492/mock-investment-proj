@@ -29,7 +29,7 @@
 <header class="header__top-bar">
     <div class="header__top-inner">
         <div class="header__top-left">
-            <div class="header__logo">MOCK</div>
+            <a href="/" class="header__logo">MOCK</a>
             <ul class="header__top-menu">
                 <li class="${currentPage == '/' || currentPage == '' || currentPage == '/index.jsp' ? 'selected' : ''}">
                     <a href="/">홈</a>

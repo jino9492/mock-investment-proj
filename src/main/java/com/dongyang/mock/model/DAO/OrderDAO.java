@@ -187,6 +187,135 @@ public class OrderDAO {
     }
 
     /**
+     * 주문 정보 업데이트 (가격, 수량)
+     * @param orderId 주문 ID
+     * @param price 주문 가격 (null이면 업데이트하지 않음)
+     * @param quantity 주문 수량 (null이면 업데이트하지 않음)
+     * @param conn DB 연결
+     * @return 영향받은 행 수
+     * @throws SQLException
+     */
+    public int updateOrder(long orderId, BigDecimal price, Long quantity, Connection conn) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE trade_order SET ");
+        List<Object> params = new ArrayList<>();
+        
+        if (price != null) {
+            sql.append("price = ?");
+            params.add(price);
+        }
+        
+        if (quantity != null) {
+            if (params.size() > 0) {
+                sql.append(", ");
+            }
+            sql.append("quantity = ?");
+            params.add(quantity);
+        }
+        
+        if (params.isEmpty()) {
+            return 0; // 업데이트할 것이 없음
+        }
+        
+        sql.append(" WHERE order_id = ?");
+        
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql.toString());
+            int paramIndex = 1;
+            for (Object param : params) {
+                if (param instanceof BigDecimal) {
+                    pstmt.setBigDecimal(paramIndex++, (BigDecimal) param);
+                } else if (param instanceof Long) {
+                    pstmt.setLong(paramIndex++, (Long) param);
+                }
+            }
+            pstmt.setLong(paramIndex, orderId);
+            
+            return pstmt.executeUpdate();
+        } finally {
+            close(null, pstmt);
+        }
+    }
+
+    /**
+     * 일반 주문 정보 업데이트 (주문 유형, 가격, 수량)
+     * @param orderId 주문 ID
+     * @param orderType 주문 유형 (LIMIT/MARKET, null이면 업데이트하지 않음)
+     * @param price 주문 가격 (null이면 업데이트하지 않음, MARKET 주문인 경우 null로 설정)
+     * @param quantity 주문 수량 (null이면 업데이트하지 않음)
+     * @param conn DB 연결
+     * @return 영향받은 행 수
+     * @throws SQLException
+     */
+    public int updateGeneralOrder(long orderId, String orderType, BigDecimal price, Long quantity, Connection conn) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE trade_order SET ");
+        List<Object> params = new ArrayList<>();
+        List<Integer> paramTypes = new ArrayList<>();
+        
+        if (orderType != null) {
+            sql.append("order_type = ?");
+            params.add(orderType);
+            paramTypes.add(Types.VARCHAR);
+        }
+        
+        if (price != null || (orderType != null && "MARKET".equals(orderType))) {
+            if (params.size() > 0) {
+                sql.append(", ");
+            }
+            if ("MARKET".equals(orderType)) {
+                // MARKET 주문인 경우 price를 null로 설정
+                sql.append("price = NULL");
+            } else {
+                sql.append("price = ?");
+                params.add(price);
+                paramTypes.add(Types.DECIMAL);
+            }
+        }
+        
+        if (quantity != null) {
+            if (params.size() > 0) {
+                sql.append(", ");
+            }
+            sql.append("quantity = ?");
+            params.add(quantity);
+            paramTypes.add(Types.BIGINT);
+        }
+        
+        if (params.isEmpty() && (orderType == null || !"MARKET".equals(orderType))) {
+            return 0; // 업데이트할 것이 없음
+        }
+        
+        sql.append(" WHERE order_id = ?");
+        
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql.toString());
+            int paramIndex = 1;
+            
+            // orderType 파라미터 설정
+            if (orderType != null) {
+                pstmt.setString(paramIndex++, orderType);
+            }
+            
+            // price 파라미터 설정 (MARKET이 아닌 경우만)
+            if (price != null && (orderType == null || !"MARKET".equals(orderType))) {
+                pstmt.setBigDecimal(paramIndex++, price);
+            }
+            
+            // quantity 파라미터 설정
+            if (quantity != null) {
+                pstmt.setLong(paramIndex++, quantity);
+            }
+            
+            pstmt.setLong(paramIndex, orderId);
+            
+            return pstmt.executeUpdate();
+        } finally {
+            close(null, pstmt);
+        }
+    }
+
+    /**
      * 모든 PENDING 주문 조회
      * @param conn DB 연결
      * @return PENDING 주문 목록
