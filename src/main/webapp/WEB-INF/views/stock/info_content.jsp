@@ -21,8 +21,8 @@
             <!-- 상단 기업 정보 헤더 -->
             <header class="stock-info__header">
                 <div class="stock-info__header-left">
-                    <h1 class="stock-info__header-title">${stock.getStockName()}</h1>
-                    <span class="stock-info__header-meta">${stock.getStockSymbol()} · ${stock.getMarketType() == 0 ? "코스피" : "코스닥"}</span>
+                    <h1 class="stock-info__header-title">${not empty stock ? stock.getStockName() : '종목 정보 없음'}</h1>
+                    <span class="stock-info__header-meta">${not empty stock ? stock.getStockSymbol() : ''}${not empty stock ? ' · ' : ''}${not empty stock ? (stock.getMarketType() == 0 ? "코스피" : "코스닥") : ''}</span>
                 </div>
                 <div class="stock-info__header-update">! 매 주 1회 업데이트</div>
             </header>
@@ -37,7 +37,7 @@
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">기업명</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value">${stock.getStockName()}</div>
+                            <div class="stock-info__basic-value">${not empty stock ? stock.getStockName() : '-'}</div>
                         </div>
                     </div>
 
@@ -45,7 +45,14 @@
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">시가총액</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value"><fmt:formatNumber value="${detail.getMarketCap()}" pattern="#,###" />억 원</div>
+                            <div class="stock-info__basic-value">
+                                <c:choose>
+                                    <c:when test="${not empty detail and not empty detail.getMarketCap()}">
+                                        <fmt:formatNumber value="${detail.getMarketCap()}" pattern="#,###" />억 원
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
                     </div>
 
@@ -57,14 +64,28 @@
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">권면액</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value"><fmt:formatNumber value="${detail.getFaceValue()}" pattern="#,###" />원</div>
+                            <div class="stock-info__basic-value">
+                                <c:choose>
+                                    <c:when test="${not empty detail and not empty detail.getFaceValue()}">
+                                        <fmt:formatNumber value="${detail.getFaceValue()}" pattern="#,###" />원
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
                     </div>
 
                     <div class="stock-info__basic-group">
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">결산월</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
-                            <div class="stock-info__basic-value">${detail.getSettlementMonth()}월</div>
+                            <div class="stock-info__basic-value">
+                                <c:choose>
+                                    <c:when test="${not empty detail and not empty detail.getSettlementMonth()}">
+                                        ${detail.getSettlementMonth()}월
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
                     </div>
 
@@ -77,7 +98,12 @@
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">상장일</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
                             <div class="stock-info__basic-value">
-                                ${detail.getListingDate()}
+                                <c:choose>
+                                    <c:when test="${not empty detail and not empty detail.getListingDate()}">
+                                        ${detail.getListingDate()}
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
                             </div>
                         </div>
                     </div>
@@ -86,7 +112,12 @@
                         <div class="stock-info__basic-cell stock-info__basic-cell--label">현재 상태</div>
                         <div class="stock-info__basic-cell stock-info__basic-cell--align-right">
                             <div class="stock-info__basic-value">
-                                ${stock.getStatus()}
+                                <c:choose>
+                                    <c:when test="${not empty stock and not empty stock.getStatus()}">
+                                        ${stock.getStatus()}
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
 <%--                                <div class="stock-info__basic-subtext">25년 11월 30일 기준</div>--%>
                             </div>
                         </div>
@@ -112,11 +143,25 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PER</span>
-                            <span class="stock-info__metrics-value">${indicator.getPer()}배</span>
+                            <span class="stock-info__metrics-value">
+                                <c:choose>
+                                    <c:when test="${not empty indicator and not empty indicator.getPer()}">
+                                        ${indicator.getPer()}배
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">PBR</span>
-                            <span class="stock-info__metrics-value">${indicator.getPbr()}배</span>
+                            <span class="stock-info__metrics-value">
+                                <c:choose>
+                                    <c:when test="${not empty indicator and not empty indicator.getPbr()}">
+                                        ${indicator.getPbr()}배
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </span>
                         </div>
                     </div>
 
@@ -124,15 +169,36 @@
                     <div class="stock-info__metrics-card stock-info__metrics-card--half">
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">ROE</span>
-                            <span class="stock-info__metrics-value">${indicator.getRoe()}%</span>
+                            <span class="stock-info__metrics-value">
+                                <c:choose>
+                                    <c:when test="${not empty indicator and not empty indicator.getRoe()}">
+                                        ${indicator.getRoe()}%
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </span>
                         </div>
                         <div class="stock-info__metrics-row">
                             <span class="stock-info__metrics-label">EPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getEps().intValue()}" pattern="#,###" />원</span>
+                            <span class="stock-info__metrics-value">
+                                <c:choose>
+                                    <c:when test="${not empty indicator and not empty indicator.getEps()}">
+                                        <fmt:formatNumber value="${indicator.getEps().intValue()}" pattern="#,###" />원
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </span>
                         </div>
                         <div class="stock-info__metrics-row stock-info__metrics-row--last">
                             <span class="stock-info__metrics-label">BPS</span>
-                            <span class="stock-info__metrics-value"><fmt:formatNumber value="${indicator.getBps().intValue()}" pattern="#,###" />원</span>
+                            <span class="stock-info__metrics-value">
+                                <c:choose>
+                                    <c:when test="${not empty indicator and not empty indicator.getBps()}">
+                                        <fmt:formatNumber value="${indicator.getBps().intValue()}" pattern="#,###" />원
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -141,15 +207,36 @@
                 <div class="stock-info__finance-card">
                     <div class="stock-info__finance-row">
                         <span class="stock-info__finance-label">매출액</span>
-                        <span class="stock-info__finance-value"><fmt:formatNumber value="${summary.getRevenue().intValue()}" pattern="#,###" />억 원</span>
+                        <span class="stock-info__finance-value">
+                            <c:choose>
+                                <c:when test="${not empty summary and not empty summary.getRevenue()}">
+                                    <fmt:formatNumber value="${summary.getRevenue().intValue()}" pattern="#,###" />억 원
+                                </c:when>
+                                <c:otherwise>-</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="stock-info__finance-row">
                         <span class="stock-info__finance-label">영업이익</span>
-                        <span class="stock-info__finance-value"><fmt:formatNumber value="${summary.getOperatingProfit().intValue()}" pattern="#,###" />억 원</span>
+                        <span class="stock-info__finance-value">
+                            <c:choose>
+                                <c:when test="${not empty summary and not empty summary.getOperatingProfit()}">
+                                    <fmt:formatNumber value="${summary.getOperatingProfit().intValue()}" pattern="#,###" />억 원
+                                </c:when>
+                                <c:otherwise>-</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="stock-info__finance-row">
                         <span class="stock-info__finance-label">신용비율</span>
-                        <span class="stock-info__finance-value">${summary.getCreditRatio()}</span>
+                        <span class="stock-info__finance-value">
+                            <c:choose>
+                                <c:when test="${not empty summary and not empty summary.getCreditRatio()}">
+                                    ${summary.getCreditRatio()}
+                                </c:when>
+                                <c:otherwise>-</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
 <%--                    <div class="stock-info__finance-row stock-info__finance-row--last">--%>
 <%--                        <span class="stock-info__finance-label">잔고율</span>--%>

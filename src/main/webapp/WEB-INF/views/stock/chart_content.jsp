@@ -104,21 +104,8 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <div class="my-stock-card__row">
-                            <span>총 수익</span>
-                            <span class="my-stock-card__profit my-stock-card__profit--neutral">0</span>
-                        </div>
-                        <div class="my-stock-card__row">
-                            <span>총 금액</span>
-                            <span id="my-stock-evaluation-amount">0원</span>
-                        </div>
-                        <div class="my-stock-card__row">
-                            <span>수량</span>
-                            <span id="my-stock-quantity">0주</span>
-                        </div>
-                        <div class="my-stock-card__row">
-                            <span>1주 평균 금액</span>
-                            <span id="my-stock-average-price">0원</span>
+                        <div class="my-stock-card__empty-message">
+                            ${not empty stock.stockName ? stock.stockName : '이'} 주식을 보유하지 않았어요
                         </div>
                     </c:otherwise>
                 </c:choose>
