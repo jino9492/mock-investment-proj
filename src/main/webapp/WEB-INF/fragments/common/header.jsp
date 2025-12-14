@@ -3,11 +3,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%
-    // 어드민 사이드바 방식 참고: 현재 경로를 정확히 계산
-    // 1. 컨트롤러에서 설정한 currentPage 우선 사용
     String currentPage = (String) request.getAttribute("currentPage");
 
-    // 2. 없으면 servletPath 사용
     if (currentPage == null || currentPage.isEmpty()) {
         String servletPath = (String) request.getAttribute("javax.servlet.forward.servlet_path");
         if (servletPath == null) {
@@ -41,10 +38,10 @@
                     <a href="/league">리그</a>
                 </li>
                 <li class="${currentPage == '/explore' || currentPage == '/search' ? 'selected' : ''}">
-                    <a href="/explore">탐색</a>
+                    <div>탐색</div>
                 </li>
                 <li class="${currentPage == '/news' ? 'selected' : ''}">
-                    <a href="/news">뉴스</a>
+                    <div>뉴스</div>
                 </li>
             </ul>
         </div>

@@ -46,6 +46,7 @@ ul {
 .league__content {
   width: 65vw;
   margin: 0 auto;
+  padding-top: 24px;
 }
 
 .league__page-title {
@@ -65,7 +66,7 @@ ul {
   display: grid;
   grid-template-columns: 1.1fr 1.2fr;
   gap: 32px;
-  margin-top: 72px;
+  margin-top: 32px;
 }
 
 /* ============================================

@@ -6,10 +6,7 @@
 <script type="module" src="${pageContext.request.contextPath}/static/js/home/main_page.js"></script>
 
 <main class="main__content">
-  <div class="main__sub-title">
-    <span class="main__dot-green"></span>
-    <strong>국내 장 열림/닫힘</strong>
-  </div>
+  <jsp:include page="${pageContext.request.contextPath}/WEB-INF/fragments/common/market_status.jsp" />
   <!-- 계좌 / 뉴스 -->
   <section class="main__top-section">
 
