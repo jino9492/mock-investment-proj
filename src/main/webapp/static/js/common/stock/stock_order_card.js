@@ -12,9 +12,12 @@ import { formatNumber, calculateTotalAmount, updateWatchPriceInfo } from './stoc
  * @param {HTMLElement} priceInputElement - 가격 입력 요소
  * @param {HTMLElement} quantityInputElement - 수량 입력 요소
  * @param {HTMLElement} totalAmountElement - 총 금액 표시 요소
+ * @param {Function} calculateTotalAmountCallback - 총 금액 계산 콜백 함수 (선택적, 없으면 공통 함수 사용)
  */
-export function setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputElement, quantityInputElement, totalAmountElement) {
+export function setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputElement, quantityInputElement, totalAmountElement, calculateTotalAmountCallback = null) {
     if (!priceMinusBtn || !pricePlusBtn || !priceInputElement) return;
+
+    const calcTotal = calculateTotalAmountCallback || (() => calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement));
 
     priceMinusBtn.addEventListener("click", function() {
         if (priceInputElement.readOnly) return; // 시장가 모드에서는 동작 안 함
@@ -22,7 +25,7 @@ export function setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputEle
         let currentPrice = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
         currentPrice = Math.max(0, currentPrice - 5);
         priceInputElement.value = formatNumber(currentPrice);
-        calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
+        calcTotal();
     });
 
     pricePlusBtn.addEventListener("click", function() {
@@ -31,7 +34,7 @@ export function setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputEle
         let currentPrice = parseFloat(priceInputElement.value.replace(/,/g, "")) || 0;
         currentPrice = currentPrice + 5;
         priceInputElement.value = formatNumber(currentPrice);
-        calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
+        calcTotal();
     });
 }
 
@@ -43,15 +46,18 @@ export function setupPriceStepButtons(priceMinusBtn, pricePlusBtn, priceInputEle
  * @param {HTMLElement} priceInputElement - 가격 입력 요소
  * @param {HTMLElement} totalAmountElement - 총 금액 표시 요소
  * @param {number|Function} maxQuantity - 최대 수량 (구매: 예치금/주가, 판매: 보유 수량) 또는 최대값을 계산하는 함수
+ * @param {Function} calculateTotalAmountCallback - 총 금액 계산 콜백 함수 (선택적, 없으면 공통 함수 사용)
  */
-export function setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quantityInputElement, priceInputElement, totalAmountElement, maxQuantity = null) {
+export function setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quantityInputElement, priceInputElement, totalAmountElement, maxQuantity = null, calculateTotalAmountCallback = null) {
     if (!quantityMinusBtn || !quantityPlusBtn || !quantityInputElement) return;
+
+    const calcTotal = calculateTotalAmountCallback || (() => calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement));
 
     quantityMinusBtn.addEventListener("click", function() {
         let currentQuantity = parseInt(quantityInputElement.value.replace(/,/g, "")) || 0;
         currentQuantity = Math.max(0, currentQuantity - 1);
         quantityInputElement.value = currentQuantity > 0 ? currentQuantity.toString() : "";
-        calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
+        calcTotal();
     });
 
     quantityPlusBtn.addEventListener("click", function() {
@@ -71,7 +77,7 @@ export function setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quan
         }
         
         quantityInputElement.value = newQuantity.toString();
-        calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
+        calcTotal();
     });
 }
 
@@ -80,9 +86,12 @@ export function setupQuantityStepButtons(quantityMinusBtn, quantityPlusBtn, quan
  * @param {HTMLElement} priceInputElement - 가격 입력 요소
  * @param {HTMLElement} quantityInputElement - 수량 입력 요소
  * @param {HTMLElement} totalAmountElement - 총 금액 표시 요소
+ * @param {Function} calculateTotalAmountCallback - 총 금액 계산 콜백 함수 (선택적, 없으면 공통 함수 사용)
  */
-export function setupPriceInput(priceInputElement, quantityInputElement, totalAmountElement) {
+export function setupPriceInput(priceInputElement, quantityInputElement, totalAmountElement, calculateTotalAmountCallback = null) {
     if (!priceInputElement) return;
+
+    const calcTotal = calculateTotalAmountCallback || (() => calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement));
 
     priceInputElement.addEventListener("input", function() {
         // 숫자만 입력 허용 (콤마 제거 후 다시 포맷팅)
@@ -90,7 +99,7 @@ export function setupPriceInput(priceInputElement, quantityInputElement, totalAm
         if (value) {
             this.value = formatNumber(parseInt(value));
         }
-        calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
+        calcTotal();
     });
 }
 
@@ -100,9 +109,12 @@ export function setupPriceInput(priceInputElement, quantityInputElement, totalAm
  * @param {HTMLElement} priceInputElement - 가격 입력 요소
  * @param {HTMLElement} totalAmountElement - 총 금액 표시 요소
  * @param {number|Function} maxQuantity - 최대 수량 (구매: 예치금/주가, 판매: 보유 수량) 또는 최대값을 계산하는 함수
+ * @param {Function} calculateTotalAmountCallback - 총 금액 계산 콜백 함수 (선택적, 없으면 공통 함수 사용)
  */
-export function setupQuantityInput(quantityInputElement, priceInputElement, totalAmountElement, maxQuantity = null) {
+export function setupQuantityInput(quantityInputElement, priceInputElement, totalAmountElement, maxQuantity = null, calculateTotalAmountCallback = null) {
     if (!quantityInputElement) return;
+
+    const calcTotal = calculateTotalAmountCallback || (() => calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement));
 
     quantityInputElement.addEventListener("input", function() {
         // 숫자만 입력 허용
@@ -128,7 +140,7 @@ export function setupQuantityInput(quantityInputElement, priceInputElement, tota
         } else {
             this.value = "";
         }
-        calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
+        calcTotal();
     });
     
     // blur 이벤트로 최대값 재확인
@@ -148,7 +160,7 @@ export function setupQuantityInput(quantityInputElement, priceInputElement, tota
                 this.value = num.toString();
             }
         }
-        calculateTotalAmount(priceInputElement, quantityInputElement, totalAmountElement);
+        calcTotal();
     });
 }
 
@@ -437,6 +449,89 @@ export function setupSubmitButton(submitBtn, priceInputElement, quantityInputEle
 export function setupPriceModePills(priceModePills, priceInput, orderTypeHidden, unitText, priceMinusBtn, pricePlusBtn, priceInputElement, calculateTotalAmountCallback) {
     if (!priceModePills.length || !priceInput) return;
 
+    // 초기화: 지정가를 기본값으로 설정
+    const limitPill = Array.from(priceModePills).find(p => p.textContent.trim() === "지정가");
+    const marketPill = Array.from(priceModePills).find(p => p.textContent.trim() === "시장가");
+    
+    // 조건 주문인지 확인 (조건 주문 섹션 내부에 있는지 확인)
+    const isConditionalOrder = priceModePills[0]?.closest('.order-card__conditional-order') !== null;
+    
+    // 현재 상태 확인 (active pill 또는 orderTypeHidden 값)
+    let currentActivePill = Array.from(priceModePills).find(p => p.classList.contains("order-card__pill--active"));
+    
+    // 조건 주문이거나, active pill이 없거나, orderTypeHidden 값과 불일치하면 지정가로 초기화
+    if (isConditionalOrder || !currentActivePill || (orderTypeHidden && orderTypeHidden.value !== "LIMIT" && orderTypeHidden.value !== "MARKET")) {
+        // 지정가로 초기화
+        if (limitPill) {
+            priceModePills.forEach(p => {
+                p.classList.remove("order-card__pill--active");
+                p.setAttribute("aria-checked", "false");
+                p.setAttribute("data-state", "unchecked");
+            });
+            limitPill.classList.add("order-card__pill--active");
+            limitPill.setAttribute("aria-checked", "true");
+            limitPill.setAttribute("data-state", "checked");
+            
+            // 지정가 모드 설정
+            priceInput.readOnly = false;
+            priceInput.placeholder = "가격을 입력하세요";
+            priceInput.classList.remove("order-card__input--readonly");
+            
+            if (orderTypeHidden) orderTypeHidden.value = "LIMIT";
+            if (unitText) unitText.style.display = "";
+            if (priceMinusBtn) priceMinusBtn.disabled = false;
+            if (pricePlusBtn) pricePlusBtn.disabled = false;
+            
+            // 현재가가 없으면 기본값 설정
+            if (!priceInput.value && priceInputElement) {
+                const currentPrice = priceInputElement.getAttribute("data-current-price");
+                if (currentPrice) {
+                    priceInput.value = formatNumber(parseInt(currentPrice));
+                    if (calculateTotalAmountCallback) {
+                        calculateTotalAmountCallback();
+                    }
+                }
+            }
+        }
+    } else if (currentActivePill === marketPill) {
+        // 시장가가 활성화되어 있으면 시장가 모드 설정
+        // 시장가가 활성화되어 있으면 시장가 모드 설정
+        priceInput.value = "";
+        priceInput.readOnly = true;
+        priceInput.placeholder = "시장가로 주문됩니다";
+        priceInput.classList.add("order-card__input--readonly");
+        
+        if (orderTypeHidden) orderTypeHidden.value = "MARKET";
+        if (unitText) unitText.style.display = "none";
+        if (priceMinusBtn) priceMinusBtn.disabled = true;
+        if (pricePlusBtn) pricePlusBtn.disabled = true;
+        
+        if (calculateTotalAmountCallback) {
+            calculateTotalAmountCallback();
+        }
+    } else if (currentActivePill === limitPill) {
+        // 지정가가 활성화되어 있으면 지정가 모드 설정
+        priceInput.readOnly = false;
+        priceInput.placeholder = "가격을 입력하세요";
+        priceInput.classList.remove("order-card__input--readonly");
+        
+        if (orderTypeHidden) orderTypeHidden.value = "LIMIT";
+        if (unitText) unitText.style.display = "";
+        if (priceMinusBtn) priceMinusBtn.disabled = false;
+        if (pricePlusBtn) pricePlusBtn.disabled = false;
+        
+        // 현재가가 없으면 기본값 설정
+        if (!priceInput.value && priceInputElement) {
+            const currentPrice = priceInputElement.getAttribute("data-current-price");
+            if (currentPrice) {
+                priceInput.value = formatNumber(parseInt(currentPrice));
+                if (calculateTotalAmountCallback) {
+                    calculateTotalAmountCallback();
+                }
+            }
+        }
+    }
+
     priceModePills.forEach(function (pill) {
         pill.addEventListener("click", function () {
             // pill 활성화 변경
@@ -465,6 +560,11 @@ export function setupPriceModePills(priceModePills, priceInput, orderTypeHidden,
                 // +/- 버튼 비활성화
                 if (priceMinusBtn) priceMinusBtn.disabled = true;
                 if (pricePlusBtn) pricePlusBtn.disabled = true;
+                
+                // 시장가로 전환 시 총 금액 계산 (현재가 사용)
+                if (calculateTotalAmountCallback) {
+                    calculateTotalAmountCallback();
+                }
 
             } else {
                 // 지정가 모드
