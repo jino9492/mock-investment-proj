@@ -109,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error(result.reason);
                 }
             });
-
             rankingList.forEach((item, index) => {
                 const rank = index + 1;
                 const stkCode = item.stkCode.replace('_AL', '');
@@ -224,9 +223,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (currentResponse.data && Array.isArray(currentResponse.data)) {
 
                 currentResponse.data.forEach(res => {
-                    const itemCode = res.item;
+                    const itemCode = res.item.replace('_AL', '');
                     const mappedElements = realtimeDOMMap[itemCode];
-
                     // 해당 종목의 DOM 요소와 필요한 데이터가 있는지 확인
                     if (mappedElements && res.values) {
                         const priceString = res.values["10"]; // 현재가

@@ -77,6 +77,8 @@ public class OrderService {
                         // 시장가 주문 - 현재가로 계산
                         StockDAO stockDAO = new StockDAO();
 
+                        System.out.println(order.getStockId());
+
                         BigDecimal currentPrice = new BigDecimal(inmemoryCacheManager.get(REALTIME_CACHE_KEY + stockDAO.getStockCodeById(order.getStockId(), conn), RealtimeDTO.class).getCurPrice());
                         // 현재가가 음수인 경우 절댓값 사용
                         if (currentPrice.compareTo(BigDecimal.ZERO) < 0) {

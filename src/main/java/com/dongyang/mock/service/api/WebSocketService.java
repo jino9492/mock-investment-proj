@@ -51,14 +51,16 @@ public class WebSocketService extends WebSocketClient {
                     System.out.println("로그인 성공");
                 }
             } else if ("PING".equals(trnm)) {
-                onMessage(generateRealtimeJson());
+                // onMessage(generateRealtimeJson());
                 sendMessage(response); // 그대로 응답
             }
 
             if (!"PING".equals(trnm)) {
-                if (response.has("data"))
+                if (response.has("data")) {
+                    System.out.println(extractItemCode(response) + " " + parseResponse(response));
                     cacheManager.put(REALTIME_CACHE_KEY + extractItemCode(response), parseResponse(response));
-                System.out.println("실시간 시세 서버 응답: " + response.toString());
+                }
+                // System.out.println("실시간 시세 서버 응답: " + response.toString());
             }
 
             RealtimeWebSocket.broadcast(message);
@@ -218,7 +220,7 @@ public class WebSocketService extends WebSocketClient {
         if (firstElement.isJsonObject()) {
             JsonObject itemObject = firstElement.getAsJsonObject();
             if (itemObject.has("item") && itemObject.get("item").isJsonPrimitive()) {
-                return itemObject.get("item").getAsString();
+                return itemObject.get("item").getAsString().replace("_AL", "");
             }
         }
         return null;
