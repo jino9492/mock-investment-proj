@@ -10,7 +10,6 @@
         body {
             margin: 0;
             background-color: #F6F7F9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         .error-wrap {
             height: 100vh;

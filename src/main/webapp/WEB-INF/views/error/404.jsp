@@ -13,7 +13,6 @@
             align-items: center;
             justify-content: center;
             background-color: #f6f7f9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         .error-box {
