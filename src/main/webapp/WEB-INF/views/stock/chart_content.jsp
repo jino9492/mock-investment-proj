@@ -70,19 +70,30 @@
                     <c:when test="${not empty holding}">
                         <div class="my-stock-card__row">
                             <span>총 수익</span>
-                            <span class="my-stock-card__profit 
-                                <c:choose>
-                                    <c:when test="${holding.profitLoss > 0}">my-stock-card__profit--positive</c:when>
-                                    <c:when test="${holding.profitLoss < 0}">my-stock-card__profit--negative</c:when>
-                                    <c:otherwise>my-stock-card__profit--neutral</c:otherwise>
-                                </c:choose>">
-                                <c:choose>
-                                    <c:when test="${holding.profitLoss > 0}">+</c:when>
-                                    <c:when test="${holding.profitLoss < 0}">-</c:when>
-                                </c:choose>
-                                <c:set var="absProfitLoss" value="${holding.profitLoss >= 0 ? holding.profitLoss : -holding.profitLoss}" />
-                                <fmt:formatNumber value="${absProfitLoss}" pattern="#,###"/>
-                            </span>
+                            <div class="my-stock-card__profit-wrapper">
+                                <jsp:include page="/WEB-INF/fragments/common/price_color_class.jsp">
+                                    <jsp:param name="value" value="${holding.profitLoss}"/>
+                                </jsp:include>
+                                <span class="my-stock-card__profit ${priceColorClass}">
+                                    <c:choose>
+                                        <c:when test="${holding.profitLoss > 0}">+</c:when>
+                                        <c:when test="${holding.profitLoss < 0}">-</c:when>
+                                    </c:choose>
+                                    <c:set var="absProfitLoss" value="${holding.profitLoss >= 0 ? holding.profitLoss : -holding.profitLoss}" />
+                                    <fmt:formatNumber value="${absProfitLoss}" pattern="#,###"/>
+                                </span>
+                                <jsp:include page="/WEB-INF/fragments/common/price_color_class.jsp">
+                                    <jsp:param name="value" value="${holding.profitRate}"/>
+                                </jsp:include>
+                                <span class="my-stock-card__profit-rate ${priceColorClass}">
+                                    (<c:choose>
+                                        <c:when test="${holding.profitRate > 0}">+</c:when>
+                                        <c:when test="${holding.profitRate < 0}">-</c:when>
+                                    </c:choose>
+                                    <c:set var="absProfitRate" value="${holding.profitRate >= 0 ? holding.profitRate : -holding.profitRate}" />
+                                    <fmt:formatNumber value="${absProfitRate}" pattern="#,##0.00"/>%)
+                                </span>
+                            </div>
                         </div>
                         <div class="my-stock-card__row">
                             <span>총 금액</span>

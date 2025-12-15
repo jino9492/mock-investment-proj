@@ -675,8 +675,16 @@ body.stock-page {
     margin-bottom: 10px;
 }
 
-.my-stock-card__profit {
-    color: #666666; /* 기본값: 회색 (보라색은 존재하지 않음) */
+/* .my-stock-card__profit의 색상은 price-color--* 유틸리티 클래스로 제어됩니다 */
+
+.my-stock-card__profit-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.my-stock-card__profit-rate {
+    /* 색상은 price-color--* 유틸리티 클래스로 제어됩니다 */
 }
 
 .my-stock-card__empty-message {

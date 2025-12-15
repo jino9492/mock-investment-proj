@@ -5,6 +5,7 @@ import {
     initializeCurrentPrice as initCurrentPrice,
     initializeQuantity as initQuantity
 } from '../common/stock/stock_order_utils.js';
+import {getPriceColorClass} from '../common/price_color_utils.js';
 
 import {
     setupPriceStepButtons,
@@ -656,16 +657,24 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
             const holding = result.holding;
             
             if (holding) {
-                // 총 수익 업데이트
+                // 총 수익 및 수익률 업데이트
                 const profitElement = myStockCard.querySelector(".my-stock-card__profit");
+                const profitRateElement = myStockCard.querySelector(".my-stock-card__profit-rate");
+                
                 if (profitElement) {
                     const profitLoss = holding.profitLoss || 0;
-                    const profitClass = profitLoss > 0 ? "my-stock-card__profit--positive" : 
-                                      profitLoss < 0 ? "my-stock-card__profit--negative" : 
-                                      "my-stock-card__profit--neutral";
-                    profitElement.className = "my-stock-card__profit " + profitClass;
+                    const priceColorClass = getPriceColorClass(profitLoss);
+                    profitElement.className = "my-stock-card__profit " + priceColorClass;
                     profitElement.textContent = (profitLoss > 0 ? "+" : profitLoss < 0 ? "-" : "") + 
                         Math.abs(profitLoss).toLocaleString('ko-KR');
+                }
+                
+                if (profitRateElement) {
+                    const profitRate = holding.profitRate || 0;
+                    const rateColorClass = getPriceColorClass(profitRate);
+                    profitRateElement.className = "my-stock-card__profit-rate " + rateColorClass;
+                    profitRateElement.textContent = "(" + (profitRate > 0 ? "+" : profitRate < 0 ? "-" : "") + 
+                        Math.abs(profitRate).toFixed(2) + "%)";
                 }
                 
                 // 총 금액 업데이트
@@ -688,9 +697,16 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
             } else {
                 // 보유 정보가 없으면 0으로 표시
                 const profitElement = myStockCard.querySelector(".my-stock-card__profit");
+                const profitRateElement = myStockCard.querySelector(".my-stock-card__profit-rate");
+                
                 if (profitElement) {
-                    profitElement.className = "my-stock-card__profit my-stock-card__profit--neutral";
+                    profitElement.className = "my-stock-card__profit price-color--neutral";
                     profitElement.textContent = "0";
+                }
+                
+                if (profitRateElement) {
+                    profitRateElement.className = "my-stock-card__profit-rate price-color--neutral";
+                    profitRateElement.textContent = "(0.00%)";
                 }
                 
                 const evaluationAmountElement = document.getElementById("my-stock-evaluation-amount");
@@ -743,6 +759,65 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     const myStockCard = document.querySelector(".my-stock-card");
     if (myStockCard) {
         startHoldingPolling();
+        
+        // 주가 변경 시 평균 단가 실시간 업데이트
+        let lastKnownPrice = null;
+        const priceInputElement = document.getElementById("order-price-input");
+        let priceCheckInterval = null;
+        
+        // 주가 변경 감지 함수
+        function checkPriceChange() {
+            if (!priceInputElement) return;
+            
+            const currentPriceAttr = priceInputElement.getAttribute("data-current-price");
+            const currentPrice = currentPriceAttr ? parseFloat(currentPriceAttr) : null;
+            
+            // 주가가 변경되었고 유효한 값인 경우
+            if (currentPrice !== null && !isNaN(currentPrice)) {
+                if (lastKnownPrice !== null && currentPrice !== lastKnownPrice) {
+                    // 주가가 변경되었으므로 평균 단가 즉시 업데이트
+                    console.log(`[평균 단가 실시간 업데이트] 주가 변경 감지: ${lastKnownPrice} → ${currentPrice}`);
+                    updateMyStockCard();
+                }
+                lastKnownPrice = currentPrice;
+            }
+        }
+        
+        // 주가 변경 감지를 위한 MutationObserver 설정
+        if (priceInputElement) {
+            const priceObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'data-current-price') {
+                        checkPriceChange();
+                    }
+                });
+            });
+            
+            priceObserver.observe(priceInputElement, {
+                attributes: true,
+                attributeFilter: ['data-current-price']
+            });
+            
+            // 초기 가격 설정
+            const initialPrice = priceInputElement.getAttribute("data-current-price");
+            if (initialPrice) {
+                const parsedPrice = parseFloat(initialPrice);
+                if (!isNaN(parsedPrice)) {
+                    lastKnownPrice = parsedPrice;
+                }
+            }
+            
+            // 주기적으로도 체크 (폴링과 함께 사용하여 놓친 변경사항 감지)
+            // 장이 열려있을 때만 더 자주 체크 (1초마다)
+            priceCheckInterval = setInterval(checkPriceChange, 1000);
+        }
+        
+        // 페이지 언로드 시 인터벌 정리
+        window.addEventListener("beforeunload", function() {
+            if (priceCheckInterval) {
+                clearInterval(priceCheckInterval);
+            }
+        });
     }
     
     // 페이지 언로드 시 폴링 중지
