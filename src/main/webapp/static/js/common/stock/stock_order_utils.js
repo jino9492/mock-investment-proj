@@ -75,77 +75,123 @@ export function initializeQuantity(quantityInputElement) {
 /**
  * 감시 가격과 현재가 비교 계산 및 표시 업데이트
  * @param {HTMLElement} watchPriceInput - 감시 가격 입력 요소
- * @param {HTMLElement} watchPriceInfo - 감시 가격 정보 표시 요소
+ * @param {HTMLElement} watchPriceInfo - 감시 가격 정보 표시 요소 (기존 호환성을 위해 유지, 실제로는 wrapper 요소)
  */
 export function updateWatchPriceInfo(watchPriceInput, watchPriceInfo) {
-    if (!watchPriceInput || !watchPriceInfo) return;
+    if (!watchPriceInput) return;
 
     const watchPriceValue = watchPriceInput.value.replace(/,/g, "");
     const watchPrice = parseFloat(watchPriceValue);
     
-    const currentPriceStr = watchPriceInfo.getAttribute("data-current-price");
-    const avgPriceStr = watchPriceInfo.getAttribute("data-avg-price");
+    // watchPriceInfo가 wrapper인 경우와 아닌 경우 모두 처리
+    // 새로운 구조: wrapper 내부에 -current와 -avg 요소가 있음
+    let watchPriceInfoCurrent = null;
+    let watchPriceInfoAvg = null;
     
-    if (!currentPriceStr) {
-        watchPriceInfo.textContent = "현재가 보다 0.00%";
-        watchPriceInfo.style.color = getPriceColorCode(0);
-        return;
-    }
-
-    const currentPrice = parseFloat(currentPriceStr);
-    
-    if (isNaN(watchPrice) || watchPrice <= 0) {
-        // 감시 가격이 입력되지 않았거나 유효하지 않으면 기본값 표시
-        if (avgPriceStr) {
-            watchPriceInfo.textContent = "현재가 보다 0.00% 내 평단 보다 0.00%";
+    if (watchPriceInfo) {
+        // wrapper 요소인지 확인 (클래스나 자식 요소 확인)
+        const isWrapper = watchPriceInfo.classList && watchPriceInfo.classList.contains('order-card__watch-price-info-wrapper');
+        
+        if (isWrapper) {
+            // 새로운 구조 (wrapper)
+            watchPriceInfoCurrent = watchPriceInfo.querySelector('[id$="-current"]');
+            watchPriceInfoAvg = watchPriceInfo.querySelector('[id$="-avg"]');
+            
+            // querySelector로 찾지 못한 경우, ID를 통해 찾기 시도
+            if (!watchPriceInfoCurrent || !watchPriceInfoAvg) {
+                // wrapper 내부의 첫 번째 요소의 ID를 기반으로 찾기
+                const firstChild = watchPriceInfo.querySelector('.order-card__watch-price-info');
+                if (firstChild && firstChild.id) {
+                    const baseId = firstChild.id.replace(/-current$|-avg$/, '');
+                    watchPriceInfoCurrent = watchPriceInfoCurrent || document.getElementById(baseId + '-current');
+                    watchPriceInfoAvg = watchPriceInfoAvg || document.getElementById(baseId + '-avg');
+                }
+            }
         } else {
-            watchPriceInfo.textContent = "현재가 보다 0.00%";
+            // 단일 요소인지 확인
+            if (watchPriceInfo.id && (watchPriceInfo.id.endsWith('-current') || watchPriceInfo.id.endsWith('-avg'))) {
+                // -current 또는 -avg로 끝나는 요소
+                if (watchPriceInfo.id.endsWith('-current')) {
+                    watchPriceInfoCurrent = watchPriceInfo;
+                } else {
+                    watchPriceInfoAvg = watchPriceInfo;
+                }
+                
+                // 나머지 요소 찾기
+                const baseId = watchPriceInfo.id.replace(/-current$|-avg$/, '');
+                if (!watchPriceInfoCurrent) {
+                    watchPriceInfoCurrent = document.getElementById(baseId + '-current');
+                }
+                if (!watchPriceInfoAvg) {
+                    watchPriceInfoAvg = document.getElementById(baseId + '-avg');
+                }
+            } else {
+                // 기존 구조 (단일 요소) - 호환성 유지
+                watchPriceInfoCurrent = watchPriceInfo;
+            }
         }
-        watchPriceInfo.style.color = getPriceColorCode(0);
-        return;
     }
-
-    // 감시 가격 기준으로 현재가의 변동률 계산
-    // (현재가 - 감시가격) / 감시가격 * 100
-    // 음수: 현재가가 감시가격보다 낮음, 양수: 현재가가 감시가격보다 높음
-    const watchPriceDiff = ((currentPrice - watchPrice) / watchPrice) * 100;
     
-    // 보유 주식이 있는 경우 평단가 비교
-    let finalText = "";
-    
-    if (avgPriceStr) {
-        const avgPrice = parseFloat(avgPriceStr);
-        if (!isNaN(avgPrice) && avgPrice > 0) {
-            const avgPriceDiff = ((currentPrice - avgPrice) / avgPrice) * 100;
-            
-            // 감시가격 기준 텍스트 생성
-            const watchPriceText = watchPriceDiff === 0 
-                ? `현재가 보다 0.00%`
-                : `현재가 보다 ${formatPriceChange(watchPriceDiff)}%`;
-            
-            // 평단가 기준 텍스트 생성
-            const avgPriceText = avgPriceDiff === 0
-                ? `평단 보다 0.00%`
-                : `평단 보다 ${formatPriceChange(avgPriceDiff)}%`;
-            
-            finalText = `${watchPriceText} 내 ${avgPriceText}`;
+    // 현재가 비교 정보 업데이트
+    if (watchPriceInfoCurrent) {
+        const currentPriceStr = watchPriceInfoCurrent.getAttribute("data-current-price");
+        
+        if (!currentPriceStr) {
+            watchPriceInfoCurrent.textContent = "현재가 보다 0.00%";
+            watchPriceInfoCurrent.style.color = getPriceColorCode(0);
         } else {
-            // 평단가가 없거나 유효하지 않은 경우
-            finalText = watchPriceDiff === 0
-                ? `현재가 보다 0.00%`
-                : `현재가 보다 ${formatPriceChange(watchPriceDiff)}%`;
+            const currentPrice = parseFloat(currentPriceStr);
+            
+            if (isNaN(watchPrice) || watchPrice <= 0) {
+                watchPriceInfoCurrent.textContent = "현재가 보다 0.00%";
+                watchPriceInfoCurrent.style.color = getPriceColorCode(0);
+            } else {
+                // 감시 가격 기준으로 현재가의 변동률 계산
+                // (현재가 - 감시가격) / 감시가격 * 100
+                const watchPriceDiff = ((currentPrice - watchPrice) / watchPrice) * 100;
+                
+                const watchPriceText = watchPriceDiff === 0 
+                    ? `현재가 보다 0.00%`
+                    : `현재가 보다 ${formatPriceChange(watchPriceDiff)}%`;
+                
+                watchPriceInfoCurrent.textContent = watchPriceText;
+                watchPriceInfoCurrent.style.color = getPriceColorCode(watchPriceDiff);
+            }
         }
-    } else {
-        // 평단가 정보가 없는 경우
-        finalText = watchPriceDiff === 0
-            ? `현재가 보다 0.00%`
-            : `현재가 보다 ${formatPriceChange(watchPriceDiff)}%`;
     }
     
-    // 색상 결정: watchPriceDiff 기준으로 색상 결정
-    const finalColor = getPriceColorCode(watchPriceDiff);
-    
-    watchPriceInfo.textContent = finalText;
-    watchPriceInfo.style.color = finalColor;
+    // 평단가 비교 정보 업데이트
+    if (watchPriceInfoAvg) {
+        const avgPriceStr = watchPriceInfoAvg.getAttribute("data-avg-price");
+        
+        if (!avgPriceStr) {
+            watchPriceInfoAvg.textContent = "";
+            watchPriceInfoAvg.style.display = "none";
+        } else {
+            const avgPrice = parseFloat(avgPriceStr);
+            
+            if (isNaN(avgPrice) || avgPrice <= 0) {
+                watchPriceInfoAvg.textContent = "";
+                watchPriceInfoAvg.style.display = "none";
+            } else if (isNaN(watchPrice) || watchPrice <= 0) {
+                watchPriceInfoAvg.textContent = "내 평단 보다 0.00%";
+                watchPriceInfoAvg.style.color = getPriceColorCode(0);
+                watchPriceInfoAvg.style.display = "";
+            } else {
+                // 평단가 기준으로 감시가격의 변동률 계산
+                // (감시가격 - 평단가) / 평단가 * 100
+                // 음수: 감시가격이 평단가보다 낮음, 양수: 감시가격이 평단가보다 높음
+                const avgPriceDiff = ((watchPrice - avgPrice) / avgPrice) * 100;
+                
+                const avgPriceText = avgPriceDiff === 0
+                    ? `내 평단 보다 0.00%`
+                    : `내 평단 보다 ${formatPriceChange(avgPriceDiff)}%`;
+                
+                watchPriceInfoAvg.textContent = avgPriceText;
+                watchPriceInfoAvg.style.color = getPriceColorCode(avgPriceDiff);
+                watchPriceInfoAvg.style.display = "";
+            }
+        }
+    }
 }
 

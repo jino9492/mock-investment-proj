@@ -518,11 +518,19 @@ body.stock-page {
     margin-bottom: 4px;
 }
 
+.order-card__watch-price-info-wrapper {
+    margin-left: 70px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 .order-card__watch-price-info {
     font-size: 12px;
     color: #F04452;
-    margin-left: 70px;
-    margin-bottom: 10px;
     line-height: 1.4;
     text-align: right;
 }

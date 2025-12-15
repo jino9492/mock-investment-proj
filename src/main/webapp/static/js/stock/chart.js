@@ -3,7 +3,8 @@ import {
     calculateTotalAmount as calcTotalAmount,
     initializeAvailableAmount as initAvailableAmount,
     initializeCurrentPrice as initCurrentPrice,
-    initializeQuantity as initQuantity
+    initializeQuantity as initQuantity,
+    updateWatchPriceInfo
 } from '../common/stock/stock_order_utils.js';
 import {getPriceColorClass} from '../common/price_color_utils.js';
 
@@ -17,6 +18,7 @@ import {
     setupWatchPriceInput
 } from '../common/stock/stock_order_card.js';
 import {loadChartByUrlCode} from "../common/chart/candle_chart.js";
+import {fetchStockChartData} from "../common/api/fetch_utils.js";
 
 document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
     loadChartByUrlCode();
@@ -673,8 +675,7 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                     const profitRate = holding.profitRate || 0;
                     const rateColorClass = getPriceColorClass(profitRate);
                     profitRateElement.className = "my-stock-card__profit-rate " + rateColorClass;
-                    profitRateElement.textContent = "(" + (profitRate > 0 ? "+" : profitRate < 0 ? "-" : "") + 
-                        Math.abs(profitRate).toFixed(2) + "%)";
+                    profitRateElement.textContent = "(" + (profitRate > 0 ? "+" : profitRate < 0 ? "-" : "") + Math.abs(profitRate).toFixed(2) + "%)";
                 }
                 
                 // 총 금액 업데이트
@@ -694,6 +695,60 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
                 if (averagePriceElement) {
                     averagePriceElement.textContent = (holding.averagePrice || 0).toLocaleString('ko-KR') + "원";
                 }
+                
+                // watch-price-info 요소들의 평균 단가 정보 업데이트
+                const allWatchPriceInfoWrappers = document.querySelectorAll('.order-card__watch-price-info-wrapper');
+                allWatchPriceInfoWrappers.forEach(function(wrapperEl) {
+                    const infoElements = wrapperEl.querySelectorAll('.order-card__watch-price-info');
+                    infoElements.forEach(function(infoEl) {
+                        if (holding.averagePrice) {
+                            infoEl.setAttribute("data-avg-price", holding.averagePrice.toString());
+                        }
+                    });
+                    
+                    // 연결된 watch-price-input 찾아서 업데이트 호출
+                    const wrapperId = wrapperEl.querySelector('.order-card__watch-price-info')?.id;
+                    if (wrapperId) {
+                        const baseId = wrapperId.replace(/-current$|-avg$/, '');
+                        let watchPriceInputEl = null;
+                        
+                        if (baseId === 'watch-price-info') {
+                            watchPriceInputEl = document.getElementById('watch-price-input');
+                        } else if (baseId === 'conditional-sell-watch-price-info') {
+                            watchPriceInputEl = document.getElementById('conditional-sell-watch-price-input');
+                        } else {
+                            const inputId = baseId.replace('-info', '-input');
+                            watchPriceInputEl = document.getElementById(inputId);
+                        }
+                        
+                        if (watchPriceInputEl) {
+                            updateWatchPriceInfo(watchPriceInputEl, wrapperEl);
+                        }
+                    }
+                });
+                
+                // 기존 구조 지원 (wrapper 없는 경우)
+                const allWatchPriceInfoElements = document.querySelectorAll('.order-card__watch-price-info:not(.order-card__watch-price-info-wrapper .order-card__watch-price-info)');
+                allWatchPriceInfoElements.forEach(function(infoEl) {
+                    if (holding.averagePrice && infoEl.closest('.order-card__watch-price-info-wrapper') === null) {
+                        infoEl.setAttribute("data-avg-price", holding.averagePrice.toString());
+                        const infoId = infoEl.id;
+                        if (infoId) {
+                            let watchPriceInputEl = null;
+                            if (infoId === 'watch-price-info') {
+                                watchPriceInputEl = document.getElementById('watch-price-input');
+                            } else if (infoId === 'conditional-sell-watch-price-info') {
+                                watchPriceInputEl = document.getElementById('conditional-sell-watch-price-input');
+                            } else {
+                                const inputId = infoId.replace('-info', '-input');
+                                watchPriceInputEl = document.getElementById(inputId);
+                            }
+                            if (watchPriceInputEl) {
+                                updateWatchPriceInfo(watchPriceInputEl, infoEl);
+                            }
+                        }
+                    }
+                });
             } else {
                 // 보유 정보가 없으면 0으로 표시
                 const profitElement = myStockCard.querySelector(".my-stock-card__profit");
@@ -933,12 +988,168 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
 
     // 조건 주문 - 감시 가격 정보 업데이트
     const watchPriceInput = document.getElementById("watch-price-input");
-    const watchPriceInfo = document.getElementById("watch-price-info");
+    // wrapper 요소를 찾거나, 없으면 기존 요소를 찾음
+    const watchPriceInfoWrapper = document.querySelector(".order-card__watch-price-info-wrapper") || 
+                                   document.getElementById("watch-price-info");
+    const watchPriceInfo = watchPriceInfoWrapper || document.getElementById("watch-price-info-current") || 
+                           document.getElementById("watch-price-info");
     const watchPriceMinusBtn = document.getElementById("watch-price-minus");
     const watchPricePlusBtn = document.getElementById("watch-price-plus");
 
     // 감시 가격 입력 필드 및 버튼 이벤트 설정
-    setupWatchPriceInput(watchPriceInput, watchPriceInfo, watchPriceMinusBtn, watchPricePlusBtn);
+    setupWatchPriceInput(watchPriceInput, watchPriceInfoWrapper || watchPriceInfo, watchPriceMinusBtn, watchPricePlusBtn);
+
+    /* 실시간 주가 업데이트 (감시 가격 정보용) */
+    let watchPricePollingInterval = null;
+    
+    // 실시간 주가 업데이트 함수
+    async function updateWatchPriceCurrentPrice() {
+        // URL에서 종목 코드 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        
+        if (!code) {
+            console.warn("[실시간 주가 업데이트] 종목 코드를 찾을 수 없습니다.");
+            return;
+        }
+        
+        try {
+            // 차트 데이터에서 최신 주가 가져오기 (첫 번째 항목이 최신 데이터)
+            const chartData = await fetchStockChartData(code);
+            
+            if (!chartData || chartData.length === 0) {
+                console.warn("[실시간 주가 업데이트] 차트 데이터를 가져올 수 없습니다.");
+                return;
+            }
+            
+            // 최신 종가 (closePrice) 가져오기
+            const latestPrice = chartData[0].closePrice;
+            
+            if (latestPrice === null || latestPrice === undefined) {
+                console.warn("[실시간 주가 업데이트] 유효한 주가 데이터가 없습니다.");
+                return;
+            }
+            
+            // 절댓값으로 변환 (음수일 수 있으므로)
+            const currentPrice = Math.abs(Math.round(latestPrice));
+            
+            // 모든 watch-price-info 요소 찾기 (구매용, 판매용 모두 포함)
+            // wrapper 내부의 요소들도 포함
+            const allWatchPriceInfoElements = document.querySelectorAll('.order-card__watch-price-info');
+            const allWatchPriceInfoWrappers = document.querySelectorAll('.order-card__watch-price-info-wrapper');
+            
+            // wrapper가 있으면 wrapper 단위로, 없으면 개별 요소 단위로 처리
+            if (allWatchPriceInfoWrappers.length > 0) {
+                allWatchPriceInfoWrappers.forEach(function(wrapperEl) {
+                    const infoElements = wrapperEl.querySelectorAll('.order-card__watch-price-info');
+                    infoElements.forEach(function(infoEl) {
+                        infoEl.setAttribute("data-current-price", currentPrice.toString());
+                    });
+                    
+                    // wrapper와 연결된 watch-price-input 찾기
+                    const wrapperId = wrapperEl.querySelector('.order-card__watch-price-info')?.id;
+                    if (wrapperId) {
+                        const baseId = wrapperId.replace(/-current$|-avg$/, '');
+                        let watchPriceInputEl = null;
+                        
+                        if (baseId === 'watch-price-info') {
+                            watchPriceInputEl = document.getElementById('watch-price-input');
+                        } else if (baseId === 'conditional-sell-watch-price-info') {
+                            watchPriceInputEl = document.getElementById('conditional-sell-watch-price-input');
+                        } else {
+                            const inputId = baseId.replace('-info', '-input');
+                            watchPriceInputEl = document.getElementById(inputId);
+                        }
+                        
+                        if (watchPriceInputEl) {
+                            watchPriceInputEl.setAttribute("data-current-price", currentPrice.toString());
+                            updateWatchPriceInfo(watchPriceInputEl, wrapperEl);
+                        }
+                    }
+                });
+            } else {
+                // 기존 구조 (개별 요소)
+                allWatchPriceInfoElements.forEach(function(watchPriceInfoEl) {
+                    const oldPrice = watchPriceInfoEl.getAttribute("data-current-price");
+                    watchPriceInfoEl.setAttribute("data-current-price", currentPrice.toString());
+                    
+                    // 해당 watch-price-info에 연결된 watch-price-input 찾기
+                    const watchPriceInfoId = watchPriceInfoEl.id;
+                    let watchPriceInputEl = null;
+                    
+                    if (watchPriceInfoId === 'watch-price-info') {
+                        watchPriceInputEl = document.getElementById('watch-price-input');
+                    } else if (watchPriceInfoId === 'conditional-sell-watch-price-info') {
+                        watchPriceInputEl = document.getElementById('conditional-sell-watch-price-input');
+                    } else {
+                        const inputId = watchPriceInfoId.replace('-info', '-input');
+                        watchPriceInputEl = document.getElementById(inputId);
+                    }
+                    
+                    if (watchPriceInputEl) {
+                        watchPriceInputEl.setAttribute("data-current-price", currentPrice.toString());
+                        if (oldPrice !== currentPrice.toString()) {
+                            updateWatchPriceInfo(watchPriceInputEl, watchPriceInfoEl);
+                        }
+                    }
+                });
+            }
+            
+            // 가격 변경 로그 (한 번만 출력)
+            if (allWatchPriceInfoElements.length > 0) {
+                const firstElement = allWatchPriceInfoElements[0];
+                const oldPrice = firstElement.getAttribute("data-current-price") || currentPrice.toString();
+                if (oldPrice !== currentPrice.toString()) {
+                    console.log(`[실시간 주가 업데이트] 주가 변경: ${oldPrice} → ${currentPrice}`);
+                }
+            }
+        } catch (error) {
+            console.error("[실시간 주가 업데이트] 오류:", error);
+        }
+    }
+
+    // 실시간 주가 폴링 시작 (5초마다 체크)
+    function startWatchPricePolling() {
+        if (watchPricePollingInterval) {
+            clearInterval(watchPricePollingInterval);
+        }
+        
+        // 초기 로드 시 즉시 업데이트
+        updateWatchPriceCurrentPrice();
+        
+        // 5초마다 업데이트
+        watchPricePollingInterval = setInterval(updateWatchPriceCurrentPrice, 5000);
+    }
+
+    // 실시간 주가 폴링 중지
+    function stopWatchPricePolling() {
+        if (watchPricePollingInterval) {
+            clearInterval(watchPricePollingInterval);
+            watchPricePollingInterval = null;
+        }
+    }
+
+    // 페이지가 보일 때만 폴링 시작
+    document.addEventListener("visibilitychange", function() {
+        const isPageVisible = !document.hidden;
+        const hasWatchPriceInfo = document.querySelector('.order-card__watch-price-info');
+        if (isPageVisible && hasWatchPriceInfo) {
+            startWatchPricePolling();
+        } else {
+            stopWatchPricePolling();
+        }
+    });
+
+    // watch-price-info 요소가 존재할 때만 폴링 시작
+    const hasWatchPriceInfo = document.querySelector('.order-card__watch-price-info');
+    if (hasWatchPriceInfo) {
+        startWatchPricePolling();
+    }
+    
+    // 페이지 언로드 시 폴링 중지
+    window.addEventListener("beforeunload", function() {
+        stopWatchPricePolling();
+    });
 
     /* 대기 주문 취소 버튼 이벤트 */
     function attachCancelButtonListeners() {

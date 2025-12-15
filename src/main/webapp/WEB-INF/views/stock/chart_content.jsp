@@ -85,14 +85,7 @@
                                 <jsp:include page="/WEB-INF/fragments/common/price_color_class.jsp">
                                     <jsp:param name="value" value="${holding.profitRate}"/>
                                 </jsp:include>
-                                <span class="my-stock-card__profit-rate ${priceColorClass}">
-                                    (<c:choose>
-                                        <c:when test="${holding.profitRate > 0}">+</c:when>
-                                        <c:when test="${holding.profitRate < 0}">-</c:when>
-                                    </c:choose>
-                                    <c:set var="absProfitRate" value="${holding.profitRate >= 0 ? holding.profitRate : -holding.profitRate}" />
-                                    <fmt:formatNumber value="${absProfitRate}" pattern="#,##0.00"/>%)
-                                </span>
+                                <span class="my-stock-card__profit-rate ${priceColorClass}">(<c:choose><c:when test="${holding.profitRate > 0}">+</c:when><c:when test="${holding.profitRate < 0}">-</c:when></c:choose><c:set var="absProfitRate" value="${holding.profitRate >= 0 ? holding.profitRate : -holding.profitRate}" /><fmt:formatNumber value="${absProfitRate}" pattern="#,##0.00"/>%)</span>
                             </div>
                         </div>
                         <div class="my-stock-card__row">

@@ -41,13 +41,24 @@
         </div>
     </div>
 </div>
-<div class="order-card__watch-price-info" id="${watchPriceInfoId}"
-     <c:if test="${not empty daily and not empty daily.closePrice}">
-     data-current-price="${daily.closePrice.abs().intValue()}"
-     </c:if>
-     <c:if test="${not empty holding}">
-     data-avg-price="${holding.averagePrice}"
-     </c:if>>
-    현재가 보다 0.00%
+<div class="order-card__watch-price-info-wrapper">
+    <span class="order-card__watch-price-info" id="${watchPriceInfoId}-current"
+         <c:if test="${not empty daily and not empty daily.closePrice}">
+         data-current-price="${daily.closePrice.abs().intValue()}"
+         </c:if>
+         <c:if test="${not empty holding}">
+         data-avg-price="${holding.averagePrice}"
+         </c:if>>
+        현재가 보다 0.00%
+    </span>
+    <span class="order-card__watch-price-info" id="${watchPriceInfoId}-avg"
+         <c:if test="${not empty daily and not empty daily.closePrice}">
+         data-current-price="${daily.closePrice.abs().intValue()}"
+         </c:if>
+         <c:if test="${not empty holding}">
+         data-avg-price="${holding.averagePrice}"
+         </c:if>>
+        <c:if test="${not empty holding}">내 평단 보다 0.00%</c:if>
+    </span>
 </div>
 
