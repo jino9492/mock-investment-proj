@@ -68,6 +68,14 @@ public class StockPriceDailyDTO {
     public BigDecimal getOpenPrice() {
         return openPrice;
     }
+    
+    /**
+     * 화면 표시용: 시가를 음수로 반환
+     * DB에는 양수로 저장되어 있지만, 화면에는 음수로 표시하기 위해 사용
+     */
+    public BigDecimal getOpenPriceForDisplay() {
+        return openPrice != null ? openPrice.negate() : null;
+    }
 
     public void setOpenPrice(BigDecimal openPrice) {
         this.openPrice = openPrice;
@@ -85,6 +93,14 @@ public class StockPriceDailyDTO {
     // low_price
     public BigDecimal getLowPrice() {
         return lowPrice;
+    }
+    
+    /**
+     * 화면 표시용: 저가를 음수로 반환
+     * DB에는 양수로 저장되어 있지만, 화면에는 음수로 표시하기 위해 사용
+     */
+    public BigDecimal getLowPriceForDisplay() {
+        return lowPrice != null ? lowPrice.negate() : null;
     }
 
     public void setLowPrice(BigDecimal lowPrice) {

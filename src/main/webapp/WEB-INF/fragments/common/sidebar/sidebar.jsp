@@ -27,13 +27,14 @@
             <c:choose>
               <c:when test="${not empty holdings && fn:length(holdings) > 0}">
                 <c:forEach var="holding" items="${holdings}" varStatus="status">
-                  <li class="stock-box__container" data-stock-name="${holding.stockName}">
+                  <li class="stock-box__container" data-stock-name="${holding.stockName}" data-stock-code="${holding.stockSymbol}">
                     <div class="stock-box__company-profile"></div>
                     <div class="stock-box__company-wrapper">
                       <div class="stock-box__detail-wrapper">
                         <div class="stock-box__company-name">${holding.stockName}</div>
                         <div class="stock-box__stock-price">
-                          <fmt:formatNumber value="${holding.currentPrice}" pattern="#,###"/>원
+                          <c:set var="absEvaluationAmount" value="${holding.evaluationAmount >= 0 ? holding.evaluationAmount : -holding.evaluationAmount}" />
+                          <fmt:formatNumber value="${absEvaluationAmount}" pattern="#,###"/>원
                         </div>
                       </div>
                       <div class="stock-box__detail-wrapper">
@@ -46,16 +47,10 @@
                             <c:when test="${holding.profitLoss < 0}">stock-box__comparison--negative</c:when>
                             <c:otherwise>stock-box__comparison--neutral</c:otherwise>
                           </c:choose>">
-                          <c:choose>
-                            <c:when test="${holding.profitLoss > 0}">+</c:when>
-                            <c:when test="${holding.profitLoss < 0}">-</c:when>
-                          </c:choose>
+                          <c:if test="${holding.profitLoss > 0}">+</c:if>
                           <c:set var="absProfitLoss" value="${holding.profitLoss >= 0 ? holding.profitLoss : -holding.profitLoss}" />
                           <fmt:formatNumber value="${absProfitLoss}" pattern="#,###"/>원
-                          (<c:choose>
-                            <c:when test="${holding.profitRate > 0}">+</c:when>
-                            <c:when test="${holding.profitRate < 0}">-</c:when>
-                          </c:choose>
+                          (<c:if test="${holding.profitRate > 0}">+</c:if>
                           <c:set var="absProfitRate" value="${holding.profitRate >= 0 ? holding.profitRate : -holding.profitRate}" />
                           <fmt:formatNumber value="${absProfitRate}" pattern="#,##0.00"/>%)
                         </div>
@@ -76,11 +71,50 @@
         </div>
         <div class="sidebar__favorite">
           <div class="sidebar__title">관심</div>
-          <ul>
-            <%@ include file="sidebar_stock_box.jsp" %>
-            <%@ include file="sidebar_stock_box.jsp" %>
-            <%@ include file="sidebar_stock_box.jsp" %>
-            <%@ include file="sidebar_stock_box.jsp" %>
+          <ul id="sidebar-watchlist-list">
+            <c:choose>
+              <c:when test="${not empty watchlistStocks && fn:length(watchlistStocks) > 0}">
+                <c:forEach var="watchlistStock" items="${watchlistStocks}" varStatus="status">
+                  <li class="stock-box__container" data-stock-name="${watchlistStock.stockName}" data-stock-code="${watchlistStock.stockSymbol}" data-stock-id="${watchlistStock.stockId}">
+                    <div class="stock-box__company-profile"></div>
+                    <div class="stock-box__company-wrapper">
+                      <div class="stock-box__detail-wrapper">
+                        <div class="stock-box__company-name">${watchlistStock.stockName}</div>
+                        <div class="stock-box__stock-price">
+                          <c:if test="${not empty watchlistStock.currentPrice}">
+                            <fmt:formatNumber value="${watchlistStock.currentPrice}" pattern="#,###"/>원
+                          </c:if>
+                        </div>
+                      </div>
+                      <div class="stock-box__detail-wrapper">
+                        <div class="stock-box__comparison 
+                          <c:choose>
+                            <c:when test="${not empty watchlistStock.changePrice && watchlistStock.changePrice > 0}">stock-box__comparison--positive</c:when>
+                            <c:when test="${not empty watchlistStock.changePrice && watchlistStock.changePrice < 0}">stock-box__comparison--negative</c:when>
+                            <c:otherwise>stock-box__comparison--neutral</c:otherwise>
+                          </c:choose>">
+                          <c:if test="${not empty watchlistStock.changePrice}">
+                            <c:if test="${watchlistStock.changePrice > 0}">+</c:if>
+                            <fmt:formatNumber value="${watchlistStock.changePrice >= 0 ? watchlistStock.changePrice : -watchlistStock.changePrice}" pattern="#,###"/>원
+                            <c:if test="${not empty watchlistStock.changeRate}">
+                              (<c:if test="${watchlistStock.changeRate > 0}">+</c:if>
+                              <fmt:formatNumber value="${watchlistStock.changeRate >= 0 ? watchlistStock.changeRate : -watchlistStock.changeRate}" pattern="#,##0.00"/>%)
+                            </c:if>
+                          </c:if>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <li class="stock-box__empty">
+                  <div style="text-align: center; padding: 20px; color: #999; font-size: 14px;">
+                    관심종목이 없습니다.
+                  </div>
+                </li>
+              </c:otherwise>
+            </c:choose>
           </ul>
         </div>
       </c:when>
@@ -97,11 +131,11 @@
       <span class="sidebar__arrow-icon"><img src="${pageContext.request.contextPath}/static/assets/toggle.png" alt=""></span>
     </button>
     <button class="sidebar__rail-item sidebar__investment-btn">
-      <span class="sidebar__rail-icon">icon</span>
+      <span class="sidebar__rail-icon"><img src="${pageContext.request.contextPath}/static/assets/graph-up.png" alt=""></span>
       <span>내 투자</span>
     </button>
     <div class="sidebar__rail-item sidebar__favorite-btn">
-      <div class="sidebar__rail-icon">icon</div>
+      <div class="sidebar__rail-icon"><img src="${pageContext.request.contextPath}/static/assets/heart.png" alt=""></div>
       <div>관심</div>
     </div>
   </div>

@@ -68,8 +68,11 @@ export function loadRankingData(limit = 100) {
 }
 
 export function loadRealtimeData(code) {
-    // 💡 단일 파라미터(code)만 사용
-    const url = `/api/socket?code=${code}`;
+    if (!code) {
+        return Promise.reject(new Error("종목 코드가 제공되지 않았습니다."));
+    }
+
+    const url = `/api/price?code=${code}`;
 
     return new Promise((resolve, reject) => {
         fetch(url, {
@@ -79,20 +82,27 @@ export function loadRealtimeData(code) {
             }
         })
             .then(response => {
+                // 1. HTTP 상태 코드 검사
                 if (!response.ok) {
-                    // rankingCode 변수가 이 스코프에 없으므로, 에러 메시지 수정
-                    throw new Error(`HTTP Error! Status: ${response.status} - Could not load realtime data for ${code}`);
+                    if (response.status === 404) {
+                        throw new Error(`[${code}] 종목의 실시간 데이터가 캐시에 존재하지 않습니다. (404 Not Found)`);
+                    }
+                    throw new Error(`HTTP Error: ${response.status} - 실시간 데이터 로드 실패`);
                 }
-                // 서버가 응답 본문을 보내지 않거나 null을 보낼 수 있으므로 안전하게 처리
-                return response.json().catch(() => null);
+
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                }
+
+                return null;
             })
             .then(data => {
-                // data가 null일 경우, 빈 배열을 반환하여 이후 처리 로직의 오류를 방지
-                const realtimeData = data || [];
-
-                // loadRealtimeData는 단일 종목을 요청하므로, 결과는 [종목객체] 형태이거나 종목객체일 수 있음.
-                // 배열이 아니면 배열로 감싸서 반환하여 이후 로직 통일
-                resolve(Array.isArray(realtimeData) ? realtimeData : [realtimeData]);
+                if (data) {
+                    resolve(data);
+                } else {
+                    resolve(null);
+                }
             })
             .catch(error => {
                 console.error(`실시간 데이터 로드 중 오류 발생 (${code}) :`, error.message);

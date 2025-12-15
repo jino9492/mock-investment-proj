@@ -10,7 +10,7 @@
   String menuLinksParam = request.getParameter("menuLinks");
   String showSiteLinkParam = request.getParameter("showSiteLink");
 
-  String currentPath = (String) request.getAttribute("currentPath");
+  String currentPath = (String) request.getAttribute("currentUrlPath");
   request.setAttribute("currentPage", currentPath);
 
   String[] menuItems = null;
