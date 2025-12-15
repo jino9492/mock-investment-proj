@@ -66,6 +66,7 @@ public class HomeController extends HttpServlet {
         request.setAttribute("isLoggedIn", isLoggedIn);
 
         request.getRequestDispatcher(VIEW_PAGE).forward(request, response);
+
     }
     
     private boolean isStaticResource(String requestURI, String contextPath) {
