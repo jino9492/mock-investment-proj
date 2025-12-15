@@ -146,7 +146,7 @@
                                 class="profile-menu__item profile-menu__logout"
                                 onclick="location.href='/login'">
                             <span class="profile-menu__icon">↩</span>
-                            <span class="profile-menu__text">로그아웃</span>
+                            <a href="/logout" class="profile-menu__text">로그아웃</a>
                         </button>
                     </div>
                 </div>
