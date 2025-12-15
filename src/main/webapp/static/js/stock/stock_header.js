@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const socket = await registerToSocket();
         socket.registerDataUpdateCallback((currentResponse)=>{
             if (currentResponse.data && currentResponse.data.length > 0) {
-                const res = currentResponse.data.find(item => item.item === code);
-
+                const res = currentResponse.data.find(item => item.item.replace("_AL", "") === code);
+                console.log(currentResponse)
                 if (res && res.values) {
                     const priceString = res.values["10"];
                     const changePriceString = res.values["11"];

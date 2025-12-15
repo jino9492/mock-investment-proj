@@ -9,7 +9,7 @@
 </head>
 <body class="login__page-wrap">
 <header class="login__header">
-    <div class="login__brand">MOCK</div>
+    <a href="/" class="login__brand">MOCK</a>
     <a class="login__close-button" aria-label="닫기" href="/">✕</a>
 </header>
 

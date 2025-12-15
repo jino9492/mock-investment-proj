@@ -70,6 +70,10 @@ public class RealtimeStockService implements ServletContextListener {
         this.socket = null;
     }
 
+    public boolean isSocketOpen() {
+        return this.socket != null && this.socket.isOpen();
+    }
+
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         disconnectSocket();

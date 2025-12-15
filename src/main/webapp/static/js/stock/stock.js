@@ -45,11 +45,6 @@ document.addEventListener("DOMContentLoaded", function handleStockPageInit() {
         wait: "general"
     };
 
-    // 숫자 포맷팅 헬퍼 함수
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
     // 조건 주문 가격 필드 초기화 함수
     function initializeConditionalOrderPriceFields() {
         const conditionalOrderPriceInput = document.getElementById("conditional-order-price-input");

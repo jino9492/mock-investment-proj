@@ -103,7 +103,7 @@ export function loadChartByUrlCode() {
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                if (context.dataset.type === 'financial') {
+                                if (context.dataset.type === 'candlestick') {
                                     const data = context.raw;
                                     return [
                                         '시가: ' + data.o.toLocaleString() + '원', '최고: ' + data.h.toLocaleString() + '원',

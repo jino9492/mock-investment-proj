@@ -80,16 +80,18 @@ public class StockFinancialIndicatorDAO {
         }
     }
 
-    public StockFinancialIndicatorDTO selectIndicatorByIdAndDate(Long stockId, Date indicatorDate, Connection conn) throws SQLException {
+    public StockFinancialIndicatorDTO selectIndicatorByStockId(Long stockId, Connection conn) throws SQLException {
         final String sql = "SELECT stock_id, indicator_date, per, pbr, roe, eps, bps, created_at, updated_at " +
-                "FROM stock_financial_indicator WHERE stock_id = ? AND indicator_date = ?";
+                "FROM stock_financial_indicator " +
+                "WHERE stock_id = ? " +
+                "ORDER BY indicator_date DESC " +
+                "LIMIT 1";
 
         StockFinancialIndicatorDTO indicator = null;
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setLong(1, stockId);
-            pstmt.setDate(2, indicatorDate);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -97,7 +99,7 @@ public class StockFinancialIndicatorDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("재무 지표 조회 실패 (Stock ID: " + stockId + ", Date: " + indicatorDate + "): " + e.getMessage());
+            System.err.println("최근 재무 지표 조회 실패 (Stock ID: " + stockId + "): " + e.getMessage());
             throw e;
         }
 

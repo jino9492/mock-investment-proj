@@ -34,12 +34,25 @@ function renderStockData(stockData) {
     if (!stockDetailContainer) return;
 
     const titleDiv = stockDetailContainer.querySelector('.main__chart-header strong');
-    const priceDiv = stockDetailContainer.querySelector('.main__chart-header span');
     const infoDivs = stockDetailContainer.querySelectorAll('.main__chart-info-label+span');
     const innerTitleDiv = infoDivs[0];
     const mcapDiv = infoDivs[1];
     const listingDateDiv = infoDivs[2];
     const faceDiv = infoDivs[3];
+
+    rerenderPrice();
+
+    titleDiv.innerHTML = stockData.companyName;
+    innerTitleDiv.innerHTML = stockData.companyName;
+    mcapDiv.innerHTML = stockData.marketCap;
+    listingDateDiv.innerHTML = stockData.listingDate;
+    faceDiv.innerHTML = stockData.faceValue;
+
+    console.log(`UI 갱신 완료: ${stockData.companyName}`);
+}
+
+export function rerenderPrice(){
+    const priceDiv = stockDetailContainer.querySelector('.main__chart-header span');
 
     const selectedStock = document.querySelector('.is-active-hover');
 
@@ -51,14 +64,6 @@ function renderStockData(stockData) {
             <span class=${getPriceColorClass((parseFloat(change.replace('+', ''))))}>(${change})</span>
         `
     }
-
-    titleDiv.innerHTML = stockData.companyName;
-    innerTitleDiv.innerHTML = stockData.companyName;
-    mcapDiv.innerHTML = stockData.marketCap;
-    listingDateDiv.innerHTML = stockData.listingDate;
-    faceDiv.innerHTML = stockData.faceValue;
-
-    console.log(`UI 갱신 완료: ${stockData.companyName}`);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
